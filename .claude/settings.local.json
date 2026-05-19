@@ -34,7 +34,10 @@
       "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonHealthService.cs\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Security\" -Filter \"*.cs\" -Recurse)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(dotnet list *)",
+      "Bash(dotnet package *)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

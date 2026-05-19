@@ -13,7 +13,7 @@ namespace CareGuide.Security.Services
     {
         private readonly string _secretKey;
         private readonly string _issuer;
-        private readonly string _audience;
+        private readonly string? _audience;
 
         public JwtService(IOptions<SecuritySettingsDto> settings)
         {
@@ -24,10 +24,10 @@ namespace CareGuide.Security.Services
             _audience = securitySettings.Audience;
         }
 
-        public string GenerateToken(Guid userId, Guid? personId, string email)
+        public string GenerateToken(Guid userId, Guid? personId)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: _issuer,
@@ -36,7 +36,6 @@ namespace CareGuide.Security.Services
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
                     new Claim("personId", personId?.ToString() ?? string.Empty),
-                    new Claim(JwtRegisteredClaimNames.Email, email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 },
                 expires: DateTime.UtcNow.AddMinutes(15),
@@ -65,7 +64,7 @@ namespace CareGuide.Security.Services
                     ClockSkew = TimeSpan.Zero,
                 }, out SecurityToken validatedToken);
 
-                return new JwtSecurityTokenHandler().ReadJwtToken(token);
+                return (JwtSecurityToken)validatedToken;
             }
             catch
             {

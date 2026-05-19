@@ -1,0 +1,8 @@
+<Project>
+  <!-- Force patched version of System.Security.Cryptography.Xml across all projects.
+       Resolves CVE GHSA-37gx-xxp4-5rgx and GHSA-w3x6-4m5h-cxqf (transitive via Identity/JWT packages).
+       Excluded from CareGuide.API — it inherits the patched version transitively through project references. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'CareGuide.API'">
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.8" />
+  </ItemGroup>
+</Project>

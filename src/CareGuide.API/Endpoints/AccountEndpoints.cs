@@ -1,4 +1,5 @@
-﻿using CareGuide.API.Endpoints.Shared;
+using CareGuide.API.Endpoints.Shared;
+using CareGuide.API.Extensions;
 using CareGuide.API.Helpers;
 using CareGuide.API.Middlewares;
 using CareGuide.Core.Interfaces;
@@ -18,6 +19,7 @@ public class AccountEndpoints() : IEndpoint
 
         group.MapPost("/", Create)
              .AllowAnonymous()
+             .RequireRateLimiting(RateLimitingExtension.AuthPolicy)
              .WithMetadata(new IgnoreSessionMiddleware())
              .WithSummary("Create Account")
              .WithDescription("Creates a new account by creating a Person for personal information and a User for account credentials.")
@@ -28,6 +30,7 @@ public class AccountEndpoints() : IEndpoint
 
         group.MapPost("/login", Login)
              .AllowAnonymous()
+             .RequireRateLimiting(RateLimitingExtension.AuthPolicy)
              .WithMetadata(new IgnoreSessionMiddleware())
              .WithSummary("Login")
              .WithDescription("Authenticates a user and returns a JWT token and a refresh token.")
@@ -43,6 +46,7 @@ public class AccountEndpoints() : IEndpoint
 
         group.MapPost("/refresh", Refresh)
              .AllowAnonymous()
+             .RequireRateLimiting(RateLimitingExtension.AuthPolicy)
              .WithMetadata(new IgnoreSessionMiddleware())
              .WithSummary("Refresh Token")
              .WithDescription("Refreshes JWT access token using a valid refresh token.")
