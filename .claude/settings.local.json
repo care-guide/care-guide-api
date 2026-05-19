@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(sln|md|json|yml|yaml\\)$\")",
+      "Bash(Remove-Item \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Tests\\\\Base.cs\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Tests\\\\Program.cs\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Tests\\\\appsettings.json\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Tests\\\\Context\" -Recurse -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Tests\\\\Tests\" -Recurse -Force)",
+      "Bash(rm -f \"/mnt/c/Users/amanda.maschio/Documents/PersonalRepos/care-guide-api/src/CareGuide.Tests/Base.cs\")",
+      "Bash(rm -f \"/mnt/c/Users/amanda.maschio/Documents/PersonalRepos/care-guide-api/src/CareGuide.Tests/Program.cs\")",
+      "Bash(rm -f \"/mnt/c/Users/amanda.maschio/Documents/PersonalRepos/care-guide-api/src/CareGuide.Tests/appsettings.json\")",
+      "Bash(rm -rf \"/mnt/c/Users/amanda.maschio/Documents/PersonalRepos/care-guide-api/src/CareGuide.Tests/Context\")",
+      "Bash(rm -rf \"/mnt/c/Users/amanda.maschio/Documents/PersonalRepos/care-guide-api/src/CareGuide.Tests/Tests\")",
+      "Read(//mnt/c/Users/amanda.maschio/Documents/PersonalRepos/**)",
+      "Bash(dotnet build *)",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home2\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home3\")",
+      "Bash(dotnet test *)",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home4\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home5\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home6\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home7\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home8\")",
+      "Bash(xargs grep -l \"AutoMapper\\\\|MapperConfiguration\\\\|AddAutoMapper\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home9\")",
+      "Bash(export DOTNET_CLI_HOME=\"/tmp/dotnet_home10\")",
+      "Bash(for f *)",
+      "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\DoctorPhoneService.cs\")",
+      "Bash(Write-Host \"===\")",
+      "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonDiseaseService.cs\")",
+      "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonFamilyHistoryService.cs\")",
+      "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonHealthService.cs\")"
+    ]
+  }
+}

@@ -35,6 +35,10 @@ Para um passo a passo de como executar a aplicação, acesse a seguinte [documen
 
 Para saber como criar e executar migrations no projeto, consulte a seguinte [documentação](docs/MIGRATIONS.md).
 
+## Testes
+
+Para informações sobre a estrutura de testes unitários e como executá-los, acesse a seguinte [documentação](docs/TESTS.md).
+
 ## Documentação da API (OpenAPI + Scalar)
 
 A API é documentada utilizando o padrão **OpenAPI** e a interface interativa do **Scalar**.
