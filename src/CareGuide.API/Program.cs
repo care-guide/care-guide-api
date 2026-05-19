@@ -7,6 +7,7 @@ using CareGuide.Models;
 using CareGuide.Models.Constants;
 using CareGuide.Security;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
@@ -95,6 +96,11 @@ else
     app.UseHttpsRedirection();
 }
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 
@@ -110,6 +116,7 @@ app.UseRateLimiter();
 
 app.MapGroup(ApiConstants.API_PREFIX)
    .RequireAuthorization()
+   .RequireRateLimiting(RateLimitingExtension.GeneralPolicy)
    .MapGroup(ApiConstants.API_VERSION)
    .AddEndpointFilterFactory(ValidationFilterFactory.Create)
    .MapAllEndpoints();

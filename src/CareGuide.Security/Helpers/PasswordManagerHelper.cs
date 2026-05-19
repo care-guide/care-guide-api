@@ -16,7 +16,8 @@ namespace CareGuide.Security.Helpers
         public static bool ValidatePassword(string password, string hash)
         {
             var result = hasher.VerifyHashedPassword(HashScope, hash, password);
-            return result == PasswordVerificationResult.Success;
+            return result is PasswordVerificationResult.Success
+                         or PasswordVerificationResult.SuccessRehashNeeded;
         }
 
         public static (bool IsSecure, string Feedback) CheckPassword(string password)

@@ -53,7 +53,7 @@ public class AccountServiceTests
         _mapper.Map<CreateUserDto>(createDto).Returns(new CreateUserDto(Guid.NewGuid(), DefaultPersonDto.Id, "new@test.com", "Str0ng@Pass!"));
         _personService.CreateAsync(Arg.Any<CreatePersonDto>(), Arg.Any<CancellationToken>()).Returns(DefaultPersonDto);
         _userService.CreateAsync(DefaultPersonDto, Arg.Any<CreateUserDto>(), Arg.Any<CancellationToken>()).Returns(DefaultUserDto);
-        _jwtService.GenerateToken(DefaultUserDto.Id, DefaultPersonDto.Id, DefaultUserDto.Email).Returns("access-token");
+        _jwtService.GenerateToken(DefaultUserDto.Id, DefaultPersonDto.Id).Returns("access-token");
         _refreshTokenService.CreateAsync(DefaultUserDto.Id, Arg.Any<CancellationToken>()).Returns(refreshToken);
 
         var result = await _sut.CreateAccountAsync(createDto, CancellationToken.None);
@@ -130,7 +130,7 @@ public class AccountServiceTests
         var refreshToken = new RefreshToken { UserId = user.Id, Token = "refresh-token" };
 
         _userRepository.GetByEmailAsync(loginDto.Email, Arg.Any<CancellationToken>()).Returns(user);
-        _jwtService.GenerateToken(user.Id, user.PersonId, loginDto.Email).Returns("access-token");
+        _jwtService.GenerateToken(user.Id, user.PersonId).Returns("access-token");
         _refreshTokenService.CreateAsync(user.Id, Arg.Any<CancellationToken>()).Returns(refreshToken);
         _userService.GetByIdDtoAsync(user.Id, Arg.Any<CancellationToken>()).Returns(DefaultUserDto);
         _personService.GetAsync(user.PersonId!.Value, Arg.Any<CancellationToken>()).Returns(DefaultPersonDto);
