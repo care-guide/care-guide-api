@@ -22,7 +22,7 @@ namespace CareGuide.Core.Services
             {
                 UserId = userId,
                 Token = _jwtService.GenerateRefreshToken(),
-                ExpiresAt = DateTime.UtcNow.AddDays(1),
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
                 Revoked = false,
                 CreatedAt = DateTime.UtcNow
             };
@@ -40,7 +40,7 @@ namespace CareGuide.Core.Services
         {
             var storedToken = await _refreshTokenRepository.GetByTokenAsync(userId, oldToken, cancellationToken);
 
-            if (storedToken == null || storedToken.ExpiresAt < DateTime.UtcNow || storedToken.Revoked)
+            if (storedToken == null || storedToken.ExpiresAt <= DateTime.UtcNow || storedToken.Revoked)
                 throw new UnauthorizedAccessException("Invalid or expired refresh token.");
 
             storedToken.Revoked = true;

@@ -61,7 +61,8 @@ namespace CareGuide.Security.Services
                     ValidIssuer = _issuer,
                     ValidateAudience = !string.IsNullOrWhiteSpace(_audience),
                     ValidAudience = _audience,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
                 }, out SecurityToken validatedToken);
 
                 return new JwtSecurityTokenHandler().ReadJwtToken(token);

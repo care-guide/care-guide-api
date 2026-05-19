@@ -12,30 +12,17 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsProduction())
+var corsOrigins = builder.Configuration.GetSection("CorsOrigins").Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
 {
-    builder.Services.AddCors(options =>
+    options.AddPolicy("CorsPolicy", policy =>
     {
-        options.AddPolicy("CorsPolicy", policy =>
-        {
-            policy.WithOrigins("https://careguide.dev")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+        policy.WithOrigins(corsOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
-}
-else
-{
-    builder.Services.AddCors(options =>
-    {
-        options.AddPolicy("CorsPolicy", policy =>
-        {
-            policy.WithOrigins("http://localhost:8080")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-    });
-}
+});
 
 builder.Services
     .AddInfrastructure(builder.Configuration)
@@ -108,8 +95,8 @@ else
     app.UseHttpsRedirection();
 }
 
-app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 
 app.UseCors("CorsPolicy");
 

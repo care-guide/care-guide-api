@@ -31,7 +31,7 @@ namespace CareGuide.Core.Services
             var entity = await _phoneRepository.GetAsync(id, cancellationToken);
 
             if (entity == null)
-                throw new KeyNotFoundException($"No person annotation found with the ID {id}.");
+                throw new KeyNotFoundException($"No phone found with the ID {id}.");
 
             return _mapper.Map<PhoneDto>(entity);
         }

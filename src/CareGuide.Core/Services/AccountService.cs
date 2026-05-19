@@ -82,7 +82,7 @@ namespace CareGuide.Core.Services
 
             var personDto = user.PersonId.HasValue
                 ? await _personService.GetAsync(user.PersonId.Value, cancellationToken)
-                : throw new InvalidOperationException("PersonId não está definido para o usuário.");
+                : throw new InvalidOperationException("User account is missing a person profile.");
 
             return new AccountDto(
                 userDto.Id,

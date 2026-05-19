@@ -13,7 +13,7 @@ namespace CareGuide.Models.Validators.PersonDisease
                 .MaximumLength(DatabaseConstants.MaxLengthStandardText).WithMessage($"Name must not exceed {DatabaseConstants.MaxLengthStandardText} characters.");
 
             RuleFor(x => x.DiagnosisDate)
-                .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Now))
+                .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow))
                 .When(x => x.DiagnosisDate.HasValue)
                 .WithMessage("DiagnosisDate cannot be in the future.");
 

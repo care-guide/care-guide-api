@@ -2,7 +2,7 @@
 {
     public class AuthCookieHelper
     {
-        public static void AppendRefreshToken(HttpResponse response, string refreshToken, int days = 1)
+        public static void AppendRefreshToken(HttpResponse response, string refreshToken, int days = 7)
         {
             var cookieOptions = new CookieOptions
             {

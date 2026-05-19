@@ -26,7 +26,7 @@ namespace CareGuide.Models.Validators.Account
 
             RuleFor(x => x.Birthday)
                 .NotEmpty().WithMessage("Birthday is required.")
-                .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Now))
+                .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow))
                 .WithMessage("Birthday cannot be in the future.");
         }
     }
