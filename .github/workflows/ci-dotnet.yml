@@ -37,6 +37,9 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
+      - name: Run unit tests
+        run: dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --configuration Release --no-build --verbosity normal
+
       - name: Validate Dockerfile (build image)
         run: docker build -t careguide_api:ci -f Dockerfile .
 
