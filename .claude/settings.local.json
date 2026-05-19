@@ -31,7 +31,10 @@
       "Bash(Write-Host \"===\")",
       "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonDiseaseService.cs\")",
       "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonFamilyHistoryService.cs\")",
-      "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonHealthService.cs\")"
+      "Bash(Get-Content \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Core\\\\Services\\\\PersonHealthService.cs\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\amanda.maschio\\\\Documents\\\\PersonalRepos\\\\care-guide-api\\\\src\\\\CareGuide.Security\" -Filter \"*.cs\" -Recurse)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(git mv *)"
     ]
   }
 }

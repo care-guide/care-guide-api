@@ -115,7 +115,13 @@ public class AccountEndpoints() : IEndpoint
 
     private static async Task<IResult> Refresh(RefreshTokenDto refreshRequest, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
     {
-        var accountDto = await accountService.RefreshTokenAsync(refreshRequest, cancellationToken);
+        var cookieToken = httpContext.Request.Cookies["refreshToken"];
+
+        if (string.IsNullOrWhiteSpace(cookieToken))
+            return Results.Unauthorized();
+
+        var safeRequest = refreshRequest with { RefreshToken = cookieToken };
+        var accountDto = await accountService.RefreshTokenAsync(safeRequest, cancellationToken);
 
         AuthCookieHelper.AppendRefreshToken(httpContext.Response, accountDto.RefreshToken);
         AuthCookieHelper.AppendSessionToken(httpContext.Response, accountDto.SessionToken);

@@ -15,8 +15,8 @@ namespace CareGuide.Infra.Repositories.Shared
 
         public virtual async Task<List<TEntity>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 10;
+            if (page < 1) throw new ArgumentException("Page must be greater than or equal to 1.", nameof(page));
+            if (pageSize < 1) throw new ArgumentException("PageSize must be greater than or equal to 1.", nameof(pageSize));
 
             return await context.Set<TEntity>()
                 .Skip((page - 1) * pageSize)
@@ -31,8 +31,8 @@ namespace CareGuide.Infra.Repositories.Shared
 
         public virtual async Task<List<TEntity>> GetManyAsync(IEnumerable<Guid> ids, int page, int pageSize, CancellationToken cancellationToken = default)
         {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 10;
+            if (page < 1) throw new ArgumentException("Page must be greater than or equal to 1.", nameof(page));
+            if (pageSize < 1) throw new ArgumentException("PageSize must be greater than or equal to 1.", nameof(pageSize));
 
             return await context.Set<TEntity>()
                 .Where(e => ids.Contains(e.Id))
