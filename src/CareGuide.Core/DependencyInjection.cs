@@ -23,6 +23,7 @@ namespace CareGuide.Core
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IEventAppointmentService, EventAppointmentService>();
+            services.AddScoped<IEventSurgeryService, EventSurgeryService>();
             services.AddScoped<IFileAssetService, FileAssetService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IDoctorAddressService, DoctorAddressService>();

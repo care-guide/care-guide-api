@@ -326,6 +326,44 @@ namespace CareGuide.Infra.Migrations
                     b.ToTable("event_appointments", (string)null);
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.EventSurgery", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("event_id");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique();
+
+                    b.ToTable("event_surgeries", (string)null);
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.FileAsset", b =>
                 {
                     b.Property<Guid>("Id")
@@ -864,6 +902,18 @@ namespace CareGuide.Infra.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_event_appointment_event");
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("CareGuide.Models.Entities.EventSurgery", b =>
+                {
+                    b.HasOne("CareGuide.Models.Entities.Event", "Event")
+                        .WithOne()
+                        .HasForeignKey("CareGuide.Models.Entities.EventSurgery", "EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_surgery_event");
 
                     b.Navigation("Event");
                 });
