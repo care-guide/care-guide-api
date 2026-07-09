@@ -16,5 +16,6 @@ namespace CareGuide.Models.Entities
         public string? Details { get; set; }
 
         public Person Person { get; set; } = null!;
+        public ICollection<EventFile> EventFiles { get; set; } = new List<EventFile>();
     }
 }

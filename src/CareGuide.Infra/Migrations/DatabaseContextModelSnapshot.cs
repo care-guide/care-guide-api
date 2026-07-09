@@ -364,6 +364,23 @@ namespace CareGuide.Infra.Migrations
                     b.ToTable("event_exams", (string)null);
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.EventFile", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("event_id");
+
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("file_id");
+
+                    b.HasKey("EventId", "FileId");
+
+                    b.HasIndex("FileId");
+
+                    b.ToTable("event_files", (string)null);
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.EventMedicine", b =>
                 {
                     b.Property<Guid>("Id")
@@ -999,6 +1016,27 @@ namespace CareGuide.Infra.Migrations
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.EventFile", b =>
+                {
+                    b.HasOne("CareGuide.Models.Entities.Event", "Event")
+                        .WithMany("EventFiles")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_file_event");
+
+                    b.HasOne("CareGuide.Models.Entities.FileAsset", "File")
+                        .WithMany("EventFiles")
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_file_file");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("File");
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.EventMedicine", b =>
                 {
                     b.HasOne("CareGuide.Models.Entities.Event", "Event")
@@ -1126,6 +1164,16 @@ namespace CareGuide.Infra.Migrations
                     b.Navigation("DoctorPhones");
 
                     b.Navigation("DoctorSpecialties");
+                });
+
+            modelBuilder.Entity("CareGuide.Models.Entities.Event", b =>
+                {
+                    b.Navigation("EventFiles");
+                });
+
+            modelBuilder.Entity("CareGuide.Models.Entities.FileAsset", b =>
+                {
+                    b.Navigation("EventFiles");
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.Person", b =>
