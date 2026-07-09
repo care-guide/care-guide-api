@@ -52,6 +52,7 @@ namespace CareGuide.Infra
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IEventAppointmentRepository, EventAppointmentRepository>();
             services.AddScoped<IEventSurgeryRepository, EventSurgeryRepository>();
+            services.AddScoped<IEventMedicineRepository, EventMedicineRepository>();
             services.AddScoped<IFileAssetRepository, FileAssetRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IDoctorAddressRepository, DoctorAddressRepository>();
