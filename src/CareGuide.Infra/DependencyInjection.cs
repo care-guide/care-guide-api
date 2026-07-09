@@ -50,6 +50,7 @@ namespace CareGuide.Infra
             services.AddScoped<IDoctorSpecialtyRepository, DoctorSpecialtyRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IEventRepository, EventRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
         }
     }
 }

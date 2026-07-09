@@ -1,4 +1,5 @@
-﻿using CareGuide.Models.Mappers.Doctor;
+﻿using CareGuide.Models.Mappers.Address;
+using CareGuide.Models.Mappers.Doctor;
 using CareGuide.Models.Mappers.DoctorPhone;
 using CareGuide.Models.Mappers.DoctorSpecialty;
 using CareGuide.Models.Mappers.Event;
@@ -35,6 +36,7 @@ namespace CareGuide.Models
                 cfg.AddProfile<DoctorSpecialtyProfileMapper>();
                 cfg.AddProfile<PersonFamilyHistoryProfileMapper>();
                 cfg.AddProfile<EventProfileMapper>();
+                cfg.AddProfile<AddressProfileMapper>();
             });
 
             return services;
