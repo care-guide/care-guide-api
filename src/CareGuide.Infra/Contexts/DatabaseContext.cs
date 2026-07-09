@@ -31,6 +31,7 @@ namespace CareGuide.Infra.Contexts
         public DbSet<EventAppointment> EventAppointments { get; set; } = null!;
         public DbSet<EventSurgery> EventSurgeries { get; set; } = null!;
         public DbSet<EventMedicine> EventMedicines { get; set; } = null!;
+        public DbSet<EventExam> EventExams { get; set; } = null!;
         public DbSet<FileAsset> FileAssets { get; set; } = null!;
         public DbSet<Address> Addresses { get; set; } = null!;
         public DbSet<DoctorAddress> DoctorAddresses { get; set; } = null!;
@@ -53,6 +54,7 @@ namespace CareGuide.Infra.Contexts
             modelBuilder.ApplyConfiguration(new EventAppointmentMapping());
             modelBuilder.ApplyConfiguration(new EventSurgeryMapping());
             modelBuilder.ApplyConfiguration(new EventMedicineMapping());
+            modelBuilder.ApplyConfiguration(new EventExamMapping());
             modelBuilder.ApplyConfiguration(new FileAssetMapping());
             modelBuilder.ApplyConfiguration(new AddressMapping());
             modelBuilder.ApplyConfiguration(new DoctorAddressMapping());
