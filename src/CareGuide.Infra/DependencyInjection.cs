@@ -51,6 +51,7 @@ namespace CareGuide.Infra
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IEventRepository, EventRepository>();
             services.AddScoped<IFileAssetRepository, FileAssetRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
         }
     }
 }

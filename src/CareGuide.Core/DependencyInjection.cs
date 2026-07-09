@@ -23,6 +23,7 @@ namespace CareGuide.Core
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IFileAssetService, FileAssetService>();
+            services.AddScoped<IAddressService, AddressService>();
 
             return services;
         }

@@ -29,6 +29,7 @@ namespace CareGuide.Infra.Contexts
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<Event> Events { get; set; } = null!;
         public DbSet<FileAsset> FileAssets { get; set; } = null!;
+        public DbSet<Address> Addresses { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +47,7 @@ namespace CareGuide.Infra.Contexts
             modelBuilder.ApplyConfiguration(new RefreshTokenMapping());
             modelBuilder.ApplyConfiguration(new EventMapping());
             modelBuilder.ApplyConfiguration(new FileAssetMapping());
+            modelBuilder.ApplyConfiguration(new AddressMapping());
 
             base.OnModelCreating(modelBuilder);
         }
