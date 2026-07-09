@@ -24,7 +24,7 @@ namespace CareGuide.Security.Services
             _audience = securitySettings.Audience;
         }
 
-        public string GenerateToken(Guid userId, Guid? personId)
+        public string GenerateToken(Guid userId, Guid? personId, bool isAdmin)
         {
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
@@ -36,6 +36,7 @@ namespace CareGuide.Security.Services
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
                     new Claim("personId", personId?.ToString() ?? string.Empty),
+                    new Claim("role", isAdmin ? "Admin" : "User"),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 },
                 expires: DateTime.UtcNow.AddMinutes(15),

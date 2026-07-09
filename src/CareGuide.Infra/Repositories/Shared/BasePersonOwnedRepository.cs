@@ -1,23 +1,23 @@
 ﻿using CareGuide.Infra.Interfaces.Shared;
 using CareGuide.Models.Entities.Shared;
-using CareGuide.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace CareGuide.Infra.Repositories.Shared
 {
     public class BasePersonOwnedRepository<TEntity> : BaseRepository<TEntity>, IBasePersonOwnedRepository<TEntity> where TEntity : Entity, IPersonOwnedEntity
     {
-        private readonly Guid _personId;
+        private readonly IQueryScope _queryScope;
 
-        public BasePersonOwnedRepository(DbContext context, IUserSessionContext userSessionContext) : base(context)
+        public BasePersonOwnedRepository(DbContext context, IQueryScope queryScope) : base(context)
         {
-            _personId = userSessionContext.PersonId;
+            _queryScope = queryScope;
         }
+
+        protected IQueryable<TEntity> Scoped => _queryScope.Apply(context.Set<TEntity>());
 
         public async Task<List<TEntity>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         {
-            return await context.Set<TEntity>()
-                .Where(e => e.PersonId == _personId)
+            return await Scoped
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
@@ -25,20 +25,17 @@ namespace CareGuide.Infra.Repositories.Shared
 
         public async Task<TEntity?> GetFirstByPersonAsync(CancellationToken cancellationToken = default)
         {
-            return await context.Set<TEntity>()
-                .Where(e => e.PersonId == _personId)
-                .FirstOrDefaultAsync(cancellationToken);
+            return await Scoped.FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<int> DeleteAllByPersonAsync(CancellationToken cancellationToken = default)
         {
-            var set = context.Set<TEntity>();
-            var entities = await set.Where(e => e.PersonId == _personId).ToListAsync(cancellationToken);
+            var entities = await Scoped.ToListAsync(cancellationToken);
 
             if (entities.Count == 0)
                 return 0;
 
-            set.RemoveRange(entities);
+            context.Set<TEntity>().RemoveRange(entities);
             return await context.SaveChangesAsync(cancellationToken);
         }
     }
