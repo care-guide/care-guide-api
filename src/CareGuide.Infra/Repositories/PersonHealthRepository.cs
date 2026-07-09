@@ -1,8 +1,8 @@
 ﻿using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Infra.Interfaces.Shared;
 using CareGuide.Infra.Repositories.Shared;
 using CareGuide.Models.Entities;
-using CareGuide.Security.Interfaces;
 
 namespace CareGuide.Infra.Repositories
 {
@@ -10,7 +10,7 @@ namespace CareGuide.Infra.Repositories
     {
         private readonly DatabaseContext _context;
 
-        public PersonHealthRepository(DatabaseContext context, IUserSessionContext userSessionContext) : base(context, userSessionContext)
+        public PersonHealthRepository(DatabaseContext context, IQueryScope queryScope) : base(context, queryScope)
         {
             _context = context;
         }

@@ -6,6 +6,7 @@ using CareGuide.Models.DTOs.Account;
 using CareGuide.Models.DTOs.Person;
 using CareGuide.Models.DTOs.User;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 using CareGuide.Security.Helpers;
 using CareGuide.Security.Interfaces;
 
@@ -46,7 +47,7 @@ namespace CareGuide.Core.Services
 
                 UserDto user = await _userService.CreateAsync(person, createUserDtoWithPerson, cancellationToken);
 
-                var accessToken = _jwtService.GenerateToken(user.Id, person.Id);
+                var accessToken = _jwtService.GenerateToken(user.Id, person.Id, isAdmin: false);
                 var refreshToken = await _refreshTokenService.CreateAsync(user.Id, cancellationToken);
 
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
@@ -75,7 +76,7 @@ namespace CareGuide.Core.Services
             if (user == null || !PasswordManagerHelper.ValidatePassword(loginAccount.Password, user.Password))
                 throw new InvalidOperationException("Wrong password or email");
 
-            var accessToken = _jwtService.GenerateToken(user.Id, user.PersonId);
+            var accessToken = _jwtService.GenerateToken(user.Id, user.PersonId, user.Role == UserRole.Admin);
             var refreshToken = await _refreshTokenService.CreateAsync(user.Id, cancellationToken);
 
             var userDto = await _userService.GetByIdDtoAsync(user.Id, cancellationToken);
@@ -108,7 +109,7 @@ namespace CareGuide.Core.Services
                 throw new UnauthorizedAccessException("Invalid email.");
 
             var newRefresh = await _refreshTokenService.RotateAsync(user.Id, refreshTokenDto.RefreshToken, cancellationToken);
-            string newAccessToken = _jwtService.GenerateToken(user.Id, user.PersonId);
+            string newAccessToken = _jwtService.GenerateToken(user.Id, user.PersonId, user.Role == UserRole.Admin);
 
             var userDto = await _userService.GetByIdDtoAsync(user.Id, cancellationToken);
             var personDto = await _personService.GetAsync(user.PersonId!.Value, cancellationToken);

@@ -4,5 +4,6 @@
     {
         Guid UserId { get; }
         Guid PersonId { get; }
+        bool IsAdmin { get; }
     }
 }

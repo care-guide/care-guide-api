@@ -1,6 +1,8 @@
 ﻿using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Infra.Interfaces.Shared;
 using CareGuide.Infra.Repositories;
+using CareGuide.Infra.Repositories.Shared;
 using CareGuide.Infra.TransactionManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +15,7 @@ namespace CareGuide.Infra
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IEfTransactionUnitOfWork, EfTransactionUnitOfWork>();
+            services.AddScoped<IQueryScope, PersonQueryScope>();
 
             services.AddDbContext<DatabaseContext>(opt =>
             {

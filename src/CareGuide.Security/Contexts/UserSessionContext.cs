@@ -8,6 +8,7 @@ namespace CareGuide.Security.Contexts
     {
         public Guid UserId { get; private set; }
         public Guid PersonId { get; private set; }
+        public bool IsAdmin { get; private set; }
 
         public UserSessionContext(IHttpContextAccessor httpContextAccessor)
         {
@@ -18,6 +19,7 @@ namespace CareGuide.Security.Contexts
 
             UserId = GetGuidClaim(user.Claims, "sub");
             PersonId = GetGuidClaim(user.Claims, "personId");
+            IsAdmin = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value == "Admin";
         }
 
         private static Guid GetGuidClaim(IEnumerable<Claim> claims, string type)

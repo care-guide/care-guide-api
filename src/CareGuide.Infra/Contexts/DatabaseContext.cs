@@ -3,7 +3,6 @@ using CareGuide.Models.Entities;
 using CareGuide.Models.Entities.Shared;
 using CareGuide.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace CareGuide.Infra.Contexts
 {
@@ -44,24 +43,6 @@ namespace CareGuide.Infra.Contexts
             modelBuilder.ApplyConfiguration(new DoctorSpecialtyMapping());
             modelBuilder.ApplyConfiguration(new RefreshTokenMapping());
 
-            if (_userSessionContext != null && _userSessionContext.PersonId != Guid.Empty)
-            {
-                var personId = _userSessionContext.PersonId;
-
-                foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-                {
-                    if (typeof(IPersonOwnedEntity).IsAssignableFrom(entityType.ClrType))
-                    {
-                        var parameter = Expression.Parameter(entityType.ClrType, "e");
-                        var property = Expression.Property(parameter, nameof(IPersonOwnedEntity.PersonId));
-                        var body = Expression.OrElse(Expression.Equal(property, Expression.Constant(null, typeof(Guid?))), Expression.Equal(property, Expression.Constant((Guid?)personId, typeof(Guid?))));
-                        var lambda = Expression.Lambda(body, parameter);
-
-                        modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
-                    }
-                }
-            }
-
             base.OnModelCreating(modelBuilder);
         }
 
@@ -81,7 +62,7 @@ namespace CareGuide.Infra.Contexts
 
         private void ApplyPersonIdRules()
         {
-            if (_userSessionContext == null || _userSessionContext.PersonId == Guid.Empty)
+            if (_userSessionContext == null || _userSessionContext.IsAdmin || _userSessionContext.PersonId == Guid.Empty)
                 return;
 
             var personId = _userSessionContext.PersonId;

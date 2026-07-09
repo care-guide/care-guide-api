@@ -1,5 +1,6 @@
 ﻿using CareGuide.Models.Constants;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,6 +18,7 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.PersonId).IsRequired().HasColumnName("person_id");
             builder.Property(x => x.Email).IsRequired().HasMaxLength(DatabaseConstants.MaxLengthStandardText).HasColumnName("email");
             builder.Property(x => x.Password).IsRequired().HasMaxLength(DatabaseConstants.MaxLengthStandardText).HasColumnName("password");
+            builder.Property(x => x.Role).IsRequired().HasDefaultValue(UserRole.User).HasColumnName("role");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
