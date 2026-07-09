@@ -27,6 +27,7 @@ namespace CareGuide.Infra.Contexts
         public DbSet<DoctorPhone> DoctorPhones { get; set; } = null!;
         public DbSet<DoctorSpecialty> DoctorSpecialties { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<Event> Events { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +43,7 @@ namespace CareGuide.Infra.Contexts
             modelBuilder.ApplyConfiguration(new DoctorPhoneMapping());
             modelBuilder.ApplyConfiguration(new DoctorSpecialtyMapping());
             modelBuilder.ApplyConfiguration(new RefreshTokenMapping());
+            modelBuilder.ApplyConfiguration(new EventMapping());
 
             base.OnModelCreating(modelBuilder);
         }

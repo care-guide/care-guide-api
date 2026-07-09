@@ -49,6 +49,7 @@ namespace CareGuide.Infra
             services.AddScoped<IDoctorPhoneRepository, DoctorPhoneRepository>();
             services.AddScoped<IDoctorSpecialtyRepository, DoctorSpecialtyRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddScoped<IEventRepository, EventRepository>();
         }
     }
 }
