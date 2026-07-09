@@ -283,6 +283,49 @@ namespace CareGuide.Infra.Migrations
                     b.ToTable("events", (string)null);
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.EventAppointment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Doctor")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("doctor");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("event_id");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique();
+
+                    b.ToTable("event_appointments", (string)null);
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.FileAsset", b =>
                 {
                     b.Property<Guid>("Id")
@@ -811,6 +854,18 @@ namespace CareGuide.Infra.Migrations
                         .HasConstraintName("fk_event_person");
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("CareGuide.Models.Entities.EventAppointment", b =>
+                {
+                    b.HasOne("CareGuide.Models.Entities.Event", "Event")
+                        .WithOne()
+                        .HasForeignKey("CareGuide.Models.Entities.EventAppointment", "EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_appointment_event");
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.PersonAnnotation", b =>
