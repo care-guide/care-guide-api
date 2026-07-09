@@ -283,6 +283,23 @@ namespace CareGuide.Infra.Migrations
                     b.ToTable("events", (string)null);
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.EventAddress", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("event_id");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("address_id");
+
+                    b.HasKey("EventId", "AddressId");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("event_addresses", (string)null);
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.EventAppointment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -992,6 +1009,27 @@ namespace CareGuide.Infra.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.EventAddress", b =>
+                {
+                    b.HasOne("CareGuide.Models.Entities.Address", "Address")
+                        .WithMany("EventAddresses")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_address_address");
+
+                    b.HasOne("CareGuide.Models.Entities.Event", "Event")
+                        .WithMany("EventAddresses")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_address_event");
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Event");
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.EventAppointment", b =>
                 {
                     b.HasOne("CareGuide.Models.Entities.Event", "Event")
@@ -1155,6 +1193,8 @@ namespace CareGuide.Infra.Migrations
             modelBuilder.Entity("CareGuide.Models.Entities.Address", b =>
                 {
                     b.Navigation("DoctorAddresses");
+
+                    b.Navigation("EventAddresses");
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.Doctor", b =>
@@ -1168,6 +1208,8 @@ namespace CareGuide.Infra.Migrations
 
             modelBuilder.Entity("CareGuide.Models.Entities.Event", b =>
                 {
+                    b.Navigation("EventAddresses");
+
                     b.Navigation("EventFiles");
                 });
 

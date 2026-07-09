@@ -15,5 +15,6 @@ namespace CareGuide.Models.Entities
         public required string State { get; set; }
 
         public ICollection<DoctorAddress> DoctorAddresses { get; set; } = new List<DoctorAddress>();
+        public ICollection<EventAddress> EventAddresses { get; set; } = new List<EventAddress>();
     }
 }
