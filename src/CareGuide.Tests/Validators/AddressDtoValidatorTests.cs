@@ -14,8 +14,6 @@ public class AddressDtoValidatorTests
     private static UpdateAddressDto ValidUpdateDto(Guid? id = null) =>
         new(id ?? Guid.NewGuid(), "12345-000", 100, "Home", "Sao Paulo", "Apt 1", "Brazil", "Center", "Near park", "SP");
 
-    // ── CreateAddressDto ─────────────────────────────────────────────────────
-
     [Fact(DisplayName = "Create: valid dto passes validation")]
     public void Create_ValidDto_Passes()
     {
@@ -150,8 +148,6 @@ public class AddressDtoValidatorTests
         var dto = ValidCreateDto() with { Type = null, Complement = null, District = null, ReferencePoint = null, Number = null };
         _createValidator.Validate(dto).IsValid.Should().BeTrue();
     }
-
-    // ── UpdateAddressDto ─────────────────────────────────────────────────────
 
     [Fact(DisplayName = "Update: valid dto passes validation")]
     public void Update_ValidDto_Passes()
