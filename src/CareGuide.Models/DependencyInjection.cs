@@ -3,6 +3,7 @@ using CareGuide.Models.Mappers.Doctor;
 using CareGuide.Models.Mappers.DoctorPhone;
 using CareGuide.Models.Mappers.DoctorSpecialty;
 using CareGuide.Models.Mappers.Event;
+using CareGuide.Models.Mappers.EventAddress;
 using CareGuide.Models.Mappers.EventAppointment;
 using CareGuide.Models.Mappers.EventExam;
 using CareGuide.Models.Mappers.EventFile;
@@ -47,6 +48,7 @@ namespace CareGuide.Models
                 cfg.AddProfile<EventMedicineProfileMapper>();
                 cfg.AddProfile<EventExamProfileMapper>();
                 cfg.AddProfile<EventFileProfileMapper>();
+                cfg.AddProfile<EventAddressProfileMapper>();
                 cfg.AddProfile<FileAssetProfileMapper>();
                 cfg.AddProfile<AddressProfileMapper>();
             });
