@@ -21,6 +21,7 @@ namespace CareGuide.Core
             services.AddScoped<IDoctorPhoneService, DoctorPhoneService>();
             services.AddScoped<IDoctorSpecialtyService, DoctorSpecialtyService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<IEventService, EventService>();
 
             return services;
         }

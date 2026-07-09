@@ -120,6 +120,78 @@ namespace CareGuide.Infra.Migrations
                     b.ToTable("doctor_specialties", (string)null);
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.Event", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Details")
+                        .HasMaxLength(1000)
+                        .HasColumnType("text")
+                        .HasColumnName("details");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsAllDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_all_day");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("person_id");
+
+                    b.Property<int?>("RecurrenceFrequency")
+                        .HasColumnType("integer")
+                        .HasColumnName("recurrence_frequency");
+
+                    b.Property<string>("RecurrenceType")
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("recurrence_type");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("type");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("StartDate");
+
+                    b.ToTable("events", (string)null);
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.Person", b =>
                 {
                     b.Property<Guid>("Id")
@@ -573,6 +645,18 @@ namespace CareGuide.Infra.Migrations
                     b.Navigation("Doctor");
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.Event", b =>
+                {
+                    b.HasOne("CareGuide.Models.Entities.Person", "Person")
+                        .WithMany("Events")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_event_person");
+
+                    b.Navigation("Person");
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.PersonAnnotation", b =>
                 {
                     b.HasOne("CareGuide.Models.Entities.Person", "Person")
@@ -674,6 +758,8 @@ namespace CareGuide.Infra.Migrations
             modelBuilder.Entity("CareGuide.Models.Entities.Person", b =>
                 {
                     b.Navigation("Doctors");
+
+                    b.Navigation("Events");
 
                     b.Navigation("PersonAnnotations");
 
