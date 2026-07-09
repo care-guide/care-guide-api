@@ -13,5 +13,7 @@ namespace CareGuide.Models.Entities
         public string? District { get; set; }
         public string? ReferencePoint { get; set; }
         public required string State { get; set; }
+
+        public ICollection<DoctorAddress> DoctorAddresses { get; set; } = new List<DoctorAddress>();
     }
 }

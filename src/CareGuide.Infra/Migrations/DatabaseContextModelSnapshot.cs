@@ -139,6 +139,23 @@ namespace CareGuide.Infra.Migrations
                     b.ToTable("doctors", (string)null);
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.DoctorAddress", b =>
+                {
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("doctor_id");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("address_id");
+
+                    b.HasKey("DoctorId", "AddressId");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("doctor_addresses", (string)null);
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.DoctorPhone", b =>
                 {
                     b.Property<Guid>("DoctorId")
@@ -730,6 +747,27 @@ namespace CareGuide.Infra.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.DoctorAddress", b =>
+                {
+                    b.HasOne("CareGuide.Models.Entities.Address", "Address")
+                        .WithMany("DoctorAddresses")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_doctor_address_address");
+
+                    b.HasOne("CareGuide.Models.Entities.Doctor", "Doctor")
+                        .WithMany("DoctorAddresses")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_doctor_address_doctor");
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Doctor");
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.DoctorPhone", b =>
                 {
                     b.HasOne("CareGuide.Models.Entities.Doctor", "Doctor")
@@ -866,8 +904,15 @@ namespace CareGuide.Infra.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("CareGuide.Models.Entities.Address", b =>
+                {
+                    b.Navigation("DoctorAddresses");
+                });
+
             modelBuilder.Entity("CareGuide.Models.Entities.Doctor", b =>
                 {
+                    b.Navigation("DoctorAddresses");
+
                     b.Navigation("DoctorPhones");
 
                     b.Navigation("DoctorSpecialties");
