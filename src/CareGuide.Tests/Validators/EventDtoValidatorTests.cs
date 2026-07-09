@@ -11,8 +11,6 @@ public class EventDtoValidatorTests
 
     private static readonly DateTime StartDate = new(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc);
 
-    // ── CreateEventDto ────────────────────────────────────────────────────────
-
     [Fact(DisplayName = "Create: valid dto passes validation")]
     public void Create_ValidDto_Passes()
     {
@@ -73,8 +71,6 @@ public class EventDtoValidatorTests
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Details");
     }
-
-    // ── UpdateEventDto ────────────────────────────────────────────────────────
 
     [Fact(DisplayName = "Update: valid dto passes validation")]
     public void Update_ValidDto_Passes()

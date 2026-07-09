@@ -22,8 +22,6 @@ public class EventMapperTests
         _mapper = services.BuildServiceProvider().GetRequiredService<IMapper>();
     }
 
-    // ── Event → EventDto ──────────────────────────────────────────────────────
-
     [Fact(DisplayName = "Event→EventDto: all fields map correctly")]
     public void Map_EventToDto_MapsAllFields()
     {
@@ -80,8 +78,6 @@ public class EventMapperTests
         dto.Details.Should().BeNull();
     }
 
-    // ── CreateEventDto → Event ────────────────────────────────────────────────
-
     [Fact(DisplayName = "CreateEventDto→Event: all fields map correctly")]
     public void Map_CreateDtoToEvent_MapsAllFields()
     {
@@ -97,8 +93,6 @@ public class EventMapperTests
         entity.RecurrenceFrequency.Should().Be(1);
         entity.Details.Should().Be("Pre-op notes");
     }
-
-    // ── UpdateEventDto → Event ────────────────────────────────────────────────
 
     [Fact(DisplayName = "UpdateEventDto→Event: all fields map correctly")]
     public void Map_UpdateDtoToEvent_MapsAllFields()
