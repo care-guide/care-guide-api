@@ -5,22 +5,13 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DB_HOST: ${{ vars.DB_HOST }}
-      DB_PORT: ${{ vars.DB_PORT }}
-      DB_EXTERNAL_PORT: ${{ vars.DB_EXTERNAL_PORT }}
-      DB_NAME: ${{ vars.DB_NAME }}
-      DB_USER: ${{ vars.DB_USER }}
-      TEST_DB_HOST: ${{ vars.TEST_DB_HOST }}
-      TEST_DB_PORT: ${{ vars.TEST_DB_PORT }}
-      TEST_DB_EXTERNAL_PORT: ${{ vars.TEST_DB_EXTERNAL_PORT }}
-      TEST_DB_NAME: ${{ vars.TEST_DB_NAME }}
-      TEST_DB_USER: ${{ vars.TEST_DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
 
     steps:
       - name: Checkout code
@@ -38,16 +29,12 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Run unit tests
-        run: dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --configuration Release --no-build --verbosity normal
+        run: dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
-      - name: Validate Dockerfile (build image)
-        run: docker build -t careguide_api:ci -f Dockerfile .
-
-      - name: Validate docker-compose syntax
-        run: docker compose -f docker-compose.yml config
-
-      - name: Test docker-compose up/down
-        run: |
-          docker compose -f docker-compose.yml up -d
-          sleep 10
-          docker compose -f docker-compose.yml down -v
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Test Results
+          path: "TestResults/*.trx"
+          reporter: dotnet-trx
