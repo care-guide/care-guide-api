@@ -2,6 +2,19 @@
 
 Context guide for AI agents. Read this file before any analysis or changes.
 
+### Related documentation
+
+| Topic | Doc |
+| ----- | --- |
+| Documentation index | [`docs/README.md`](docs/README.md) |
+| Solution structure | [`docs/STRUCTURE.md`](docs/STRUCTURE.md) |
+| API conventions (errors, pagination, auth) | [`docs/API.md`](docs/API.md) |
+| Security (auth, passwords, secrets) | [`docs/SECURITY.md`](docs/SECURITY.md) |
+| LGPD / data privacy | [`docs/LGPD.md`](docs/LGPD.md) |
+| Configuration & secrets | [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) |
+| Migrations | [`docs/MIGRATIONS.md`](docs/MIGRATIONS.md) |
+| Tests | [`docs/TESTS.md`](docs/TESTS.md) |
+
 ---
 
 ## Stack
@@ -27,7 +40,7 @@ CareGuide.API       → Endpoints (Minimal API), Middlewares, Filters
 CareGuide.Core      → Service interfaces + implementations (business rules)
 CareGuide.Infra     → Repository interfaces + implementations (EF Core, DbContext)
 CareGuide.Models    → Entities, DTOs, Enums, Mappers, Validators, Constants
-CareGuide.Security  → JWT, PasswordManager (BCrypt + zxcvbn)
+CareGuide.Security  → JWT, PasswordManager (PBKDF2 via ASP.NET Identity + zxcvbn strength)
 CareGuide.Tests     → Unit tests (no DB, no network)
 ```
 
@@ -161,7 +174,7 @@ public class ExampleEndpoints() : IEndpoint
 
 ## Tests
 
-> ⚠️ **Mandatory:** After any code change, run the tests before completing the task. No change is considered done without passing tests.
+> **Mandatory:** After any code change, run the tests before completing the task. No change is considered done without passing tests.
 
 ```bash
 dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj

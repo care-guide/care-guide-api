@@ -1,64 +1,70 @@
-## Guia de Execução da Aplicação
+# Application Execution Guide
 
-### Pré-requisitos
+> Configuration (ports, environment variables and secrets): see [CONFIGURATION.md](CONFIGURATION.md).
 
-- [Docker Desktop](https://docs.docker.com/get-docker/) instalado e em execução.
-- [Visual Studio 2022](https://visualstudio.microsoft.com/pt-br/vs/) ou superior instalado (para execução local via IIS Express).
+### Prerequisites
 
-### Passo a Passo
+- [Docker Desktop](https://docs.docker.com/get-docker/) installed and running.
+- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) or later installed (for local execution via IIS Express).
 
-1. **Clone o repositório:**
+### Step by Step
+
+1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/fernando-martens/care-guide-api.git
+   git clone https://github.com/care-guide/care-guide-api.git
    ```
 
-2. **Verifique os arquivos de configuração:**  
-   Certifique-se de que os arquivos `Dockerfile` e `docker-compose.yml` estão presentes na raiz do projeto.
+2. **Check the configuration files:**  
+   Make sure the `Dockerfile` and `docker-compose.yml` files are present at the project root.
 
-### Executando via Docker Compose
+### Running via Docker Compose
 
-3. **Inicie a aplicação com Docker Compose:**
+3. **Start the application with Docker Compose:**
 
    ```sh
    docker-compose up
    ```
 
-   Todos os serviços necessários serão configurados e iniciados automaticamente.
+   All required services will be configured and started automatically.
 
-### Informações Importantes
+### Important Information
 
-- A API estará disponível em: [http://localhost:8080](http://localhost:8080)
-- O banco de dados PostgreSQL utilizará a porta `5434`.
-- Certifique-se de que as portas `8080` e `5434` estejam livres antes de iniciar o projeto.
+- The API will be available at: [http://localhost:8080](http://localhost:8080)
+- The PostgreSQL database uses port `5434`.
+- Make sure ports `8080` and `5434` are free before starting the project.
 
-### Comandos Úteis
+### Useful Commands
 
-- **Recriar containers após alterações:**
+- **Recreate containers after changes:**
 
   ```sh
   docker-compose up -d --build
   ```
 
-- **Parar a execução dos containers:**
+- **Stop running containers:**
 
   ```sh
   docker-compose stop
   ```
 
-- **Parar e remover containers:**
+- **Stop and remove containers:**
   ```sh
   docker-compose down
   ```
 
 ---
 
-### Executando Localmente pelo IIS Express
+### Running Locally with IIS Express
 
-1. Abra a solução `CareGuide.sln` no Visual Studio.
-2. Selecione o projeto de inicialização `CareGuide.API`.
-3. No menu superior, selecione o perfil **IIS Express**.
-4. Pressione `F5` ou clique em **Iniciar Depuração** para executar a API localmente.
-5. A API estará disponível em `http://localhost:5000` (ou na porta configurada em `launchSettings.json`).
+1. Open the `CareGuide.sln` solution in Visual Studio.
+2. Select `CareGuide.API` as the startup project.
+3. In the top menu, select the **IIS Express** profile.
+4. Press `F5` or click **Start Debugging** to run the API locally.
+5. The API will be available at `http://localhost:5000` (or the port configured in `launchSettings.json`).
 
-   > Certifique-se de que o banco de dados esteja acessível e configurado corretamente em `appsettings.Development.json`.
+   > Make sure the database is accessible and correctly configured in `appsettings.Development.json`.
+
+---
+
+[Documentation index](README.md) · [Project README](../README.md)
