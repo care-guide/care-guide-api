@@ -1,38 +1,45 @@
-# Guia de Migrations (Entity Framework Core)
+# Migrations Guide (Entity Framework Core)
 
-Este documento orienta como criar e aplicar migrations no projeto utilizando o Entity Framework Core com PostgreSQL.
+This document explains how to create and apply migrations in the project using Entity Framework Core with PostgreSQL.
 
-## Pré-requisito
+> The commands below assume execution from the `src/` folder. Adjust the `--project` paths according to
+> your working directory. The connection string must be configured — see [CONFIGURATION.md](CONFIGURATION.md).
 
-Antes de executar os comandos de migrations, certifique-se de que a ferramenta `dotnet-ef` está instalada:
+## Prerequisite
+
+Before running the migration commands, make sure the `dotnet-ef` tool is installed:
 
 ```sh
  dotnet tool install --global dotnet-ef
 ```
 
-## Principais Comandos
+## Main Commands
 
-### 1. Criar uma nova migration
+### 1. Create a new migration
 
 ```sh
  dotnet ef migrations add MigrationName --project CareGuide.Infra --startup-project CareGuide.API
 ```
 
-- `MigrationName`: Nome descritivo para a migration (ex: `AddPatientTable`).
-- O parâmetro `--project` indica onde estão as classes de contexto e migrations.
-- O parâmetro `--startup-project` indica o projeto de inicialização da aplicação.
+- `MigrationName`: Descriptive name for the migration (e.g. `AddPatientTable`).
+- The `--project` parameter indicates where the context and migration classes live.
+- The `--startup-project` parameter indicates the application startup project.
 
-### 2. Aplicar uma migration ao banco de dados
+### 2. Apply a migration to the database
 
 ```sh
  dotnet ef database update --project CareGuide.Infra --startup-project CareGuide.API
 ```
 
-- Aplica todas migrações as pendentes.
+- Applies all pending migrations.
 
-## Documentação Oficial
+## Official Documentation
 
-Para mais comandos e opções, consulte a documentação oficial do Entity Framework Core:
+For more commands and options, see the official Entity Framework Core documentation:
 
-- [EF Core CLI Reference](https://learn.microsoft.com/pt-br/ef/core/cli/dotnet)
-- [Migrations Overview](https://learn.microsoft.com/pt-br/ef/core/managing-schemas/migrations/)
+- [EF Core CLI Reference](https://learn.microsoft.com/en-us/ef/core/cli/dotnet)
+- [Migrations Overview](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
+
+---
+
+[Documentation index](README.md) · [Project README](../README.md)

@@ -1,24 +1,29 @@
-# Testes
+# Tests
 
-## Visão Geral
+> Test conventions (AAA, NSubstitute, FluentAssertions) and where to create each file: see
+> [AGENTS.md](../AGENTS.md) → Tests.
 
-O projeto `CareGuide.Tests` contém testes unitários para as camadas de **Serviços**, **Validadores** e **Mappers** da solução. Os testes não dependem de banco de dados, infraestrutura externa ou configuração de ambiente — são completamente isolados e executados em memória.
+## Overview
 
-## Tecnologias
+The `CareGuide.Tests` project contains unit tests for the **Services**, **Validators** and **Mappers**
+layers of the solution. The tests do not depend on a database, external infrastructure or environment
+configuration — they are fully isolated and run in memory.
 
-| Biblioteca | Versão | Finalidade |
+## Technologies
+
+| Library | Version | Purpose |
 |---|---|---|
-| [xUnit](https://xunit.net/) | 2.9.3 | Framework de testes |
-| [NSubstitute](https://nsubstitute.github.io/) | 5.3.0 | Mocking de dependências |
-| [FluentAssertions](https://fluentassertions.com/) | 6.12.2 | Assertions legíveis |
-| [AutoMapper](https://automapper.org/) | 16.1.1 | Teste dos profiles de mapeamento |
+| [xUnit](https://xunit.net/) | 2.9.3 | Test framework |
+| [NSubstitute](https://nsubstitute.github.io/) | 5.3.0 | Dependency mocking |
+| [FluentAssertions](https://fluentassertions.com/) | 6.12.2 | Readable assertions |
+| [AutoMapper](https://automapper.org/) | 16.1.1 | Testing the mapping profiles |
 
-## Estrutura dos Testes
+## Test Structure
 
 ```
 CareGuide.Tests/
 ├── Helpers/
-│   └── PasswordManagerHelperTests.cs       # Hash, validação e força de senha
+│   └── PasswordManagerHelperTests.cs       # Password hashing, validation and strength
 ├── Mappers/
 │   ├── AccountMapperTests.cs               # CreateAccountDto → Person/User/UserDto
 │   ├── DoctorMapperTests.cs                # Doctor ↔ DTO, DoctorSpecialty ↔ DTO
@@ -28,19 +33,19 @@ CareGuide.Tests/
 │   ├── PersonPhoneProfileMapperTests.cs    # PersonPhone → PersonPhoneDto
 │   └── PhoneMapperTests.cs                 # Phone ↔ DTO
 ├── Services/
-│   ├── AccountServiceTests.cs              # Criação de conta, login, refresh token, logout, exclusão
-│   ├── DoctorPhoneServiceTests.cs          # CRUD de telefones de médico com UoW
-│   ├── DoctorServiceTests.cs               # CRUD de médicos
-│   ├── DoctorSpecialtyServiceTests.cs      # CRUD de especialidades
-│   ├── PersonAnnotationServiceTests.cs     # CRUD de anotações
-│   ├── PersonDiseaseServiceTests.cs        # CRUD de doenças
-│   ├── PersonFamilyHistoryServiceTests.cs  # CRUD de histórico familiar
-│   ├── PersonHealthServiceTests.cs         # CRUD de saúde + exclusão individual
-│   ├── PersonPhoneServiceTests.cs          # CRUD de telefones de pessoa com UoW
-│   ├── PersonServiceTests.cs               # CRUD de pessoas
-│   ├── PhoneServiceTests.cs                # CRUD de telefones
-│   ├── RefreshTokenServiceTests.cs         # Criação, rotação e invalidação de tokens
-│   └── UserServiceTests.cs                 # CRUD de usuários com hash de senha
+│   ├── AccountServiceTests.cs              # Account creation, login, refresh token, logout, deletion
+│   ├── DoctorPhoneServiceTests.cs          # Doctor phone CRUD with UoW
+│   ├── DoctorServiceTests.cs               # Doctor CRUD
+│   ├── DoctorSpecialtyServiceTests.cs      # Specialty CRUD
+│   ├── PersonAnnotationServiceTests.cs     # Annotation CRUD
+│   ├── PersonDiseaseServiceTests.cs        # Disease CRUD
+│   ├── PersonFamilyHistoryServiceTests.cs  # Family history CRUD
+│   ├── PersonHealthServiceTests.cs         # Health CRUD + individual deletion
+│   ├── PersonPhoneServiceTests.cs          # Person phone CRUD with UoW
+│   ├── PersonServiceTests.cs               # Person CRUD
+│   ├── PhoneServiceTests.cs                # Phone CRUD
+│   ├── RefreshTokenServiceTests.cs         # Token creation, rotation and invalidation
+│   └── UserServiceTests.cs                 # User CRUD with password hashing
 └── Validators/
     ├── CreateAccountDtoValidatorTests.cs
     ├── CreateDoctorDtoValidatorTests.cs
@@ -53,9 +58,9 @@ CareGuide.Tests/
     └── UpdateDoctorDtoValidatorTests.cs
 ```
 
-## Padrão Utilizado
+## Pattern Used
 
-Todos os testes seguem o padrão **AAA (Arrange, Act, Assert)**:
+All tests follow the **AAA (Arrange, Act, Assert)** pattern:
 
 ```csharp
 [Fact(DisplayName = "GetAsync: not found throws KeyNotFoundException")]
@@ -73,47 +78,56 @@ public async Task GetAsync_NotFound_ThrowsKeyNotFoundException()
 }
 ```
 
-Dependências externas (repositórios, serviços, mapper) são substituídas por **substitutos** via NSubstitute. Nenhum teste acessa banco de dados ou rede.
+External dependencies (repositories, services, mapper) are replaced by **substitutes** via NSubstitute.
+No test accesses a database or the network.
 
-## Como Executar
+## How to Run
 
-### Pré-requisitos
+### Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) instalado.
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) installed.
 
-### Todos os testes
+### All tests
 
 ```bash
 dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj
 ```
 
-### Com output detalhado
+### With detailed output
 
 ```bash
 dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --verbosity normal
 ```
 
-### Filtrando por categoria
+### Filtering by category
 
 ```bash
-# Apenas testes de serviços
+# Service tests only
 dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --filter "FullyQualifiedName~Services"
 
-# Apenas testes de validadores
+# Validator tests only
 dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --filter "FullyQualifiedName~Validators"
 
-# Apenas testes de mappers
+# Mapper tests only
 dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --filter "FullyQualifiedName~Mappers"
 ```
 
-### Pelo nome do DisplayName
+### By DisplayName
 
 ```bash
 dotnet test src/CareGuide.Tests/CareGuide.Tests.csproj --filter "DisplayName~rollback"
 ```
 
-## Resultado Esperado
+## Expected Result
+
+All tests must pass — the number that matters is **`Failed: 0`**:
 
 ```
-Aprovado!  – Com falha: 0, Aprovado: 307, Ignorado: 0, Total: 307
+Passed!  – Failed: 0, Passed: <N>, Skipped: 0, Total: <N>
 ```
+
+> The total (`<N>`) grows as new tests are added; do not hard-code it in the documentation.
+
+---
+
+[Documentation index](README.md) · [Project README](../README.md)
