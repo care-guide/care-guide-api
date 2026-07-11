@@ -25,10 +25,6 @@ treatments received, giving the patient a complete and organized view of their c
 - PostgreSQL;
 - Docker;
 
-## Database Entity-Relationship Diagram
-
-- [ER Diagram](https://miro.com/app/board/uXjVNh5qees=/)
-
 ## Documentation
 
 Full documentation index: [docs/README.md](docs/README.md).
@@ -44,6 +40,7 @@ Full documentation index: [docs/README.md](docs/README.md).
 | Tests | [docs/TESTS.md](docs/TESTS.md) |
 | Security | [docs/SECURITY.md](docs/SECURITY.md) |
 | LGPD / Privacy | [docs/LGPD.md](docs/LGPD.md) |
+| ER Diagram | <a href="https://miro.com/app/board/uXjVNh5qees=/" target="_blank" rel="noopener noreferrer">ER Diagram (Miro)</a> |
 
 ## API Documentation (OpenAPI + Scalar)
 

@@ -18,9 +18,22 @@
 2. **Check the configuration files:**  
    Make sure the `Dockerfile` and `docker-compose.yml` files are present at the project root.
 
+3. **Create the `.env` file:**  
+   `docker-compose` reads database credentials and ports from a `.env` file at the
+   project root (used to substitute `${VAR}` in `docker-compose.yml`). It is gitignored,
+   so it does not exist after a fresh clone. Copy the template and adjust as needed:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+   Without this file, the `postgres` container starts with blank user/password and the
+   healthcheck fails, so `careguide_db` becomes unhealthy and the API does not start.
+   See [CONFIGURATION.md](CONFIGURATION.md) for what each variable does.
+
 ### Running via Docker Compose
 
-3. **Start the application with Docker Compose:**
+4. **Start the application with Docker Compose:**
 
    ```sh
    docker-compose up
