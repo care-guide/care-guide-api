@@ -1,4 +1,5 @@
 using CareGuide.API.BackgroundServices;
+using CareGuide.API.Endpoints;
 using CareGuide.API.Extensions;
 using CareGuide.API.Filters;
 using CareGuide.API.Middlewares;
@@ -8,6 +9,7 @@ using CareGuide.Models;
 using CareGuide.Models.Constants;
 using CareGuide.Security;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
@@ -63,17 +65,26 @@ builder.Services.AddOpenApi(ApiConstants.API_VERSION, options =>
                     Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
                 }
             };
-
-            foreach (var operation in document.Paths.Values.SelectMany(path => path.Operations ?? Enumerable.Empty<KeyValuePair<HttpMethod, OpenApiOperation>>()))
-            {
-                operation.Value.Security ??= [];
-
-                operation.Value.Security.Add(new OpenApiSecurityRequirement
-                {
-                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
-                });
-            }
         }
+    });
+
+    // Only mark an operation as requiring Bearer auth when its endpoint doesn't allow anonymous
+    // access (e.g. anonymous account routes and the /health liveness probe are excluded).
+    options.AddOperationTransformer((operation, transformerContext, cancellationToken) =>
+    {
+        var metadata = transformerContext.Description.ActionDescriptor.EndpointMetadata;
+        var isAnonymous = metadata.Any(m => m is IAllowAnonymous);
+
+        if (!isAnonymous)
+        {
+            operation.Security ??= [];
+            operation.Security.Add(new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", transformerContext.Document)] = []
+            });
+        }
+
+        return Task.CompletedTask;
     });
 });
 
@@ -115,6 +126,10 @@ app.UseMiddleware<SessionMiddleware>();
 
 app.UseAuthorization();
 app.UseRateLimiter();
+
+// Anonymous liveness probe, intentionally mapped outside the authenticated "/api/v1" group below
+// (GET /health, /health/live) — see HealthCheckEndpoints for details.
+new HealthCheckEndpoints().RegisterEndpoints(app);
 
 app.MapGroup(ApiConstants.API_PREFIX)
    .RequireAuthorization()

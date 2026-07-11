@@ -4,6 +4,7 @@ using CareGuide.Models.Entities;
 using CareGuide.Models.Enums;
 using CareGuide.Models.Mappers.FileAsset;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
 
 namespace CareGuide.Tests.Mappers;
 
@@ -42,12 +43,37 @@ public class FileAssetMapperTests
         dto.Name.Should().Be("report.pdf");
         dto.Size.Should().Be(2048);
         dto.Hash.Should().Be(new string('a', 64));
-        dto.StorageKey.Should().Be(entity.StorageKey);
         dto.ContentType.Should().Be("application/pdf");
         dto.StorageProvider.Should().Be(StorageProvider.CloudflareR2);
         dto.UploadStatus.Should().Be(FileUploadStatus.Uploaded);
         dto.CreatedAt.Should().Be(entity.CreatedAt);
         dto.UpdatedAt.Should().Be(entity.UpdatedAt);
+    }
+
+    [Fact(DisplayName = "FileAsset→FileAssetDto: StorageKey is never exposed (no property, not in serialized JSON)")]
+    public void Map_FileAssetToDto_DoesNotExposeStorageKey()
+    {
+        var entity = new FileAsset
+        {
+            Id = Guid.NewGuid(),
+            Name = "report.pdf",
+            Size = 2048,
+            Hash = new string('a', 64),
+            StorageKey = "files/0123456789abcdef",
+            ContentType = "application/pdf",
+            StorageProvider = StorageProvider.CloudflareR2,
+            UploadStatus = FileUploadStatus.Uploaded,
+            CreatedAt = new DateTime(2024, 1, 1),
+            UpdatedAt = new DateTime(2024, 6, 1),
+        };
+
+        var dto = _mapper.Map<FileAssetDto>(entity);
+
+        typeof(FileAssetDto).GetProperty("StorageKey").Should().BeNull();
+
+        var json = JsonSerializer.Serialize(dto);
+        json.Should().NotContain("StorageKey", "the internal object key must never be serialized to clients")
+            .And.NotContain(entity.StorageKey);
     }
 
     [Fact(DisplayName = "CreateFileAssetDto→FileAsset: all fields map correctly")]
