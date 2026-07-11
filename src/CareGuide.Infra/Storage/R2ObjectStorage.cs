@@ -9,19 +9,22 @@ public sealed class R2ObjectStorage(IAmazonS3 client, IOptions<R2StorageOptions>
 {
     private readonly R2StorageOptions _options = options.Value;
 
-    public Uri CreateUploadUrl(string objectKey, string contentType, TimeSpan expiresIn)
+    public Uri CreateUploadUrl(string objectKey, string contentType, string expectedSha256, TimeSpan expiresIn)
     {
         ValidateRequest(objectKey, expiresIn);
         if (string.IsNullOrWhiteSpace(contentType)) throw new ArgumentException("Content type is required.", nameof(contentType));
+        if (string.IsNullOrWhiteSpace(expectedSha256)) throw new ArgumentException("Expected SHA-256 is required.", nameof(expectedSha256));
 
-        return new Uri(client.GetPreSignedURL(new GetPreSignedUrlRequest
+        var request = new GetPreSignedUrlRequest
         {
             BucketName = _options.Bucket,
             Key = objectKey,
             Verb = HttpVerb.PUT,
             ContentType = contentType,
             Expires = DateTime.UtcNow.Add(expiresIn)
-        }));
+        };
+        request.Metadata.Add("sha256", expectedSha256);
+        return new Uri(client.GetPreSignedURL(request));
     }
 
     public Uri CreateDownloadUrl(string objectKey, TimeSpan expiresIn)
@@ -43,7 +46,7 @@ public sealed class R2ObjectStorage(IAmazonS3 client, IOptions<R2StorageOptions>
         {
             var response = await client.GetObjectMetadataAsync(_options.Bucket, objectKey, cancellationToken);
             return new StorageObjectMetadata(objectKey, response.ContentLength, response.Headers.ContentType,
-                response.ETag, response.LastModified);
+                response.ETag, response.Metadata["x-amz-meta-sha256"], response.LastModified);
         }
         catch (AmazonS3Exception exception) when (exception.StatusCode == System.Net.HttpStatusCode.NotFound)
         {

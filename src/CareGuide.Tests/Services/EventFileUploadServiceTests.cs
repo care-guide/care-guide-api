@@ -27,7 +27,7 @@ public class EventFileUploadServiceTests
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(CreateEvent(eventId, personId));
         _fileRepository.AddAsync(Arg.Any<FileAsset>(), Arg.Any<CancellationToken>())
             .Returns(call => call.Arg<FileAsset>());
-        _storage.CreateUploadUrl(Arg.Any<string>(), "application/pdf", TimeSpan.FromMinutes(5))
+        _storage.CreateUploadUrl(Arg.Any<string>(), "application/pdf", new string('a', 64), TimeSpan.FromMinutes(5))
             .Returns(new Uri("https://storage.test/upload"));
         var service = CreateService();
         var dto = new InitiateEventFileUploadDto("exam.pdf", 1024, "application/pdf", new string('A', 64));
@@ -37,6 +37,7 @@ public class EventFileUploadServiceTests
         result.Method.Should().Be("PUT");
         result.UploadUrl.Should().Be(new Uri("https://storage.test/upload"));
         result.RequiredHeaders.Should().Contain("Content-Type", "application/pdf");
+        result.RequiredHeaders.Should().Contain("x-amz-meta-sha256", new string('a', 64));
         result.ExpiresAt.Should().BeCloseTo(DateTimeOffset.UtcNow.AddMinutes(5), TimeSpan.FromSeconds(2));
         await _fileRepository.Received(1).AddAsync(
             Arg.Is<FileAsset>(file =>
@@ -59,7 +60,7 @@ public class EventFileUploadServiceTests
 
         await act.Should().ThrowAsync<KeyNotFoundException>();
         await _fileRepository.DidNotReceive().AddAsync(Arg.Any<FileAsset>(), Arg.Any<CancellationToken>());
-        _storage.DidNotReceive().CreateUploadUrl(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<TimeSpan>());
+        _storage.DidNotReceive().CreateUploadUrl(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<TimeSpan>());
     }
 
     private EventFileUploadService CreateService() => new(
