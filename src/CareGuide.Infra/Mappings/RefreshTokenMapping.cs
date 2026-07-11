@@ -18,7 +18,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Revoked).IsRequired().HasDefaultValue(false).HasColumnName("revoked");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
 
             builder.HasOne(x => x.User).WithMany(u => u.RefreshTokens).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         }

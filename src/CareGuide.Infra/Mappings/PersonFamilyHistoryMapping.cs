@@ -19,7 +19,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.AgeAtDiagnosis).HasColumnName("age_at_diagnosis");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
 
             builder.HasOne(x => x.Person).WithMany(x => x.PersonFamilyHistories).HasForeignKey(x => x.PersonId).HasConstraintName("fk_person_family_history_person").OnDelete(DeleteBehavior.Cascade);
         }

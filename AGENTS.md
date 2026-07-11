@@ -80,7 +80,7 @@ Any new type (DTO, entity, enum, mapper, validator, constant) **must be created 
 
 ### Entities
 
-- Inherit from `Entity` (base with `Id`, `CreatedAt`, `UpdatedAt`, `IsActive`)
+- Inherit from `Entity` (base with `Id`, `CreatedAt`, `UpdatedAt`)
 - Properties marked `required` when mandatory in the database
 - Relationships via navigation properties
 
@@ -91,7 +91,6 @@ public class Entity : IEntity
     public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public bool IsActive { get; set; } = true;
 }
 ```
 

@@ -19,7 +19,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Hash).IsRequired().HasMaxLength(128).HasColumnName("hash");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
 
             builder.HasIndex(x => x.Hash);
         }

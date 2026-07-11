@@ -27,7 +27,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Description).HasColumnType("text").HasColumnName("description");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
 
             builder.HasOne(x => x.Person).WithOne(x => x.PersonHealth).HasForeignKey<PersonHealth>(x => x.PersonId).OnDelete(DeleteBehavior.Cascade);
         }

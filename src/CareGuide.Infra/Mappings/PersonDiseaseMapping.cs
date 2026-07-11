@@ -27,7 +27,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.DiseaseType).IsRequired().HasMaxLength(3).HasColumnName("disease_type").HasConversion(bloodTypeConverter);
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
 
             builder.HasOne(x => x.Person).WithMany(x => x.PersonDiseases).HasForeignKey(x => x.PersonId).HasConstraintName("fk_person_disease_person").OnDelete(DeleteBehavior.Cascade);
         }

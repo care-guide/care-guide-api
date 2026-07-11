@@ -59,5 +59,42 @@ namespace CareGuide.Tests.Repositories
             var result = await repository.GetAllAsync(page, pageSize, CancellationToken.None);
             result.Should().HaveCount(PaginationConstants.DefaultPageSize);
         }
+
+        [Fact(DisplayName = "DeleteAsync: physically removes entity")]
+        public async Task DeleteAsync_PhysicallyRemovesEntity()
+        {
+            using var seedContext = CreateContext();
+            var phone = new Phone { Number = "999999999", AreaCode = "11", Type = PhoneType.CEL };
+            seedContext.Phones.Add(phone);
+            await seedContext.SaveChangesAsync();
+
+            using var context = CreateContext();
+            var repository = new PhoneRepository(context);
+
+            var deleted = await repository.DeleteAsync(phone.Id, CancellationToken.None);
+
+            deleted.Should().NotBeNull();
+            context.Phones.Should().NotContain(x => x.Id == phone.Id);
+        }
+
+        [Fact(DisplayName = "DeleteManyAsync: physically removes matching entities")]
+        public async Task DeleteManyAsync_PhysicallyRemovesMatchingEntities()
+        {
+            using var seedContext = CreateContext();
+            var deletedPhoneA = new Phone { Number = "999999991", AreaCode = "11", Type = PhoneType.CEL };
+            var deletedPhoneB = new Phone { Number = "999999992", AreaCode = "11", Type = PhoneType.CEL };
+            var remainingPhone = new Phone { Number = "999999993", AreaCode = "11", Type = PhoneType.CEL };
+            seedContext.Phones.AddRange(deletedPhoneA, deletedPhoneB, remainingPhone);
+            await seedContext.SaveChangesAsync();
+
+            using var context = CreateContext();
+            var repository = new PhoneRepository(context);
+
+            var deleted = await repository.DeleteManyAsync([deletedPhoneA.Id, deletedPhoneB.Id], CancellationToken.None);
+
+            deleted.Should().HaveCount(2);
+            context.Phones.Should().NotContain(x => x.Id == deletedPhoneA.Id || x.Id == deletedPhoneB.Id);
+            context.Phones.Should().ContainSingle(x => x.Id == remainingPhone.Id);
+        }
     }
 }

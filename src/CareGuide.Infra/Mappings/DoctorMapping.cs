@@ -18,7 +18,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Details).HasColumnType("text").HasMaxLength(DatabaseConstants.MaxLengthLargeText).HasColumnName("details");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
 
             builder.HasOne(x => x.Person).WithMany(x => x.Doctors).HasForeignKey(x => x.PersonId).HasConstraintName("fk_doctor_person").OnDelete(DeleteBehavior.Cascade);
         }
