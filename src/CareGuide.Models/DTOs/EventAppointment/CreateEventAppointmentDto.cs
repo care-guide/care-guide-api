@@ -5,6 +5,7 @@ namespace CareGuide.Models.DTOs.EventAppointment
 {
     public record CreateEventAppointmentDto(
         string? Doctor,
+        Guid? DoctorId,
         [property: JsonConverter(typeof(JsonStringEnumConverter))] EventAppointmentType Type
     );
 }

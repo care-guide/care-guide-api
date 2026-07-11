@@ -22,6 +22,7 @@ namespace CareGuide.Infra.Repositories
 
             return await context.Set<EventAppointment>()
                 .Include(x => x.Event)
+                .Include(x => x.DoctorRef)
                 .FirstOrDefaultAsync(x => x.EventId == eventId && x.Event.PersonId == personId, cancellationToken);
         }
     }

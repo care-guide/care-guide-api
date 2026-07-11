@@ -17,7 +17,7 @@ namespace CareGuide.Infra.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -296,6 +296,10 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("doctor");
 
+                    b.Property<Guid?>("DoctorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("doctor_id");
+
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid")
                         .HasColumnName("event_id");
@@ -311,6 +315,8 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
 
                     b.HasIndex("EventId")
                         .IsUnique();
@@ -979,12 +985,20 @@ namespace CareGuide.Infra.Migrations
 
             modelBuilder.Entity("CareGuide.Models.Entities.EventAppointment", b =>
                 {
+                    b.HasOne("CareGuide.Models.Entities.Doctor", "DoctorRef")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_event_appointment_doctor");
+
                     b.HasOne("CareGuide.Models.Entities.Event", "Event")
                         .WithOne()
                         .HasForeignKey("CareGuide.Models.Entities.EventAppointment", "EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_event_appointment_event");
+
+                    b.Navigation("DoctorRef");
 
                     b.Navigation("Event");
                 });

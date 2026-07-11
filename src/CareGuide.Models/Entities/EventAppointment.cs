@@ -7,8 +7,10 @@ namespace CareGuide.Models.Entities
     {
         public required Guid EventId { get; set; }
         public string? Doctor { get; set; }
+        public Guid? DoctorId { get; set; }
         public required EventAppointmentType Type { get; set; }
 
         public Event Event { get; set; } = null!;
+        public Doctor? DoctorRef { get; set; }
     }
 }

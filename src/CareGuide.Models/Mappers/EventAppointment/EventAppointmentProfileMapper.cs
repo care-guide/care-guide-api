@@ -7,7 +7,8 @@ namespace CareGuide.Models.Mappers.EventAppointment
     {
         public EventAppointmentProfileMapper()
         {
-            CreateMap<Entities.EventAppointment, EventAppointmentDto>();
+            CreateMap<Entities.EventAppointment, EventAppointmentDto>()
+                .ForCtorParam(nameof(EventAppointmentDto.DoctorName), opt => opt.MapFrom(src => src.DoctorRef != null ? src.DoctorRef.Name : null));
             CreateMap<CreateEventAppointmentDto, Entities.EventAppointment>();
             CreateMap<UpdateEventAppointmentDto, Entities.EventAppointment>();
         }
