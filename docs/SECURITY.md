@@ -27,8 +27,8 @@ Both the `sessionToken` (access, 15 min) and the `refreshToken` (7 days) are wri
 - `Secure = true` — only sent over HTTPS.
 - `SameSite = Strict` — CSRF protection.
 
-The `POST /accounts/refresh` endpoint reads the refresh token **from the cookie**, not from the body,
-to avoid leaking it into client logs.
+The `POST /api/v1/accounts/refresh` endpoint reads the refresh token **from the cookie**, not from
+the body, to avoid leaking it into client logs.
 
 ---
 
@@ -46,8 +46,13 @@ Implemented in `PasswordManagerHelper`.
 
 | Policy | Target | Limit |
 | ------ | ------ | ----- |
-| `general` | All authenticated endpoints | 60 req/min per IP (sliding window) |
-| `auth` | `/accounts` (login, refresh, create) | 5 req/min per IP (fixed window) — anti brute-force |
+| `general` | Versioned API endpoints under `/api/v1` | 60 req/min per IP (sliding window) |
+| `auth` | `/api/v1/accounts` create, login and refresh | 5 req/min per IP (fixed window) — anti brute-force |
+
+Account endpoints are registered under `/api/v1/accounts`. Create, login and refresh are anonymous
+and explicitly use the stricter `auth` policy; protected account endpoints remain under the versioned
+API group and require authentication. The endpoint-specific `auth` policy is the intended limiter for
+those three authentication routes.
 
 Response when exceeded: **HTTP 429** with `Retry-After` and an `application/problem+json` body.
 The IP is resolved considering `X-Forwarded-For` (behind a proxy).

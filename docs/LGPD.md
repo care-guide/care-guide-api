@@ -74,7 +74,7 @@ There is currently no consent entity in the model.
 | ----- | --------------- | -------------------- |
 | Confirmation and access | Partial | `GET` of Person/PersonHealth/etc. via authenticated API |
 | Correction | Yes | `PUT`/`PATCH` of the holder's entities |
-| Deletion | Partial | `DELETE /accounts/{id}` — **see §6 on soft vs hard delete** |
+| Deletion | Partial | `DELETE /api/v1/accounts/{id}` — **see §6 on soft vs hard delete** |
 | Portability | _Pending_ | No structured data export |
 | Information on data sharing | _Pending_ | Document third parties/processors |
 | Consent revocation | _Pending_ | Depends on consent recording (§3) |
@@ -105,7 +105,7 @@ Implemented today (details in [SECURITY.md](SECURITY.md)):
 ## 6. Retention and deletion
 
 - **Basis:** `Entity` has an `IsActive` flag, suggesting **soft delete**. Verify whether
-  `DELETE /accounts/{id}` performs a logical or physical deletion.
+  `DELETE /api/v1/accounts/{id}` performs a logical or physical deletion.
 - **LGPD requirement:** data must be deleted after the purpose ends (art. 15/16), except for legal
   retention cases. A soft delete does **not** by itself satisfy the right to deletion.
 - **Pending:** define a retention period per data category and a purge routine (hard delete) for the
