@@ -1,9 +1,9 @@
 using CareGuide.API.Middlewares;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Nodes;
 
 namespace CareGuide.Tests.Middlewares;

@@ -3,8 +3,8 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Core.Services;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Infra.TransactionManagement;
-using CareGuide.Models.DTOs.Phone;
 using CareGuide.Models.DTOs.PersonPhone;
+using CareGuide.Models.DTOs.Phone;
 using CareGuide.Models.Entities;
 using CareGuide.Models.Enums;
 
