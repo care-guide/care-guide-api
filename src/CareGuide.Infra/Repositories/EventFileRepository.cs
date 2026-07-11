@@ -40,7 +40,12 @@ namespace CareGuide.Infra.Repositories
 
             return await _context.EventFiles
                 .Include(ef => ef.File)
-                .FirstOrDefaultAsync(ef => ef.EventId == eventId && ef.FileId == fileId && ef.Event.PersonId == personId, cancellationToken);
+                .FirstOrDefaultAsync(ef =>
+                    ef.EventId == eventId &&
+                    ef.FileId == fileId &&
+                    ef.Event.PersonId == personId &&
+                    ef.File.PersonId == personId,
+                    cancellationToken);
         }
 
         public async Task DeleteAsync(EventFile entity, CancellationToken cancellationToken = default)

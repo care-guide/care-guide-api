@@ -27,15 +27,23 @@ public sealed class R2ObjectStorage(IAmazonS3 client, IOptions<R2StorageOptions>
         return new Uri(client.GetPreSignedURL(request));
     }
 
-    public Uri CreateDownloadUrl(string objectKey, TimeSpan expiresIn)
+    public Uri CreateDownloadUrl(string objectKey, string downloadFileName, TimeSpan expiresIn)
     {
         ValidateRequest(objectKey, expiresIn);
+        if (string.IsNullOrWhiteSpace(downloadFileName)) throw new ArgumentException("Download file name is required.", nameof(downloadFileName));
+        var safeFileName = Path.GetFileName(downloadFileName);
+        if (safeFileName.Any(char.IsControl)) throw new ArgumentException("Download file name contains invalid characters.", nameof(downloadFileName));
+
         return new Uri(client.GetPreSignedURL(new GetPreSignedUrlRequest
         {
             BucketName = _options.Bucket,
             Key = objectKey,
             Verb = HttpVerb.GET,
-            Expires = DateTime.UtcNow.Add(expiresIn)
+            Expires = DateTime.UtcNow.Add(expiresIn),
+            ResponseHeaderOverrides = new ResponseHeaderOverrides
+            {
+                ContentDisposition = $"attachment; filename*=UTF-8''{Uri.EscapeDataString(safeFileName)}"
+            }
         }));
     }
 

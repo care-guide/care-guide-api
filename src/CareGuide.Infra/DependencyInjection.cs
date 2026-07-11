@@ -44,6 +44,10 @@ namespace CareGuide.Infra
             services.AddOptions<FileUploadOptions>()
                 .Bind(configuration.GetSection(FileUploadOptions.SectionName))
                 .ValidateOnStart();
+            services.AddSingleton<IValidateOptions<FileDownloadOptions>, FileDownloadOptionsValidator>();
+            services.AddOptions<FileDownloadOptions>()
+                .Bind(configuration.GetSection(FileDownloadOptions.SectionName))
+                .ValidateOnStart();
 
             services.AddDbContext<DatabaseContext>(opt =>
             {
