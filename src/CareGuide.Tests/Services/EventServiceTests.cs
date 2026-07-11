@@ -145,12 +145,41 @@ public class EventServiceTests
         };
         var dtos = events.Select(e => new EventDto(e.Id, e.PersonId!.Value, e.Name, e.StartDate, null, e.Type, false, null, null, null, DateTime.UtcNow, DateTime.UtcNow)).ToList();
 
-        _repository.GetAllByPersonAsync(1, 10, Arg.Any<CancellationToken>()).Returns(events);
+        _repository.GetAllByPersonAsync(null, null, EventSortOrder.Asc, 1, 10, Arg.Any<CancellationToken>()).Returns(events);
         _mapper.Map<List<EventDto>>(events).Returns(dtos);
 
-        var result = await _sut.GetAllByPersonAsync(1, 10, CancellationToken.None);
+        var result = await _sut.GetAllByPersonAsync(null, null, EventSortOrder.Asc, 1, 10, CancellationToken.None);
 
         result.Should().HaveCount(2);
+    }
+
+    [Fact(DisplayName = "GetAllByPersonAsync: from later than to throws ArgumentException")]
+    public async Task GetAllByPersonAsync_FromLaterThanTo_ThrowsArgumentException()
+    {
+        var from = new DateTime(2026, 2, 1, 0, 0, 0, DateTimeKind.Utc);
+        var to = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var act = async () => await _sut.GetAllByPersonAsync(from, to, EventSortOrder.Asc, 1, 10, CancellationToken.None);
+
+        await act.Should().ThrowAsync<ArgumentException>()
+            .WithMessage("*from*");
+
+        await _repository.DidNotReceive().GetAllByPersonAsync(Arg.Any<DateTime?>(), Arg.Any<DateTime?>(), Arg.Any<EventSortOrder>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact(DisplayName = "GetAllByPersonAsync: passes date range and sort order through to the repository")]
+    public async Task GetAllByPersonAsync_PassesFiltersToRepository()
+    {
+        var from = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var to = new DateTime(2026, 1, 31, 0, 0, 0, DateTimeKind.Utc);
+        var events = new List<Event>();
+
+        _repository.GetAllByPersonAsync(from, to, EventSortOrder.Desc, 2, 5, Arg.Any<CancellationToken>()).Returns(events);
+        _mapper.Map<List<EventDto>>(events).Returns(new List<EventDto>());
+
+        await _sut.GetAllByPersonAsync(from, to, EventSortOrder.Desc, 2, 5, CancellationToken.None);
+
+        await _repository.Received(1).GetAllByPersonAsync(from, to, EventSortOrder.Desc, 2, 5, Arg.Any<CancellationToken>());
     }
 
     [Fact(DisplayName = "DeleteAllByPersonAsync: delegates to repository")]

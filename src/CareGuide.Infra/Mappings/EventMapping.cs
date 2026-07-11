@@ -31,8 +31,7 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
 
-            builder.HasIndex(x => x.PersonId);
-            builder.HasIndex(x => x.StartDate);
+            builder.HasIndex(x => new { x.PersonId, x.StartDate }).HasDatabaseName("ix_events_person_id_start_date");
 
             builder.HasOne(x => x.Person).WithMany(x => x.Events).HasForeignKey(x => x.PersonId).HasConstraintName("fk_event_person").OnDelete(DeleteBehavior.Cascade);
         }

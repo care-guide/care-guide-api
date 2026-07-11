@@ -3,6 +3,7 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.Event;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Core.Services
 {
@@ -17,9 +18,18 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<List<EventDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<List<EventDto>> GetAllByPersonAsync(
+            DateTime? from,
+            DateTime? to,
+            EventSortOrder sortOrder,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken)
         {
-            var list = await _eventRepository.GetAllByPersonAsync(page, pageSize, cancellationToken);
+            if (from.HasValue && to.HasValue && from.Value > to.Value)
+                throw new ArgumentException("The 'from' date must not be later than the 'to' date.", nameof(from));
+
+            var list = await _eventRepository.GetAllByPersonAsync(from, to, sortOrder, page, pageSize, cancellationToken);
             return _mapper.Map<List<EventDto>>(list);
         }
 
