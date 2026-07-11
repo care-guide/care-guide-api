@@ -117,6 +117,11 @@ Implemented today (details in [SECURITY.md](SECURITY.md)):
   object is preserved while referenced; unreferenced completed files follow the configured retention
   period. Definitive deletion first records a recoverable deletion state, then removes the private
   object, and finally deletes the database row. Expired pending uploads are purged idempotently.
+- **Cloudflare R2:** attachments can contain sensitive health data and are processed by an external
+  storage provider. A private bucket and temporary URLs are technical safeguards, not a legal basis and
+  not proof of LGPD compliance. Before production, validate data location/jurisdiction, international
+  transfer implications, contractual roles/DPA, subprocessors, retention, backup behavior, incident
+  duties and data-subject deletion with qualified legal/privacy stakeholders.
 
 ---
 

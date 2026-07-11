@@ -35,6 +35,8 @@ Full documentation index: [docs/README.md](docs/README.md).
 | Solution structure | [docs/STRUCTURE.md](docs/STRUCTURE.md) |
 | Execution | [docs/EXECUTION.md](docs/EXECUTION.md) |
 | Configuration and secrets | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) |
+| Private R2 file flow | [docs/FILE_STORAGE.md](docs/FILE_STORAGE.md) |
+| R2 operations runbook | [docs/R2_RUNBOOK.md](docs/R2_RUNBOOK.md) |
 | API conventions | [docs/API.md](docs/API.md) |
 | Migrations | [docs/MIGRATIONS.md](docs/MIGRATIONS.md) |
 | Development database seed | [database/seeds/README.md](database/seeds/README.md) |
