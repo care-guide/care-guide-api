@@ -1,7 +1,20 @@
-﻿namespace CareGuide.API.Helpers
+﻿using CareGuide.Models.Constants;
+
+namespace CareGuide.API.Helpers
 {
     public class AuthCookieHelper
     {
+        /// <summary>
+        /// Explicit, backward-compatible signal for non-browser clients. Only returns true when the
+        /// caller sends <c>X-Client-Type: mobile</c>; any other value or its absence is treated as a
+        /// browser, preserving the cookie-only default. Comparison is case-insensitive.
+        /// </summary>
+        public static bool IsNativeClient(HttpRequest request)
+        {
+            return request.Headers.TryGetValue(AuthClientConstants.ClientTypeHeaderName, out var value)
+                && string.Equals(value, AuthClientConstants.MobileClientTypeValue, StringComparison.OrdinalIgnoreCase);
+        }
+
         public static void AppendRefreshToken(HttpResponse response, string refreshToken, int days = 7)
         {
             var cookieOptions = new CookieOptions
