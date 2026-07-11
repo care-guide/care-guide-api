@@ -48,6 +48,26 @@ the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `D
 | `FileLifecycle:CleanupIntervalMinutes` | Interval between idempotent cleanup runs | `15` |
 | `Logging:LogLevel` | Log levels | — |
 
+All duration values are integers in seconds, minutes or days as stated in the key name. Byte limits are
+integer bytes. Content types and extensions are arrays; extensions include the leading dot. Startup
+validation rejects missing R2 settings, non-HTTPS endpoints, empty allowlists, unsupported hash format,
+unsafe URL lifetimes and invalid lifecycle periods.
+
+### R2 values and secret delivery
+
+| Cloudflare value | Care Guide key | Secret? |
+| ---------------- | -------------- | ------- |
+| S3 endpoint | `Storage:R2:Endpoint` | No |
+| Account ID | `Storage:R2:AccountId` | Treat as configuration, not a credential |
+| Private bucket name | `Storage:R2:Bucket` | Internal configuration |
+| Access Key ID | `Storage:R2:AccessKey` | **Yes** |
+| Secret Access Key | `Storage:R2:SecretKey` | **Yes** |
+| API Token Value | Not consumed by the S3 client | **Yes; do not configure it here** |
+
+Docker Compose reads the `STORAGE_R2_*` placeholders from the gitignored root `.env` and maps them to
+.NET's `Storage__R2__*` environment variables. Direct `dotnet run` does not load `.env`; use User Secrets.
+Production must inject the same keys from its secret manager. See [FILE_STORAGE.md](FILE_STORAGE.md).
+
 ## Ports
 
 | Service | Port | Context |
@@ -81,6 +101,12 @@ Storage__R2__AccountId=...
 Storage__R2__Bucket=...
 Storage__R2__AccessKey=...
 Storage__R2__SecretKey=...
+FileUploads__MaxSizeBytes=10485760
+FileUploads__PresignedUrlExpirationSeconds=300
+FileDownloads__PresignedUrlExpirationSeconds=300
+FileLifecycle__PendingUploadExpirationMinutes=60
+FileLifecycle__UnreferencedFileRetentionDays=30
+FileLifecycle__CleanupIntervalMinutes=15
 ```
 
 > In the repository, `SecretKey` and the connection string are empty. Fill them only locally

@@ -95,6 +95,20 @@ The JWT `SecretKey` and the connection string **must not be versioned** with rea
 In the repository these fields are empty; provide the values locally/in production via User Secrets,
 environment variables or a secrets vault. See [CONFIGURATION.md](CONFIGURATION.md) §Secrets.
 
+### Private R2 attachments
+
+- The R2 bucket remains private; no public bucket URL or public custom domain is part of the design.
+- Permanent R2 credentials exist only in server configuration and are never returned to clients.
+- Pre-signed URLs authorize one method on one opaque object key for a configured short lifetime.
+- Event, attachment and file queries are person-owned; possessing a `fileId` or storage key is insufficient.
+- Upload size, extension and MIME type use validated allowlists. Client filenames are metadata only and
+  are sanitized before being placed in signed download `Content-Disposition`.
+- Confirmation checks R2 object metadata. `ETag` is not assumed to be a SHA-256 content digest.
+- URLs, credentials, object keys and patient filenames must not appear in application logs or error bodies.
+- Cleanup and definitive deletion preserve referenced objects and expose partial failures for retry.
+
+Operational controls and credential rotation are documented in [R2_RUNBOOK.md](R2_RUNBOOK.md).
+
 ---
 
 ## 8. Reporting vulnerabilities

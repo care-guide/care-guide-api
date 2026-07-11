@@ -9,6 +9,8 @@ Central documentation index for the project. Start here.
 | [../README.md](../README.md) | Project overview, goal and features |
 | [EXECUTION.md](EXECUTION.md) | How to run the application (Docker and local) |
 | [CONFIGURATION.md](CONFIGURATION.md) | Environment variables, `appsettings`, ports and secrets |
+| [FILE_STORAGE.md](FILE_STORAGE.md) | Complete private R2 upload, confirmation, download and deletion flow |
+| [R2_RUNBOOK.md](R2_RUNBOOK.md) | Credential rotation, orphan cleanup, deletion failures and cost monitoring |
 
 ## Development
 

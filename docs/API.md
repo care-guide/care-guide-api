@@ -102,6 +102,22 @@ If cryptographic verification of stored bytes becomes mandatory, a trusted backe
 stream the object and calculate SHA-256 (or use a future provider checksum with documented semantics)
 before changing the upload status.
 
+## Private event-file flow
+
+The complete request/response examples are in [FILE_STORAGE.md](FILE_STORAGE.md). All routes are
+authenticated and use the `/api/v1` prefix:
+
+| Step | Route | Success | Common failures |
+| ---- | ----- | ------- | --------------- |
+| Initiate | `POST /events/{eventId}/files/uploads` | `201` pending file + pre-signed `PUT` | `400` invalid metadata; `404` event outside scope |
+| Confirm | `POST /events/{eventId}/files/{fileId}/confirm` | `200` idempotent attachment | `400` mismatch/state; `404` record/object missing |
+| Download | `GET /events/{eventId}/files/{fileId}/download` | `200` temporary GET URL | `400` pending; `404` unauthorized/missing object |
+| Detach | `DELETE /events/{eventId}/files/{fileId}` | `204` | `404` association outside scope/missing |
+| Delete | `DELETE /files/{fileId}` | `204` | `400` still referenced/storage failure; `404` outside scope/missing |
+
+Pre-signed URLs are opaque temporary capabilities. Clients must not log, persist, cache beyond expiry,
+modify their query parameters, or reuse a PUT URL for GET (and vice versa).
+
 ## Field limits
 
 | Constant | Value |
