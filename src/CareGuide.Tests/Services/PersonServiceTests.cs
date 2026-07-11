@@ -10,14 +10,16 @@ namespace CareGuide.Tests.Services;
 public class PersonServiceTests
 {
     private readonly IPersonRepository _repository;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly PersonService _sut;
 
     public PersonServiceTests()
     {
         _repository = Substitute.For<IPersonRepository>();
+        _userRepository = Substitute.For<IUserRepository>();
         _mapper = Substitute.For<IMapper>();
-        _sut = new PersonService(_repository, _mapper);
+        _sut = new PersonService(_repository, _userRepository, _mapper);
     }
 
     [Fact(DisplayName = "GetAsync: person not found throws KeyNotFoundException")]
@@ -134,5 +136,109 @@ public class PersonServiceTests
         await _sut.DeleteAsync(id, CancellationToken.None);
 
         await _repository.Received(1).DeleteAsync(id, Arg.Any<CancellationToken>());
+    }
+
+    // ── GetMyProfileAsync ─────────────────────────────────────────────────────
+
+    [Fact(DisplayName = "GetMyProfileAsync: empty personId throws UnauthorizedAccessException")]
+    public async Task GetMyProfileAsync_EmptyPersonId_ThrowsUnauthorizedAccessException()
+    {
+        var act = async () => await _sut.GetMyProfileAsync(Guid.Empty, CancellationToken.None);
+
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+    }
+
+    [Fact(DisplayName = "GetMyProfileAsync: person not found throws KeyNotFoundException")]
+    public async Task GetMyProfileAsync_PersonNotFound_ThrowsKeyNotFoundException()
+    {
+        var personId = Guid.NewGuid();
+        _repository.GetAsync(personId, Arg.Any<CancellationToken>()).Returns((Person?)null);
+
+        var act = async () => await _sut.GetMyProfileAsync(personId, CancellationToken.None);
+
+        await act.Should().ThrowAsync<KeyNotFoundException>();
+    }
+
+    [Fact(DisplayName = "GetMyProfileAsync: user not found throws KeyNotFoundException")]
+    public async Task GetMyProfileAsync_UserNotFound_ThrowsKeyNotFoundException()
+    {
+        var personId = Guid.NewGuid();
+        var entity = new Person { Id = personId, Name = "Alice", Gender = Gender.F, Birthday = new DateOnly(1990, 1, 1) };
+        _repository.GetAsync(personId, Arg.Any<CancellationToken>()).Returns(entity);
+        _userRepository.GetByPersonIdAsync(personId, Arg.Any<CancellationToken>()).Returns((User?)null);
+
+        var act = async () => await _sut.GetMyProfileAsync(personId, CancellationToken.None);
+
+        await act.Should().ThrowAsync<KeyNotFoundException>();
+    }
+
+    [Fact(DisplayName = "GetMyProfileAsync: found returns composed profile with email")]
+    public async Task GetMyProfileAsync_Found_ReturnsProfileWithEmail()
+    {
+        var personId = Guid.NewGuid();
+        var entity = new Person { Id = personId, Name = "Alice", Gender = Gender.F, Birthday = new DateOnly(1990, 1, 1), Picture = "http://pic.url" };
+        var user = new User { PersonId = personId, Email = "alice@example.com", Password = "hashed" };
+        var personDto = new PersonDto(personId, "Alice", "http://pic.url", Gender.F, new DateOnly(1990, 1, 1), DateTime.UtcNow, DateTime.UtcNow);
+
+        _repository.GetAsync(personId, Arg.Any<CancellationToken>()).Returns(entity);
+        _userRepository.GetByPersonIdAsync(personId, Arg.Any<CancellationToken>()).Returns(user);
+        _mapper.Map<PersonDto>(entity).Returns(personDto);
+
+        var result = await _sut.GetMyProfileAsync(personId, CancellationToken.None);
+
+        result.Id.Should().Be(personId);
+        result.Name.Should().Be("Alice");
+        result.Gender.Should().Be(Gender.F);
+        result.Birthday.Should().Be(new DateOnly(1990, 1, 1));
+        result.Picture.Should().Be("http://pic.url");
+        result.Email.Should().Be("alice@example.com");
+    }
+
+    // ── UpdateMyProfileAsync ──────────────────────────────────────────────────
+
+    [Fact(DisplayName = "UpdateMyProfileAsync: empty personId throws UnauthorizedAccessException")]
+    public async Task UpdateMyProfileAsync_EmptyPersonId_ThrowsUnauthorizedAccessException()
+    {
+        var dto = new UpdatePersonProfileDto("New Name", Gender.F, new DateOnly(1990, 1, 1), null);
+
+        var act = async () => await _sut.UpdateMyProfileAsync(Guid.Empty, dto, CancellationToken.None);
+
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+    }
+
+    [Fact(DisplayName = "UpdateMyProfileAsync: person not found throws KeyNotFoundException")]
+    public async Task UpdateMyProfileAsync_PersonNotFound_ThrowsKeyNotFoundException()
+    {
+        var personId = Guid.NewGuid();
+        var dto = new UpdatePersonProfileDto("New Name", Gender.F, new DateOnly(1990, 1, 1), null);
+        _repository.GetAsync(personId, Arg.Any<CancellationToken>()).Returns((Person?)null);
+
+        var act = async () => await _sut.UpdateMyProfileAsync(personId, dto, CancellationToken.None);
+
+        await act.Should().ThrowAsync<KeyNotFoundException>();
+    }
+
+    [Fact(DisplayName = "UpdateMyProfileAsync: valid data updates fields and returns profile with email")]
+    public async Task UpdateMyProfileAsync_ValidData_UpdatesFieldsAndReturnsProfile()
+    {
+        var personId = Guid.NewGuid();
+        var existing = new Person { Id = personId, Name = "Old", Gender = Gender.M, Birthday = new DateOnly(1980, 1, 1) };
+        var user = new User { PersonId = personId, Email = "alice@example.com", Password = "hashed" };
+        var dto = new UpdatePersonProfileDto("New Name", Gender.F, new DateOnly(1990, 5, 10), "http://pic.url");
+        var mappedDto = new PersonDto(personId, "New Name", "http://pic.url", Gender.F, new DateOnly(1990, 5, 10), DateTime.UtcNow, DateTime.UtcNow);
+
+        _repository.GetAsync(personId, Arg.Any<CancellationToken>()).Returns(existing);
+        _repository.UpdateAsync(existing, Arg.Any<CancellationToken>()).Returns(existing);
+        _userRepository.GetByPersonIdAsync(personId, Arg.Any<CancellationToken>()).Returns(user);
+        _mapper.Map<PersonDto>(existing).Returns(mappedDto);
+
+        var result = await _sut.UpdateMyProfileAsync(personId, dto, CancellationToken.None);
+
+        existing.Name.Should().Be("New Name");
+        existing.Gender.Should().Be(Gender.F);
+        existing.Birthday.Should().Be(new DateOnly(1990, 5, 10));
+        existing.Picture.Should().Be("http://pic.url");
+        result.Email.Should().Be("alice@example.com");
+        result.Name.Should().Be("New Name");
     }
 }
