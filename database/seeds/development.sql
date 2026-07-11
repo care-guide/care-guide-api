@@ -1,6 +1,5 @@
 BEGIN;
 
--- Deterministic seed roots. Cascades remove all owned dependent rows on reruns.
 DELETE FROM persons WHERE id IN (
     '10000000-0000-0000-0000-000000000001',
     '10000000-0000-0000-0000-000000000002'
