@@ -3,6 +3,7 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.FileAsset;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Core.Services
 {
@@ -19,7 +20,7 @@ namespace CareGuide.Core.Services
 
         public async Task<List<FileAssetDto>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            var list = await _fileAssetRepository.GetAllAsync(page, pageSize, cancellationToken);
+            var list = await _fileAssetRepository.GetAllByPersonAsync(page, pageSize, cancellationToken);
             return _mapper.Map<List<FileAssetDto>>(list);
         }
 
@@ -42,6 +43,9 @@ namespace CareGuide.Core.Services
                 throw new ArgumentNullException(nameof(createFileAssetDto));
 
             var entity = _mapper.Map<FileAsset>(createFileAssetDto);
+            entity.StorageKey = $"files/{Guid.NewGuid():N}";
+            entity.StorageProvider = StorageProvider.CloudflareR2;
+            entity.UploadStatus = FileUploadStatus.Pending;
 
             await _fileAssetRepository.AddAsync(entity, cancellationToken);
 
@@ -64,6 +68,7 @@ namespace CareGuide.Core.Services
             existing.Name = updateFileAssetDto.Name;
             existing.Size = updateFileAssetDto.Size;
             existing.Hash = updateFileAssetDto.Hash;
+            existing.ContentType = updateFileAssetDto.ContentType;
 
             var updated = await _fileAssetRepository.UpdateAsync(existing, cancellationToken);
             return _mapper.Map<FileAssetDto>(updated);

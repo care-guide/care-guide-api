@@ -3,7 +3,7 @@ using CareGuide.Models.Entities;
 
 namespace CareGuide.Infra.Interfaces
 {
-    public interface IFileAssetRepository : IRepository<FileAsset>
+    public interface IFileAssetRepository : IBasePersonOwnedRepository<FileAsset>
     {
 
     }

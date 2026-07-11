@@ -2,6 +2,7 @@ using AutoMapper;
 using CareGuide.Models.DTOs.FileAsset;
 using CareGuide.Models.Entities;
 using CareGuide.Models.Mappers.FileAsset;
+using CareGuide.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CareGuide.Tests.Mappers;
@@ -27,6 +28,10 @@ public class FileAssetMapperTests
             Name = "report.pdf",
             Size = 2048,
             Hash = new string('a', 64),
+            StorageKey = "files/0123456789abcdef",
+            ContentType = "application/pdf",
+            StorageProvider = StorageProvider.CloudflareR2,
+            UploadStatus = FileUploadStatus.Uploaded,
             CreatedAt = new DateTime(2024, 1, 1),
             UpdatedAt = new DateTime(2024, 6, 1),
         };
@@ -37,6 +42,10 @@ public class FileAssetMapperTests
         dto.Name.Should().Be("report.pdf");
         dto.Size.Should().Be(2048);
         dto.Hash.Should().Be(new string('a', 64));
+        dto.StorageKey.Should().Be(entity.StorageKey);
+        dto.ContentType.Should().Be("application/pdf");
+        dto.StorageProvider.Should().Be(StorageProvider.CloudflareR2);
+        dto.UploadStatus.Should().Be(FileUploadStatus.Uploaded);
         dto.CreatedAt.Should().Be(entity.CreatedAt);
         dto.UpdatedAt.Should().Be(entity.UpdatedAt);
     }
@@ -44,19 +53,20 @@ public class FileAssetMapperTests
     [Fact(DisplayName = "CreateFileAssetDto→FileAsset: all fields map correctly")]
     public void Map_CreateFileAssetDtoToEntity_MapsFields()
     {
-        var dto = new CreateFileAssetDto("photo.jpg", 4096, new string('b', 64));
+        var dto = new CreateFileAssetDto("photo.jpg", 4096, new string('b', 64), "image/jpeg");
 
         var entity = _mapper.Map<FileAsset>(dto);
 
         entity.Name.Should().Be("photo.jpg");
         entity.Size.Should().Be(4096);
         entity.Hash.Should().Be(new string('b', 64));
+        entity.ContentType.Should().Be("image/jpeg");
     }
 
     [Fact(DisplayName = "UpdateFileAssetDto→FileAsset: all fields map correctly")]
     public void Map_UpdateFileAssetDtoToEntity_MapsFields()
     {
-        var dto = new UpdateFileAssetDto(Guid.NewGuid(), "invoice.pdf", 8192, new string('c', 64));
+        var dto = new UpdateFileAssetDto(Guid.NewGuid(), "invoice.pdf", 8192, new string('c', 64), "application/pdf");
 
         var entity = _mapper.Map<FileAsset>(dto);
 
