@@ -4,6 +4,7 @@ namespace CareGuide.Models.DTOs.FileAsset
         Guid Id,
         string Name,
         long Size,
-        string Hash
+        string Hash,
+        string ContentType
     );
 }

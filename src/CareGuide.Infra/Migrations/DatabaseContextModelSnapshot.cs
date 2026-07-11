@@ -454,6 +454,12 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("content_type");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -470,17 +476,44 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("name");
 
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("person_id");
+
                     b.Property<long>("Size")
                         .HasColumnType("bigint")
                         .HasColumnName("size");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("storage_key");
+
+                    b.Property<string>("StorageProvider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("storage_provider");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
+                    b.Property<string>("UploadStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("upload_status");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Hash");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("StorageKey")
+                        .IsUnique();
 
                     b.ToTable("files", (string)null);
                 });
@@ -1011,6 +1044,18 @@ namespace CareGuide.Infra.Migrations
                         .HasConstraintName("fk_event_surgery_event");
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("CareGuide.Models.Entities.FileAsset", b =>
+                {
+                    b.HasOne("CareGuide.Models.Entities.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_file_person");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.PersonAnnotation", b =>
