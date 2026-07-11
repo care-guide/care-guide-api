@@ -12,7 +12,8 @@ namespace CareGuide.Models.Mappers.EventFile
                 .ForCtorParam(nameof(EventFileDto.FileId), opt => opt.MapFrom(src => GetFile(src).Id))
                 .ForCtorParam(nameof(EventFileDto.Name), opt => opt.MapFrom(src => GetFile(src).Name))
                 .ForCtorParam(nameof(EventFileDto.Size), opt => opt.MapFrom(src => GetFile(src).Size))
-                .ForCtorParam(nameof(EventFileDto.Hash), opt => opt.MapFrom(src => GetFile(src).Hash));
+                .ForCtorParam(nameof(EventFileDto.Hash), opt => opt.MapFrom(src => GetFile(src).Hash))
+                .ForCtorParam(nameof(EventFileDto.ContentType), opt => opt.MapFrom(src => GetFile(src).ContentType));
         }
 
         private static Entities.FileAsset GetFile(Entities.EventFile source)

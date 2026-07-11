@@ -17,13 +17,14 @@ public class R2ObjectStorageTests
             .Returns("https://example.test/upload");
         var storage = CreateStorage();
 
-        var result = storage.CreateUploadUrl("person/file.pdf", "application/pdf", TimeSpan.FromMinutes(5));
+        var result = storage.CreateUploadUrl("person/file.pdf", "application/pdf", new string('a', 64), TimeSpan.FromMinutes(5));
 
         result.Should().Be(new Uri("https://example.test/upload"));
         captured.Should().NotBeNull();
         captured!.BucketName.Should().Be("private-bucket");
         captured.Key.Should().Be("person/file.pdf");
         captured.ContentType.Should().Be("application/pdf");
+        captured.Metadata["x-amz-meta-sha256"].Should().Be(new string('a', 64));
         captured.Verb.Should().Be(HttpVerb.PUT);
         captured.Expires.Should().BeCloseTo(DateTime.UtcNow.AddMinutes(5), TimeSpan.FromSeconds(2));
     }

@@ -33,6 +33,7 @@ public class EventFileProfileMapperTests
                 Name = "exam-result.pdf",
                 Size = 2048,
                 Hash = "abc123",
+                ContentType = "application/pdf",
             }
         };
 
@@ -43,6 +44,7 @@ public class EventFileProfileMapperTests
         dto.Name.Should().Be("exam-result.pdf");
         dto.Size.Should().Be(2048);
         dto.Hash.Should().Be("abc123");
+        dto.ContentType.Should().Be("application/pdf");
     }
 
     [Fact(DisplayName = "EventFile→EventFileDto: null File navigation throws InvalidOperationException")]

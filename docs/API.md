@@ -89,6 +89,19 @@ Constants in `PaginationConstants`:
 Automatic via `ValidationFilterFactory` — do not call the validator manually in the endpoint.
 Every input DTO has a matching validator. See [AGENTS.md](../AGENTS.md) → Validators.
 
+## Direct-upload integrity
+
+Direct event-file uploads require the client to send the expected SHA-256 digest as the signed
+`x-amz-meta-sha256` header. Confirmation performs an R2 `HEAD` request and compares this metadata,
+the content length, and the content type with the pending `FileAsset` before attaching it.
+
+R2 does not expose a universally reliable SHA-256 content digest through `ETag`; multipart ETags in
+particular must not be interpreted as hashes. The signed metadata prevents the confirmation request
+from silently changing the declared digest, but it does not independently prove the bytes' digest.
+If cryptographic verification of stored bytes becomes mandatory, a trusted backend process must
+stream the object and calculate SHA-256 (or use a future provider checksum with documented semantics)
+before changing the upload status.
+
 ## Field limits
 
 | Constant | Value |

@@ -34,6 +34,14 @@ namespace CareGuide.API.Endpoints
                  .WithDescription("Detaches a file from a specific event.")
                  .Produces(StatusCodes.Status204NoContent)
                  .ProducesProblem(StatusCodes.Status404NotFound);
+
+            group.MapPost("/{fileId:guid}/confirm", ConfirmUpload)
+                 .WithName("ConfirmEventFileUpload")
+                 .WithSummary("Confirm an uploaded event file")
+                 .WithDescription("Validates the private object metadata, marks the file as uploaded, and attaches it to the event atomically.")
+                 .Produces<EventFileDto>(StatusCodes.Status200OK)
+                 .ProducesProblem(StatusCodes.Status400BadRequest)
+                 .ProducesProblem(StatusCodes.Status404NotFound);
         }
 
         private static async Task<IResult> GetAllByEventId(Guid eventId, IEventFileService eventFileService, CancellationToken cancellationToken)
@@ -52,6 +60,12 @@ namespace CareGuide.API.Endpoints
         {
             await eventFileService.DetachAsync(eventId, fileId, cancellationToken);
             return Results.NoContent();
+        }
+
+        private static async Task<IResult> ConfirmUpload(Guid eventId, Guid fileId, IEventFileService eventFileService, CancellationToken cancellationToken)
+        {
+            var result = await eventFileService.ConfirmUploadAsync(eventId, fileId, cancellationToken);
+            return Results.Ok(result);
         }
     }
 }

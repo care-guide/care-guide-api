@@ -5,6 +5,7 @@ namespace CareGuide.Models.DTOs.EventFile
         Guid FileId,
         string Name,
         long Size,
-        string Hash
+        string Hash,
+        string ContentType
     );
 }

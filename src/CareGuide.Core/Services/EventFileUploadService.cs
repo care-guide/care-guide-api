@@ -50,13 +50,17 @@ public sealed class EventFileUploadService(
 
         var expiresIn = TimeSpan.FromSeconds(_options.PresignedUrlExpirationSeconds);
         var expiresAt = DateTimeOffset.UtcNow.Add(expiresIn);
-        var uploadUrl = objectStorage.CreateUploadUrl(storageKey, dto.ContentType, expiresIn);
+        var uploadUrl = objectStorage.CreateUploadUrl(storageKey, dto.ContentType, file.Hash, expiresIn);
 
         return new InitiateEventFileUploadResponseDto(
             file.Id,
             uploadUrl,
             "PUT",
-            new Dictionary<string, string> { ["Content-Type"] = dto.ContentType },
+            new Dictionary<string, string>
+            {
+                ["Content-Type"] = dto.ContentType,
+                ["x-amz-meta-sha256"] = file.Hash
+            },
             expiresAt);
     }
 }

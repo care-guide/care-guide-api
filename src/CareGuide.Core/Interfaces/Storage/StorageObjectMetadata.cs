@@ -5,4 +5,5 @@ public sealed record StorageObjectMetadata(
     long ContentLength,
     string? ContentType,
     string? ETag,
+    string? ExpectedSha256,
     DateTime? LastModified);

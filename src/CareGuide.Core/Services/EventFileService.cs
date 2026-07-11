@@ -1,8 +1,11 @@
 using AutoMapper;
 using CareGuide.Core.Interfaces;
+using CareGuide.Core.Interfaces.Storage;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Infra.TransactionManagement;
 using CareGuide.Models.DTOs.EventFile;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Core.Services
 {
@@ -12,13 +15,23 @@ namespace CareGuide.Core.Services
         private readonly IEventRepository _eventRepository;
         private readonly IFileAssetRepository _fileAssetRepository;
         private readonly IMapper _mapper;
+        private readonly IObjectStorage _objectStorage;
+        private readonly IEfTransactionUnitOfWork _unitOfWork;
 
-        public EventFileService(IEventFileRepository eventFileRepository, IEventRepository eventRepository, IFileAssetRepository fileAssetRepository, IMapper mapper)
+        public EventFileService(
+            IEventFileRepository eventFileRepository,
+            IEventRepository eventRepository,
+            IFileAssetRepository fileAssetRepository,
+            IMapper mapper,
+            IObjectStorage objectStorage,
+            IEfTransactionUnitOfWork unitOfWork)
         {
             _eventFileRepository = eventFileRepository;
             _eventRepository = eventRepository;
             _fileAssetRepository = fileAssetRepository;
             _mapper = mapper;
+            _objectStorage = objectStorage;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IReadOnlyCollection<EventFileDto>> GetAllByEventIdAsync(Guid eventId, CancellationToken cancellationToken)
@@ -39,6 +52,8 @@ namespace CareGuide.Core.Services
 
             if (file == null)
                 throw new KeyNotFoundException($"No file found with ID {fileId}.");
+            if (file.UploadStatus != FileUploadStatus.Uploaded)
+                throw new InvalidOperationException("Only completed uploads can be attached to an event.");
 
             var existing = await _eventFileRepository.GetByEventAndFileAsync(eventId, fileId, cancellationToken);
 
@@ -65,6 +80,50 @@ namespace CareGuide.Core.Services
                 throw new KeyNotFoundException($"No file attachment found for event {eventId} and file {fileId}.");
 
             await _eventFileRepository.DeleteAsync(eventFile, cancellationToken);
+        }
+
+        public async Task<EventFileDto> ConfirmUploadAsync(Guid eventId, Guid fileId, CancellationToken cancellationToken)
+        {
+            var parentEvent = await _eventRepository.GetAsync(eventId, cancellationToken);
+            if (parentEvent == null)
+                throw new KeyNotFoundException($"No event found with ID {eventId}.");
+
+            var file = await _fileAssetRepository.GetAsync(fileId, cancellationToken);
+            if (file == null)
+                throw new KeyNotFoundException($"No file found with ID {fileId}.");
+            var existing = await _eventFileRepository.GetByEventAndFileAsync(eventId, fileId, cancellationToken);
+            if (existing != null && file.UploadStatus == FileUploadStatus.Uploaded)
+                return _mapper.Map<EventFileDto>(existing);
+            if (existing != null || file.UploadStatus != FileUploadStatus.Pending)
+                throw new InvalidOperationException("The file is not in a valid pending state for confirmation.");
+
+            var metadata = await _objectStorage.GetMetadataAsync(file.StorageKey, cancellationToken);
+            if (metadata == null)
+                throw new KeyNotFoundException("The uploaded object was not found in private storage.");
+            if (metadata.ContentLength != file.Size)
+                throw new InvalidOperationException("The uploaded object size does not match the pending file.");
+            if (!string.Equals(metadata.ContentType, file.ContentType, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The uploaded object content type does not match the pending file.");
+            if (!string.Equals(metadata.ExpectedSha256, file.Hash, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The uploaded object SHA-256 metadata does not match the pending file.");
+
+            var attachment = new EventFile { EventId = eventId, FileId = fileId, File = file };
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await _eventFileRepository.AddAsync(attachment, cancellationToken);
+                file.UploadStatus = FileUploadStatus.Uploaded;
+                await _fileAssetRepository.UpdateAsync(file, cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
+            }
+            catch
+            {
+                file.UploadStatus = FileUploadStatus.Pending;
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                throw;
+            }
+
+            return _mapper.Map<EventFileDto>(attachment);
         }
     }
 }
