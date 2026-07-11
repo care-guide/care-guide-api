@@ -28,7 +28,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Picture).HasColumnName("picture");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
         }
     }
 }

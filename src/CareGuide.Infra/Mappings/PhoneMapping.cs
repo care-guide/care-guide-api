@@ -26,7 +26,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Type).IsRequired().HasColumnType("varchar(3)").HasConversion(phoneTypeConverter).HasColumnName("type");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
         }
     }
 }

@@ -55,12 +55,6 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("district");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
                     b.Property<int?>("Number")
                         .HasColumnType("integer")
                         .HasColumnName("number");
@@ -115,12 +109,6 @@ namespace CareGuide.Infra.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("text")
                         .HasColumnName("details");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -192,12 +180,6 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("doctor_id");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -234,12 +216,6 @@ namespace CareGuide.Infra.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("end_date");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<bool>("IsAllDay")
                         .ValueGeneratedOnAdd()
@@ -324,12 +300,6 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("event_id");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(3)
@@ -365,12 +335,6 @@ namespace CareGuide.Infra.Migrations
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid")
                         .HasColumnName("event_id");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -430,12 +394,6 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("event_id");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
                     b.Property<string>("Laboratory")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -467,12 +425,6 @@ namespace CareGuide.Infra.Migrations
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid")
                         .HasColumnName("event_id");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -511,12 +463,6 @@ namespace CareGuide.Infra.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasColumnName("hash");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -558,12 +504,6 @@ namespace CareGuide.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("char(1)")
                         .HasColumnName("gender");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -608,12 +548,6 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("file_url");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
@@ -649,12 +583,6 @@ namespace CareGuide.Infra.Migrations
                         .HasMaxLength(3)
                         .HasColumnType("character varying(3)")
                         .HasColumnName("disease_type");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -701,12 +629,6 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("diagnosis");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
@@ -752,12 +674,6 @@ namespace CareGuide.Infra.Migrations
                     b.Property<decimal>("Height")
                         .HasColumnType("decimal(5,2)")
                         .HasColumnName("height");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("uuid")
@@ -816,12 +732,6 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -859,12 +769,6 @@ namespace CareGuide.Infra.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<bool>("Revoked")
                         .ValueGeneratedOnAdd()
@@ -909,12 +813,6 @@ namespace CareGuide.Infra.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("email");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Password")
                         .IsRequired()

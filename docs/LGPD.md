@@ -74,7 +74,7 @@ There is currently no consent entity in the model.
 | ----- | --------------- | -------------------- |
 | Confirmation and access | Partial | `GET` of Person/PersonHealth/etc. via authenticated API |
 | Correction | Yes | `PUT`/`PATCH` of the holder's entities |
-| Deletion | Partial | `DELETE /api/v1/accounts/{id}` — **see §6 on soft vs hard delete** |
+| Deletion | Partial | `DELETE /api/v1/accounts/{id}` — **see §6 on hard delete strategy** |
 | Portability | _Pending_ | No structured data export |
 | Information on data sharing | _Pending_ | Document third parties/processors |
 | Consent revocation | _Pending_ | Depends on consent recording (§3) |
@@ -104,12 +104,15 @@ Implemented today (details in [SECURITY.md](SECURITY.md)):
 
 ## 6. Retention and deletion
 
-- **Basis:** `Entity` has an `IsActive` flag, suggesting **soft delete**. Verify whether
-  `DELETE /api/v1/accounts/{id}` performs a logical or physical deletion.
+- **Decision:** the current API uses **hard delete** for `DELETE` operations. Repositories physically
+  remove entities from the database instead of marking them inactive.
+- **Model alignment:** the former `Entity.IsActive` flag was removed because it suggested a soft-delete
+  strategy that was not implemented consistently by queries or repositories.
 - **LGPD requirement:** data must be deleted after the purpose ends (art. 15/16), except for legal
-  retention cases. A soft delete does **not** by itself satisfy the right to deletion.
-- **Pending:** define a retention period per data category and a purge routine (hard delete) for the
-  holder who requests deletion, including files (`FileAsset`) and tokens.
+  retention cases. Hard delete supports the right to deletion, but each data category still needs a
+  documented retention rule.
+- **Pending:** define a retention period per data category and a purge/backup-retention policy for
+  data that may remain outside live tables, including files (`FileAsset`), tokens and backups.
 
 ---
 

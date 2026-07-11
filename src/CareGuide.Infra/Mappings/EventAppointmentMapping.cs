@@ -26,7 +26,6 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Type).IsRequired().HasMaxLength(3).HasColumnName("type").HasConversion(typeConverter);
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
-            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true).HasColumnName("is_active");
 
             builder.HasIndex(x => x.EventId).IsUnique();
 
