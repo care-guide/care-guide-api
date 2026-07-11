@@ -13,6 +13,7 @@ See also: [EXECUTION.md](EXECUTION.md) · [SECURITY.md](SECURITY.md)
 | `src/CareGuide.API/appsettings.json` | Base configuration (all environments) |
 | `src/CareGuide.API/appsettings.Development.json` | Overrides for local development |
 | Environment variables | Override the files; **use for secrets** |
+| `.env` (project root) | Read by `docker-compose` to substitute `${VAR}` (DB user/password/ports). Gitignored; copy from `.env.example`. |
 
 ## Configuration keys
 
