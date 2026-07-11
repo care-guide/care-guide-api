@@ -205,12 +205,12 @@ namespace CareGuide.API.Middlewares
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
 
-            var retryAfter = context.Response.Headers["Retry-After"].FirstOrDefault();
+            var retryAfterHeader = context.Response.Headers.RetryAfter.FirstOrDefault();
 
             var extensions = new Dictionary<string, object>();
-            if (!string.IsNullOrEmpty(retryAfter))
+            if (int.TryParse(retryAfterHeader, out var retryAfterSeconds))
             {
-                extensions["retryAfter"] = retryAfter;
+                extensions["retryAfter"] = retryAfterSeconds;
             }
 
             var problem = CreateProblemDetails(

@@ -74,6 +74,86 @@ public class ErrorHandlerMiddlewareTests
         problem["traceId"]!.GetValue<string>().Should().Be(context.TraceIdentifier);
     }
 
+    [Theory(DisplayName = "429 from rate limiter (general or auth policy) yields a single problem+json body with retryAfter")]
+    [InlineData("general")]
+    [InlineData("auth")]
+    public async Task InvokeAsync_RateLimitRejection_WritesSingleProblemJsonBodyWithRetryAfter(string policyName)
+    {
+        // Simulates what OnRejected leaves behind for either policy: status 429 + a real
+        // Retry-After header (derived from the limiter's lease metadata), and NO body written
+        // (OnRejected must not write a body — ErrorHandlerMiddleware is the single writer).
+        _ = policyName;
+
+        const int retryAfterSeconds = 17;
+
+        var env = Substitute.For<IWebHostEnvironment>();
+        env.EnvironmentName.Returns(Environments.Production);
+
+        var logger = Substitute.For<ILogger<ErrorHandlerMiddleware>>();
+        var middleware = new ErrorHandlerMiddleware(logger, env);
+
+        var context = new DefaultHttpContext();
+        context.Request.Path = "/api/v1/test";
+        context.Response.Body = new MemoryStream();
+
+        RequestDelegate next = ctx =>
+        {
+            ctx.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            ctx.Response.Headers.RetryAfter = retryAfterSeconds.ToString();
+            return Task.CompletedTask;
+        };
+
+        await middleware.InvokeAsync(context, next);
+
+        context.Response.StatusCode.Should().Be(StatusCodes.Status429TooManyRequests);
+        context.Response.ContentType.Should().StartWith("application/problem+json");
+        context.Response.Headers.RetryAfter.ToString().Should().Be(retryAfterSeconds.ToString());
+
+        context.Response.Body.Position = 0;
+        using var reader = new StreamReader(context.Response.Body);
+        var body = await reader.ReadToEndAsync();
+
+        // A single well-formed JSON document proves there was exactly one writer of the body:
+        // a double-write (plain text + problem+json, or problem+json twice) would either throw
+        // ("response already started") or produce concatenated/invalid JSON here.
+        var problem = JsonNode.Parse(body)!.AsObject();
+
+        problem["status"]!.GetValue<int>().Should().Be(StatusCodes.Status429TooManyRequests);
+        problem["retryAfter"]!.GetValue<int>().Should().Be(retryAfterSeconds);
+        problem["type"]!.GetValue<string>().Should().StartWith("https://problems-registry.smartbear.com/");
+    }
+
+    [Fact(DisplayName = "429 without Retry-After metadata still yields a single problem+json body, no retryAfter field")]
+    public async Task InvokeAsync_RateLimitRejectionWithoutRetryAfter_OmitsRetryAfterExtension()
+    {
+        var env = Substitute.For<IWebHostEnvironment>();
+        env.EnvironmentName.Returns(Environments.Production);
+
+        var logger = Substitute.For<ILogger<ErrorHandlerMiddleware>>();
+        var middleware = new ErrorHandlerMiddleware(logger, env);
+
+        var context = new DefaultHttpContext();
+        context.Request.Path = "/api/v1/test";
+        context.Response.Body = new MemoryStream();
+
+        RequestDelegate next = ctx =>
+        {
+            ctx.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            return Task.CompletedTask;
+        };
+
+        await middleware.InvokeAsync(context, next);
+
+        context.Response.ContentType.Should().StartWith("application/problem+json");
+
+        context.Response.Body.Position = 0;
+        using var reader = new StreamReader(context.Response.Body);
+        var body = await reader.ReadToEndAsync();
+        var problem = JsonNode.Parse(body)!.AsObject();
+
+        problem.ContainsKey("retryAfter").Should().BeFalse();
+    }
+
     private static async Task<(HttpContext Context, JsonObject Problem)> InvokeMiddlewareAsync(string environmentName, Exception exception)
     {
         var env = Substitute.For<IWebHostEnvironment>();
