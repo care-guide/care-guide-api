@@ -41,12 +41,12 @@ namespace CareGuide.Infra.Repositories.Shared
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
+        public virtual async Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await context.Set<TEntity>().AnyAsync(e => e.Id == id, cancellationToken);
         }
 
-        public async Task<int> CountExistingAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        public virtual async Task<int> CountExistingAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
         {
             var idList = ids?.Distinct().ToList() ?? [];
             if (idList.Count == 0) return 0;
@@ -76,7 +76,7 @@ namespace CareGuide.Infra.Repositories.Shared
             return entity;
         }
 
-        public async Task<TEntity?> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var entity = await context.Set<TEntity>().FindAsync([id], cancellationToken);
 
@@ -88,7 +88,7 @@ namespace CareGuide.Infra.Repositories.Shared
             return entity;
         }
 
-        public async Task<List<TEntity>> DeleteManyAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        public virtual async Task<List<TEntity>> DeleteManyAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
         {
             var set = context.Set<TEntity>();
             var entities = await set.Where(e => ids.Contains(e.Id)).ToListAsync(cancellationToken);
