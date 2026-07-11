@@ -8,9 +8,13 @@ namespace CareGuide.Models.Validators.Account
     {
         public UpdatePasswordAccountDtoValidator()
         {
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Password is required.")
-                .MaximumLength(DatabaseConstants.MaxLengthStandardText).WithMessage($"Password must not exceed {DatabaseConstants.MaxLengthStandardText} characters.");
+            RuleFor(x => x.CurrentPassword)
+                .NotEmpty().WithMessage("Current password is required.")
+                .MaximumLength(DatabaseConstants.MaxLengthStandardText).WithMessage($"Current password must not exceed {DatabaseConstants.MaxLengthStandardText} characters.");
+
+            RuleFor(x => x.NewPassword)
+                .NotEmpty().WithMessage("New password is required.")
+                .MaximumLength(DatabaseConstants.MaxLengthStandardText).WithMessage($"New password must not exceed {DatabaseConstants.MaxLengthStandardText} characters.");
         }
     }
 }

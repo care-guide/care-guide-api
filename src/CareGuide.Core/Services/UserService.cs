@@ -69,17 +69,20 @@ namespace CareGuide.Core.Services
             if (existingUser == null)
                 throw new KeyNotFoundException();
 
-            var (isSecure, feedback) = PasswordManagerHelper.CheckPassword(user.Password);
+            if (!PasswordManagerHelper.ValidatePassword(user.CurrentPassword, existingUser.Password))
+                throw new UnauthorizedAccessException("Current password is incorrect.");
+
+            var (isSecure, feedback) = PasswordManagerHelper.CheckPassword(user.NewPassword);
 
             if (!isSecure)
                 throw new InvalidOperationException(feedback);
 
-            if (PasswordManagerHelper.ValidatePassword(user.Password, existingUser.Password))
+            if (PasswordManagerHelper.ValidatePassword(user.NewPassword, existingUser.Password))
             {
                 throw new InvalidOperationException("The new password cannot be the same as the current password.");
             }
 
-            existingUser.Password = PasswordManagerHelper.HashPassword(user.Password);
+            existingUser.Password = PasswordManagerHelper.HashPassword(user.NewPassword);
 
             await _userRepository.UpdateAsync(existingUser, cancellationToken);
         }

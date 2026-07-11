@@ -128,6 +128,7 @@ namespace CareGuide.Core.Services
         public async Task UpdatePasswordAccountAsync(Guid id, UpdatePasswordAccountDto updatePasswordAccount, CancellationToken cancellationToken)
         {
             await _userService.UpdatePasswordAsync(id, updatePasswordAccount, cancellationToken);
+            await _refreshTokenService.InvalidateAllAsync(id, cancellationToken);
         }
 
         public async Task DeleteAccountAsync(Guid id, CancellationToken cancellationToken)
