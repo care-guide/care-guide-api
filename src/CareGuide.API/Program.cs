@@ -1,4 +1,5 @@
 using CareGuide.API.Extensions;
+using CareGuide.API.BackgroundServices;
 using CareGuide.API.Filters;
 using CareGuide.API.Middlewares;
 using CareGuide.Core;
@@ -78,6 +79,7 @@ builder.Services.AddOpenApi(ApiConstants.API_VERSION, options =>
 
 builder.Services.AddTransient<ErrorHandlerMiddleware>();
 builder.Services.AddTransient<SessionMiddleware>();
+builder.Services.AddHostedService<AbandonedUploadCleanupBackgroundService>();
 
 var app = builder.Build();
 

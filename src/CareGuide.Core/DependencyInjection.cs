@@ -31,6 +31,8 @@ namespace CareGuide.Core
             services.AddScoped<IEventFileUploadService, EventFileUploadService>();
             services.AddScoped<IEventAddressService, EventAddressService>();
             services.AddScoped<IFileAssetService, FileAssetService>();
+            services.AddScoped<IFileLifecycleService, FileLifecycleService>();
+            services.AddScoped<IAbandonedUploadCleanupService, AbandonedUploadCleanupService>();
             services.AddScoped<IAddressService, AddressService>();
             services.AddScoped<IDoctorAddressService, DoctorAddressService>();
 

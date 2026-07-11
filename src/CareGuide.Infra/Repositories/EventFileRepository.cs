@@ -53,5 +53,13 @@ namespace CareGuide.Infra.Repositories
             _context.EventFiles.Remove(entity);
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public Task<int> CountByFileAsync(Guid fileId, CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+            return _context.EventFiles.CountAsync(
+                ef => ef.FileId == fileId && ef.File.PersonId == personId,
+                cancellationToken);
+        }
     }
 }

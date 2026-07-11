@@ -43,6 +43,9 @@ the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `D
 | `FileUploads:HashFormat` | Required expected-hash encoding | `Hex` |
 | `FileUploads:PresignedUrlExpirationSeconds` | Direct-upload URL lifetime | `300` |
 | `FileDownloads:PresignedUrlExpirationSeconds` | Private download URL lifetime (60–3600 seconds) | `300` |
+| `FileLifecycle:PendingUploadExpirationMinutes` | Time before an unattached pending upload is abandoned | `60` |
+| `FileLifecycle:UnreferencedFileRetentionDays` | Retention before a completed unreferenced file is purged | `30` |
+| `FileLifecycle:CleanupIntervalMinutes` | Interval between idempotent cleanup runs | `15` |
 | `Logging:LogLevel` | Log levels | — |
 
 ## Ports

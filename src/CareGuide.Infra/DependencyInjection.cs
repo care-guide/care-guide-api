@@ -48,6 +48,10 @@ namespace CareGuide.Infra
             services.AddOptions<FileDownloadOptions>()
                 .Bind(configuration.GetSection(FileDownloadOptions.SectionName))
                 .ValidateOnStart();
+            services.AddSingleton<IValidateOptions<FileLifecycleOptions>, FileLifecycleOptionsValidator>();
+            services.AddOptions<FileLifecycleOptions>()
+                .Bind(configuration.GetSection(FileLifecycleOptions.SectionName))
+                .ValidateOnStart();
 
             services.AddDbContext<DatabaseContext>(opt =>
             {
@@ -89,6 +93,7 @@ namespace CareGuide.Infra
             services.AddScoped<IEventFileRepository, EventFileRepository>();
             services.AddScoped<IEventAddressRepository, EventAddressRepository>();
             services.AddScoped<IFileAssetRepository, FileAssetRepository>();
+            services.AddScoped<IAbandonedFileRepository, AbandonedFileRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IDoctorAddressRepository, DoctorAddressRepository>();
         }

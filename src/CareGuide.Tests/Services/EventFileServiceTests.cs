@@ -149,6 +149,7 @@ public class EventFileServiceTests
         await _sut.DetachAsync(eventId, fileId, CancellationToken.None);
 
         await _repository.Received(1).DeleteAsync(eventFile, Arg.Any<CancellationToken>());
+        await _objectStorage.DidNotReceive().DeleteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]

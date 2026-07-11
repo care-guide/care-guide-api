@@ -113,6 +113,10 @@ Implemented today (details in [SECURITY.md](SECURITY.md)):
   documented retention rule.
 - **Pending:** define a retention period per data category and a purge/backup-retention policy for
   data that may remain outside live tables, including files (`FileAsset`), tokens and backups.
+- **File lifecycle:** detaching or deleting an event removes only `EventFile` associations. The shared
+  object is preserved while referenced; unreferenced completed files follow the configured retention
+  period. Definitive deletion first records a recoverable deletion state, then removes the private
+  object, and finally deletes the database row. Expired pending uploads are purged idempotently.
 
 ---
 
