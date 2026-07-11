@@ -36,7 +36,8 @@ public class AccountEndpoints() : IEndpoint
              .WithDescription("Authenticates a user and returns a JWT token and a refresh token.")
              .Accepts<LoginAccountDto>("application/json")
              .Produces<AccountResponseDto>(StatusCodes.Status200OK)
-             .ProducesProblem(StatusCodes.Status400BadRequest);
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/logout", Logout)
              .WithSummary("Logout")
@@ -52,7 +53,8 @@ public class AccountEndpoints() : IEndpoint
              .WithDescription("Refreshes JWT access token using a valid refresh token.")
              .Accepts<RefreshTokenDto>("application/json")
              .Produces<AccountResponseDto>(StatusCodes.Status200OK)
-             .ProducesProblem(StatusCodes.Status400BadRequest);
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/{id:guid}/password", UpdatePassword)
              .WithSummary("Update Password")
@@ -122,7 +124,7 @@ public class AccountEndpoints() : IEndpoint
         var cookieToken = httpContext.Request.Cookies["refreshToken"];
 
         if (string.IsNullOrWhiteSpace(cookieToken))
-            return Results.Unauthorized();
+            throw new UnauthorizedAccessException("Invalid or missing refresh token.");
 
         var safeRequest = refreshRequest with { RefreshToken = cookieToken };
         var accountDto = await accountService.RefreshTokenAsync(safeRequest, cancellationToken);
