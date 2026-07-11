@@ -2,7 +2,6 @@
 using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
-using CareGuide.Models.DTOs.PersonAnnotation;
 using CareGuide.Models.DTOs.PersonDisease;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,30 +20,30 @@ namespace CareGuide.API.Endpoints
                  .WithName("GetAllPersonDiseases")
                  .WithSummary("Get all diseases")
                  .WithDescription("Retrieves all diseases for the authenticated person using pagination parameters.")
-                 .Produces<List<PersonAnnotationDto>>(StatusCodes.Status200OK)
+                 .Produces<List<PersonDiseaseDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapGet("/{id:guid}", GetById)
                  .WithName("GetPersonDiseaseById")
                  .WithSummary("Get disease by id")
                  .WithDescription("Retrieves a specific disease for the authenticated person by its identifier.")
-                 .Produces<PersonAnnotationDto>(StatusCodes.Status200OK)
+                 .Produces<PersonDiseaseDto>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status404NotFound);
 
             group.MapPost("/", Create)
                  .WithName("CreatePersonDisease")
                  .WithSummary("Create disease")
                  .WithDescription("Creates a new disease for the authenticated person.")
-                 .Accepts<CreatePersonAnnotationDto>("application/json")
-                 .Produces<PersonAnnotationDto>(StatusCodes.Status201Created)
+                 .Accepts<CreatePersonDiseaseDto>("application/json")
+                 .Produces<PersonDiseaseDto>(StatusCodes.Status201Created)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapPut("/{id:guid}", Update)
                  .WithName("UpdatePersonDisease")
                  .WithSummary("Update disease")
                  .WithDescription("Updates an existing disease for the authenticated person by its identifier.")
-                 .Accepts<UpdatePersonAnnotationDto>("application/json")
-                 .Produces<PersonAnnotationDto>(StatusCodes.Status200OK)
+                 .Accepts<UpdatePersonDiseaseDto>("application/json")
+                 .Produces<PersonDiseaseDto>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest)
                  .ProducesProblem(StatusCodes.Status404NotFound);
 
