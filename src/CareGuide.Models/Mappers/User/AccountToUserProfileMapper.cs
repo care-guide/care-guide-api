@@ -10,8 +10,6 @@ namespace CareGuide.Models.Mappers.User
         {
             CreateMap<CreateAccountDto, CreateUserDto>()
                 .ConstructUsing(src => new CreateUserDto(
-                    Guid.Empty,
-                    Guid.Empty,
                     src.Email,
                     src.Password
                 ));

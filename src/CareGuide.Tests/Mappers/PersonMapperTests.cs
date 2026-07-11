@@ -73,13 +73,14 @@ public class PersonMapperTests
     [Fact(DisplayName = "CreatePersonDto→Person: Name, Gender, Birthday map correctly")]
     public void Map_CreatePersonDtoToPerson_MapsFields()
     {
-        var dto = new CreatePersonDto(Guid.NewGuid(), "Alice", Gender.F, new DateOnly(1990, 5, 20), null);
+        var dto = new CreatePersonDto("Alice", Gender.F, new DateOnly(1990, 5, 20), null);
 
         var entity = _mapper.Map<Person>(dto);
 
         entity.Name.Should().Be("Alice");
         entity.Gender.Should().Be(Gender.F);
         entity.Birthday.Should().Be(new DateOnly(1990, 5, 20));
+        entity.Id.Should().NotBeEmpty(because: "the Id must be server-generated, never client-supplied");
     }
 
     // ── PersonAnnotation → PersonAnnotationDto ────────────────────────────────

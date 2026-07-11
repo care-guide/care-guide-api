@@ -67,7 +67,7 @@ public class PersonServiceTests
     [Fact(DisplayName = "CreateAsync: persists mapped entity and returns DTO")]
     public async Task CreateAsync_ValidDto_PersistsAndReturnsDto()
     {
-        var createDto = new CreatePersonDto(Guid.NewGuid(), "Alice", Gender.F, new DateOnly(1990, 1, 1), null);
+        var createDto = new CreatePersonDto("Alice", Gender.F, new DateOnly(1990, 1, 1), null);
         var entity = new Person { Name = "Alice", Gender = Gender.F, Birthday = new DateOnly(1990, 1, 1) };
         var expected = new PersonDto(entity.Id, "Alice", null, Gender.F, new DateOnly(1990, 1, 1), DateTime.UtcNow, DateTime.UtcNow);
 

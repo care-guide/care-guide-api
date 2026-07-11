@@ -49,8 +49,8 @@ public class AccountServiceTests
         var createDto = new CreateAccountDto("new@test.com", "Str0ng@Pass!", "Test User", Gender.F, DateOnly.FromDateTime(DateTime.Now));
         var refreshToken = new RefreshToken { UserId = DefaultUserDto.Id, Token = "refresh-token" };
 
-        _mapper.Map<CreatePersonDto>(createDto).Returns(new CreatePersonDto(Guid.NewGuid(), "Test User", Gender.F, DateOnly.FromDateTime(DateTime.Now), null));
-        _mapper.Map<CreateUserDto>(createDto).Returns(new CreateUserDto(Guid.NewGuid(), DefaultPersonDto.Id, "new@test.com", "Str0ng@Pass!"));
+        _mapper.Map<CreatePersonDto>(createDto).Returns(new CreatePersonDto("Test User", Gender.F, DateOnly.FromDateTime(DateTime.Now), null));
+        _mapper.Map<CreateUserDto>(createDto).Returns(new CreateUserDto("new@test.com", "Str0ng@Pass!"));
         _personService.CreateAsync(Arg.Any<CreatePersonDto>(), Arg.Any<CancellationToken>()).Returns(DefaultPersonDto);
         _userService.CreateAsync(DefaultPersonDto, Arg.Any<CreateUserDto>(), Arg.Any<CancellationToken>()).Returns(DefaultUserDto);
         _jwtService.GenerateToken(DefaultUserDto.Id, DefaultPersonDto.Id, Arg.Any<bool>()).Returns("access-token");
@@ -69,8 +69,8 @@ public class AccountServiceTests
     {
         var createDto = new CreateAccountDto("fail@test.com", "Str0ng@Pass!", "User", Gender.M, DateOnly.FromDateTime(DateTime.Now));
 
-        _mapper.Map<CreatePersonDto>(createDto).Returns(new CreatePersonDto(Guid.NewGuid(), "User", Gender.M, DateOnly.FromDateTime(DateTime.Now), null));
-        _mapper.Map<CreateUserDto>(createDto).Returns(new CreateUserDto(Guid.NewGuid(), Guid.NewGuid(), "fail@test.com", "Str0ng@Pass!"));
+        _mapper.Map<CreatePersonDto>(createDto).Returns(new CreatePersonDto("User", Gender.M, DateOnly.FromDateTime(DateTime.Now), null));
+        _mapper.Map<CreateUserDto>(createDto).Returns(new CreateUserDto("fail@test.com", "Str0ng@Pass!"));
         _personService.CreateAsync(Arg.Any<CreatePersonDto>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<PersonDto>(new InvalidOperationException("Email already registered")));
 

@@ -48,14 +48,10 @@ public class AccountMapperTests
         result.Picture.Should().BeNull();
     }
 
-    [Fact(DisplayName = "CreateAccountDto→CreatePersonDto: Id is set to Guid.Empty")]
-    public void Map_CreateAccountToCreatePerson_IdIsEmpty()
+    [Fact(DisplayName = "CreatePersonDto: does not expose an Id property")]
+    public void CreatePersonDto_DoesNotExposeId()
     {
-        var dto = new CreateAccountDto("bob@test.com", "Str0ng@Pass!", "Bob", Gender.M, new DateOnly(1985, 1, 1));
-
-        var result = _mapper.Map<CreatePersonDto>(dto);
-
-        result.Id.Should().Be(Guid.Empty);
+        typeof(CreatePersonDto).GetProperty("Id").Should().BeNull(because: "the Id must be generated server-side, never client-supplied");
     }
 
     [Fact(DisplayName = "CreateAccountDto→CreatePersonDto: Email and Password are not mapped")]
@@ -84,15 +80,11 @@ public class AccountMapperTests
         result.Password.Should().Be("Str0ng@Pass!");
     }
 
-    [Fact(DisplayName = "CreateAccountDto→CreateUserDto: Id and PersonId are set to Guid.Empty")]
-    public void Map_CreateAccountToCreateUser_IdsAreEmpty()
+    [Fact(DisplayName = "CreateUserDto: does not expose Id or PersonId properties")]
+    public void CreateUserDto_DoesNotExposeIdOrPersonId()
     {
-        var dto = new CreateAccountDto("alice@test.com", "pass", "Alice", Gender.F, new DateOnly(1990, 1, 1));
-
-        var result = _mapper.Map<CreateUserDto>(dto);
-
-        result.Id.Should().Be(Guid.Empty);
-        result.PersonId.Should().Be(Guid.Empty);
+        typeof(CreateUserDto).GetProperty("Id").Should().BeNull(because: "the Id must be generated server-side, never client-supplied");
+        typeof(CreateUserDto).GetProperty("PersonId").Should().BeNull(because: "PersonId must be wired server-side by AccountService, never client-supplied");
     }
 
     // ── User → UserDto ────────────────────────────────────────────────────────
@@ -141,11 +133,12 @@ public class AccountMapperTests
     [Fact(DisplayName = "CreateUserDto→User: Email and Password map correctly")]
     public void Map_CreateUserDtoToEntity_MapsEmailAndPassword()
     {
-        var dto = new CreateUserDto(Guid.NewGuid(), Guid.NewGuid(), "alice@test.com", "Str0ng@Pass!");
+        var dto = new CreateUserDto("alice@test.com", "Str0ng@Pass!");
 
         var entity = _mapper.Map<User>(dto);
 
         entity.Email.Should().Be("alice@test.com");
         entity.Password.Should().Be("Str0ng@Pass!");
+        entity.Id.Should().NotBeEmpty(because: "the Id must be server-generated, never client-supplied");
     }
 }
