@@ -4,6 +4,8 @@ namespace CareGuide.Models.Enums
     {
         Pending,
         Uploaded,
-        Failed
+        Failed,
+        DeletionPending,
+        DeletionFailed
     }
 }
