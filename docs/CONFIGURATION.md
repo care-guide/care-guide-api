@@ -27,7 +27,7 @@ the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `D
 | `SecuritySettings:SecretKey` | JWT signing key (**secret**) | *(via env/vault)* |
 | `SecuritySettings:Issuer` | Token issuer | `CareGuideAPI` |
 | `SecuritySettings:Audience` | Token audience | `CareGuideClient` |
-| `CorsOrigins` | Allowed origins (array) | `["https://careguide.dev"]` |
+| `CorsOrigins` | Allowed origins for credentialed CORS (array, explicit — no wildcard) | `["https://careguide.dev"]` |
 | `AllowedHosts` | Allowed hosts | `*` |
 | `Storage:R2:Endpoint` | HTTPS endpoint of the S3-compatible R2 account | `https://<account-id>.r2.cloudflarestorage.com` |
 | `Storage:R2:AccountId` | Cloudflare account identifier | *(via env/vault)* |
@@ -52,6 +52,16 @@ All duration values are integers in seconds, minutes or days as stated in the ke
 integer bytes. Content types and extensions are arrays; extensions include the leading dot. Startup
 validation rejects missing R2 settings, non-HTTPS endpoints, empty allowlists, unsupported hash format,
 unsafe URL lifetimes and invalid lifecycle periods.
+
+### CORS
+
+`CorsOrigins` feeds the `"CorsPolicy"` registered in `Program.cs`, which calls `AllowCredentials()`
+so browsers include the auth cookie on cross-origin requests (e.g. a web SPA hosted on a different
+origin). Because the CORS spec forbids combining credentialed requests with a wildcard origin, the
+policy always resolves origins via `WithOrigins(corsOrigins)` — `AllowAnyOrigin()` must never be
+added back. Add every web frontend origin that needs cookie-authenticated access to `CorsOrigins`;
+anything not listed is rejected by the browser's preflight check. Non-browser clients (mobile apps,
+server-to-server calls) are not subject to CORS and are unaffected by this setting.
 
 ### R2 values and secret delivery
 

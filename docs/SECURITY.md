@@ -87,6 +87,17 @@ user from reading/editing another user's data. See [AGENTS.md](../AGENTS.md) →
 
 Allowed origins configured in `CorsOrigins` (`appsettings`). See [CONFIGURATION.md](CONFIGURATION.md).
 
+The `CorsPolicy` (`Program.cs`) calls `AllowCredentials()` so the browser will send/receive the
+`HttpOnly` auth cookie on cross-origin requests from a web frontend (e.g. a future SPA). Per the
+CORS spec, credentialed requests **must not** be paired with a wildcard origin — the browser
+rejects `Access-Control-Allow-Origin: *` together with `Access-Control-Allow-Credentials: true`.
+The policy therefore always uses `WithOrigins(...)` sourced from the explicit `CorsOrigins` list;
+`AllowAnyOrigin()` must never be reintroduced alongside `AllowCredentials()`.
+
+Non-browser clients (server-to-server calls, curl, mobile native HTTP clients) are unaffected:
+CORS is enforced only by browsers reading the `Origin` header, so requests without it bypass the
+CORS pipeline entirely.
+
 ---
 
 ## 7. Secret management
