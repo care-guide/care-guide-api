@@ -27,6 +27,10 @@ Both the `sessionToken` (access, 15 min) and the `refreshToken` (7 days) are wri
 - `Secure = true` — only sent over HTTPS.
 - `SameSite = Strict` — CSRF protection.
 
+On successful login, the JSON response contains only account profile data. Tokens are not included in
+the response body; they are delivered through the cookies above. Non-browser API clients can send an
+access token with `Authorization: Bearer <token>`; that header takes precedence over `sessionToken`.
+
 The `POST /api/v1/accounts/refresh` endpoint reads the refresh token **from the cookie**, not from
 the body, to avoid leaking it into client logs.
 

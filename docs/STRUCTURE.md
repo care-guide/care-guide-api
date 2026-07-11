@@ -12,7 +12,13 @@ src/
     CareGuide.Models/   → Entities, DTOs, Enums, Mappers, Validators, Constants
     CareGuide.Security/ → JWT, password hashing and strength
     CareGuide.Tests/    → Unit tests (no database, no network)
+database/
+    seeds/              → Idempotent local-development database seed and runner
 ```
+
+`database/seeds` is development tooling rather than an application layer. Its runner reads the local
+`.env`, hashes development passwords through `CareGuide.Security`, and populates relationally valid
+data after migrations have been applied. See [the seed guide](../database/seeds/README.md).
 
 ## Dependency flow
 

@@ -132,13 +132,14 @@ public class AccountServiceTests
         _userRepository.GetByEmailAsync(loginDto.Email, Arg.Any<CancellationToken>()).Returns(user);
         _jwtService.GenerateToken(user.Id, user.PersonId, Arg.Any<bool>()).Returns("access-token");
         _refreshTokenService.CreateAsync(user.Id, Arg.Any<CancellationToken>()).Returns(refreshToken);
-        _userService.GetByIdDtoAsync(user.Id, Arg.Any<CancellationToken>()).Returns(DefaultUserDto);
+        _mapper.Map<UserDto>(user).Returns(DefaultUserDto);
         _personService.GetAsync(user.PersonId!.Value, Arg.Any<CancellationToken>()).Returns(DefaultPersonDto);
 
         var result = await _sut.LoginAccountAsync(loginDto, CancellationToken.None);
 
         result.SessionToken.Should().Be("access-token");
         result.RefreshToken.Should().Be("refresh-token");
+        await _userService.DidNotReceive().GetByIdDtoAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
     [Fact(DisplayName = "RefreshTokenAsync: user not found throws UnauthorizedAccessException")]
