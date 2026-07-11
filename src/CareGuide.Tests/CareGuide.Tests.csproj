@@ -17,7 +17,9 @@
     <PackageReference Include="FluentAssertions" Version="8.10.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.9" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
-    <PackageReference Include="Microsoft.OpenApi" Version="3.8.0" />
+    <!-- Must match CareGuide.API: patched 2.x (>= 2.7.5 for GHSA-v5pm-xwqc-g5wc), compatible with
+         the Microsoft.AspNetCore.OpenApi 10.0.9 source generator (flows in via the API project ref). -->
+    <PackageReference Include="Microsoft.OpenApi" Version="2.10.0" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
