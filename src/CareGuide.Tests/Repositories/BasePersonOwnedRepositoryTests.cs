@@ -1,6 +1,7 @@
 using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Repositories;
 using CareGuide.Infra.Repositories.Shared;
+using CareGuide.Models.Constants;
 using CareGuide.Models.Entities;
 using CareGuide.Models.Enums;
 using CareGuide.Security.Interfaces;
@@ -96,6 +97,40 @@ namespace CareGuide.Tests.Repositories
             var result = await repository.GetManyAsync([diseaseA.Id, diseaseB.Id], 1, 10, CancellationToken.None);
 
             result.Should().ContainSingle(d => d.Id == diseaseA.Id);
+        }
+
+        [Fact(DisplayName = "GetAllByPersonAsync: pageSize above MaxPageSize is clamped")]
+        public async Task GetAllByPersonAsync_PageSizeAboveMax_IsClamped()
+        {
+            using (var seedContext = CreateContext())
+            {
+                for (var i = 0; i < PaginationConstants.MaxPageSize + 20; i++)
+                    seedContext.PersonDiseases.Add(new PersonDisease { PersonId = _personAId, Name = $"Disease {i}", DiseaseType = DiseaseType.Chronic });
+
+                await seedContext.SaveChangesAsync();
+            }
+
+            using var context = CreateContext();
+            var repository = CreateRepository(context, _personAId);
+
+            var result = await repository.GetAllByPersonAsync(1, PaginationConstants.MaxPageSize + 50, CancellationToken.None);
+
+            result.Should().HaveCount(PaginationConstants.MaxPageSize);
+        }
+
+        [Theory(DisplayName = "GetAllByPersonAsync: non-positive page/pageSize are normalized instead of throwing")]
+        [InlineData(-1, -1)]
+        [InlineData(0, 0)]
+        public async Task GetAllByPersonAsync_NonPositiveValues_AreNormalized(int page, int pageSize)
+        {
+            await SeedAsync();
+
+            using var context = CreateContext();
+            var repository = CreateRepository(context, _personAId);
+
+            var act = async () => await repository.GetAllByPersonAsync(page, pageSize, CancellationToken.None);
+
+            await act.Should().NotThrowAsync();
         }
 
         [Fact]

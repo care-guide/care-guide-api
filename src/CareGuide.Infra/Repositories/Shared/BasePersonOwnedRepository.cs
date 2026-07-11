@@ -22,8 +22,7 @@ namespace CareGuide.Infra.Repositories.Shared
 
         public override async Task<List<TEntity>> GetManyAsync(IEnumerable<Guid> ids, int page, int pageSize, CancellationToken cancellationToken = default)
         {
-            if (page < 1) throw new ArgumentException("Page must be greater than or equal to 1.", nameof(page));
-            if (pageSize < 1) throw new ArgumentException("PageSize must be greater than or equal to 1.", nameof(pageSize));
+            (page, pageSize) = NormalizePagination(page, pageSize);
 
             return await Scoped
                 .Where(e => ids.Contains(e.Id))
@@ -73,6 +72,8 @@ namespace CareGuide.Infra.Repositories.Shared
 
         public async Task<List<TEntity>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         {
+            (page, pageSize) = NormalizePagination(page, pageSize);
+
             return await Scoped
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

@@ -71,6 +71,9 @@ Constants in `PaginationConstants`:
 | -------- | ----- |
 | `DefaultPage` | `1` |
 | `DefaultPageSize` | `10` |
+| `MaxPageSize` | `100` |
+
+`page`/`pageSize` are normalized by `BaseRepository`/`BasePersonOwnedRepository`, never throw: `page < 1` → `DefaultPage`; `pageSize < 1` → `DefaultPageSize`; `pageSize > MaxPageSize` → `MaxPageSize`.
 
 ## Validation
 
