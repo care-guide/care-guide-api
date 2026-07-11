@@ -42,6 +42,7 @@ the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `D
 | `FileUploads:HashAlgorithm` | Required expected-hash algorithm | `SHA256` |
 | `FileUploads:HashFormat` | Required expected-hash encoding | `Hex` |
 | `FileUploads:PresignedUrlExpirationSeconds` | Direct-upload URL lifetime | `300` |
+| `FileDownloads:PresignedUrlExpirationSeconds` | Private download URL lifetime (60–3600 seconds) | `300` |
 | `Logging:LogLevel` | Log levels | — |
 
 ## Ports

@@ -34,9 +34,28 @@ public class R2ObjectStorageTests
     {
         var storage = CreateStorage();
 
-        var act = () => storage.CreateDownloadUrl("person/file.pdf", TimeSpan.FromHours(2));
+        var act = () => storage.CreateDownloadUrl("person/file.pdf", "exam.pdf", TimeSpan.FromHours(2));
 
         act.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void CreateDownloadUrl_ShouldUseGetExpectedObjectAndSafeContentDisposition()
+    {
+        GetPreSignedUrlRequest? captured = null;
+        _client.GetPreSignedURL(Arg.Do<GetPreSignedUrlRequest>(request => captured = request))
+            .Returns("https://example.test/download");
+        var storage = CreateStorage();
+
+        var result = storage.CreateDownloadUrl("person/event/file", "../exam result.pdf", TimeSpan.FromMinutes(5));
+
+        result.Should().Be(new Uri("https://example.test/download"));
+        captured.Should().NotBeNull();
+        captured!.BucketName.Should().Be("private-bucket");
+        captured.Key.Should().Be("person/event/file");
+        captured.Verb.Should().Be(HttpVerb.GET);
+        captured.ResponseHeaderOverrides.ContentDisposition.Should().Be("attachment; filename*=UTF-8''exam%20result.pdf");
+        captured.Expires.Should().BeCloseTo(DateTime.UtcNow.AddMinutes(5), TimeSpan.FromSeconds(2));
     }
 
     private R2ObjectStorage CreateStorage() => new(_client, Options.Create(new R2StorageOptions

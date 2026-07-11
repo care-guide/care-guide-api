@@ -42,6 +42,14 @@ namespace CareGuide.API.Endpoints
                  .Produces<EventFileDto>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest)
                  .ProducesProblem(StatusCodes.Status404NotFound);
+
+            group.MapGet("/{fileId:guid}/download", CreateDownload)
+                 .WithName("CreateEventFileDownload")
+                 .WithSummary("Create a temporary event-file download")
+                 .WithDescription("Authorizes access to an attached private file and returns a short-lived pre-signed GET URL.")
+                 .Produces<EventFileDownloadDto>(StatusCodes.Status200OK)
+                 .ProducesProblem(StatusCodes.Status400BadRequest)
+                 .ProducesProblem(StatusCodes.Status404NotFound);
         }
 
         private static async Task<IResult> GetAllByEventId(Guid eventId, IEventFileService eventFileService, CancellationToken cancellationToken)
@@ -65,6 +73,16 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> ConfirmUpload(Guid eventId, Guid fileId, IEventFileService eventFileService, CancellationToken cancellationToken)
         {
             var result = await eventFileService.ConfirmUploadAsync(eventId, fileId, cancellationToken);
+            return Results.Ok(result);
+        }
+
+        private static async Task<IResult> CreateDownload(
+            Guid eventId,
+            Guid fileId,
+            IEventFileDownloadService downloadService,
+            CancellationToken cancellationToken)
+        {
+            var result = await downloadService.CreateDownloadAsync(eventId, fileId, cancellationToken);
             return Results.Ok(result);
         }
     }
