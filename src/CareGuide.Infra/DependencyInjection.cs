@@ -8,6 +8,7 @@ using CareGuide.Infra.Repositories;
 using CareGuide.Infra.Repositories.Shared;
 using CareGuide.Infra.Storage;
 using CareGuide.Infra.TransactionManagement;
+using CareGuide.Models.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,10 @@ namespace CareGuide.Infra
                     });
             });
             services.AddSingleton<IObjectStorage, R2ObjectStorage>();
+            services.AddSingleton<IValidateOptions<FileUploadOptions>, FileUploadOptionsValidator>();
+            services.AddOptions<FileUploadOptions>()
+                .Bind(configuration.GetSection(FileUploadOptions.SectionName))
+                .ValidateOnStart();
 
             services.AddDbContext<DatabaseContext>(opt =>
             {
