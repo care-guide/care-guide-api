@@ -145,12 +145,14 @@ public class EventServiceTests
         };
         var dtos = events.Select(e => new EventDto(e.Id, e.PersonId!.Value, e.Name, e.StartDate, null, e.Type, false, null, null, null, DateTime.UtcNow, DateTime.UtcNow)).ToList();
 
-        _repository.GetAllByPersonAsync(1, 10, Arg.Any<CancellationToken>()).Returns(events);
+        _repository.GetAllByPersonPagedAsync(1, 10, Arg.Any<CancellationToken>()).Returns((events, 2, 1, 10));
         _mapper.Map<List<EventDto>>(events).Returns(dtos);
 
         var result = await _sut.GetAllByPersonAsync(1, 10, CancellationToken.None);
 
-        result.Should().HaveCount(2);
+        result.Items.Should().HaveCount(2);
+        result.Total.Should().Be(2);
+        result.HasNext.Should().BeFalse();
     }
 
     [Fact(DisplayName = "DeleteAllByPersonAsync: delegates to repository")]

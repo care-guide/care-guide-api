@@ -33,13 +33,14 @@ public class PersonPhoneServiceTests
     public async Task GetAllByPersonAsync_EmptyList_ThrowsKeyNotFoundException()
     {
         _repository.GetAllByPersonWithPhonesAsync(1, 10, Arg.Any<CancellationToken>()).Returns(new List<PersonPhone>());
+        _repository.CountByPersonAsync(Arg.Any<CancellationToken>()).Returns(0);
 
         var act = async () => await _sut.GetAllByPersonAsync(1, 10, CancellationToken.None);
 
         await act.Should().ThrowAsync<KeyNotFoundException>();
     }
 
-    [Fact(DisplayName = "GetAllByPersonAsync: found returns mapped list")]
+    [Fact(DisplayName = "GetAllByPersonAsync: found returns paged envelope with real total")]
     public async Task GetAllByPersonAsync_Found_ReturnsMappedList()
     {
         var phoneId = Guid.NewGuid();
@@ -50,11 +51,14 @@ public class PersonPhoneServiceTests
         var dtos = new List<PersonPhoneDto> { new(Guid.NewGuid(), phoneId, "912345678", "11", PhoneType.CEL) };
 
         _repository.GetAllByPersonWithPhonesAsync(1, 10, Arg.Any<CancellationToken>()).Returns(personPhones);
+        _repository.CountByPersonAsync(Arg.Any<CancellationToken>()).Returns(1);
         _mapper.Map<List<PersonPhoneDto>>(personPhones).Returns(dtos);
 
         var result = await _sut.GetAllByPersonAsync(1, 10, CancellationToken.None);
 
-        result.Should().HaveCount(1);
+        result.Items.Should().HaveCount(1);
+        result.Total.Should().Be(1);
+        result.HasNext.Should().BeFalse();
     }
 
     // ── GetAsync ──────────────────────────────────────────────────────────────
@@ -202,7 +206,7 @@ public class PersonPhoneServiceTests
     [Fact(DisplayName = "DeleteAllByPersonAsync: empty phone list skips delete")]
     public async Task DeleteAllByPersonAsync_EmptyList_SkipsOperation()
     {
-        _repository.GetAllByPersonWithPhonesAsync(1, int.MaxValue, Arg.Any<CancellationToken>()).Returns(new List<PersonPhone>());
+        _repository.GetAllByPersonUnpagedAsync(Arg.Any<CancellationToken>()).Returns(new List<PersonPhone>());
 
         await _sut.DeleteAllByPersonAsync(CancellationToken.None);
 
@@ -214,7 +218,7 @@ public class PersonPhoneServiceTests
     {
         var phoneId = Guid.NewGuid();
         var personPhones = new List<PersonPhone> { new() { PhoneId = phoneId } };
-        _repository.GetAllByPersonWithPhonesAsync(1, int.MaxValue, Arg.Any<CancellationToken>()).Returns(personPhones);
+        _repository.GetAllByPersonUnpagedAsync(Arg.Any<CancellationToken>()).Returns(personPhones);
 
         await _sut.DeleteAllByPersonAsync(CancellationToken.None);
 

@@ -2,6 +2,7 @@ using AutoMapper;
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.Event;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -17,10 +18,10 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<List<EventDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<EventDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            var list = await _eventRepository.GetAllByPersonAsync(page, pageSize, cancellationToken);
-            return _mapper.Map<List<EventDto>>(list);
+            var (items, total, normalizedPage, normalizedPageSize) = await _eventRepository.GetAllByPersonPagedAsync(page, pageSize, cancellationToken);
+            return new PagedResult<EventDto>(_mapper.Map<List<EventDto>>(items), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<EventDto> GetAsync(Guid id, CancellationToken cancellationToken)
