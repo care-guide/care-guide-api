@@ -11,7 +11,9 @@ to create endpoints, see [AGENTS.md](../AGENTS.md) → Endpoints.
 - Version: `/v1` (`ApiConstants.API_VERSION`)
 - Effective base route: **`/api/v1/...`**
 
-Exception: account endpoints live under `/accounts` (authentication, outside the protected versioned group).
+Account endpoints also live under the versioned base route: **`/api/v1/accounts`**.
+Account creation, login and refresh are explicitly marked as anonymous; logout, password update
+and account deletion require authentication.
 
 ## Interactive documentation
 
