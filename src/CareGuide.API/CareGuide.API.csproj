@@ -10,6 +10,11 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+    <!-- Pinned to the latest 2.x: patches GHSA-v5pm-xwqc-g5wc (>= 2.7.5) while staying
+         compatible with the Microsoft.AspNetCore.OpenApi 10.0.9 source generator, which assigns
+         IOpenApiMediaType.Example (made read-only in Microsoft.OpenApi 3.x). Do not bump to 3.x
+         until Microsoft.AspNetCore.OpenApi targets it. -->
+    <PackageReference Include="Microsoft.OpenApi" Version="2.10.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
       <PrivateAssets>all</PrivateAssets>
@@ -19,7 +24,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.OpenApi" Version="3.8.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.11" />
 
   </ItemGroup>
