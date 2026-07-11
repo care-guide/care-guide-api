@@ -12,10 +12,10 @@ namespace CareGuide.API.Extensions
         {
             services.AddRateLimiter(options =>
             {
-                // General: sliding window, 60 req/min per IP
+                // General: sliding window, 60 req/min per authenticated user (falls back to IP if anonymous)
                 options.AddPolicy(GeneralPolicy, httpContext =>
                     RateLimitPartition.GetSlidingWindowLimiter(
-                        partitionKey: ResolveClientIp(httpContext),
+                        partitionKey: ResolveIdentityPartitionKey(httpContext),
                         factory: _ => new SlidingWindowRateLimiterOptions
                         {
                             PermitLimit = 60,
@@ -56,7 +56,27 @@ namespace CareGuide.API.Extensions
             return services;
         }
 
-        private static string ResolveClientIp(HttpContext context)
+        /// <summary>
+        /// Partition key for the <see cref="GeneralPolicy"/>. Authenticated requests partition by the
+        /// validated JWT "sub" (userId) claim so users sharing a public IP (e.g. mobile carrier CGNAT)
+        /// don't throttle each other. The claim comes from the validated token/principal only — never
+        /// from a client-supplied header, which would be trivially spoofable. Genuinely anonymous
+        /// requests fall back to IP-based partitioning.
+        /// </summary>
+        internal static string ResolveIdentityPartitionKey(HttpContext context)
+        {
+            var user = context.User;
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                var userId = user.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+                if (!string.IsNullOrWhiteSpace(userId))
+                    return $"user:{userId}";
+            }
+
+            return $"ip:{ResolveClientIp(context)}";
+        }
+
+        internal static string ResolveClientIp(HttpContext context)
         {
             var forwarded = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(forwarded))
