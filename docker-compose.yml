@@ -11,6 +11,11 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DatabaseConnection: Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+      Storage__R2__Endpoint: ${STORAGE_R2_ENDPOINT}
+      Storage__R2__AccountId: ${STORAGE_R2_ACCOUNT_ID}
+      Storage__R2__Bucket: ${STORAGE_R2_BUCKET}
+      Storage__R2__AccessKey: ${STORAGE_R2_ACCESS_KEY}
+      Storage__R2__SecretKey: ${STORAGE_R2_SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy

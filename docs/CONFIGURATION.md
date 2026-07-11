@@ -29,6 +29,13 @@ the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `D
 | `SecuritySettings:Audience` | Token audience | `CareGuideClient` |
 | `CorsOrigins` | Allowed origins (array) | `["https://careguide.dev"]` |
 | `AllowedHosts` | Allowed hosts | `*` |
+| `Storage:R2:Endpoint` | HTTPS endpoint of the S3-compatible R2 account | `https://<account-id>.r2.cloudflarestorage.com` |
+| `Storage:R2:AccountId` | Cloudflare account identifier | *(via env/vault)* |
+| `Storage:R2:Bucket` | Private bucket name | `care-guide-private` |
+| `Storage:R2:AccessKey` | R2 S3 access key (**secret**) | *(via env/vault)* |
+| `Storage:R2:SecretKey` | R2 S3 secret key (**secret**) | *(via env/vault)* |
+| `Storage:R2:MinPresignedUrlExpirationSeconds` | Minimum allowed pre-signed URL lifetime | `60` |
+| `Storage:R2:MaxPresignedUrlExpirationSeconds` | Maximum allowed pre-signed URL lifetime | `3600` |
 | `Logging:LogLevel` | Log levels | — |
 
 ## Ports
@@ -59,6 +66,11 @@ Environment variable format (`:` becomes `__`):
 ```
 ConnectionStrings__DatabaseConnection=...
 SecuritySettings__SecretKey=...
+Storage__R2__Endpoint=https://<account-id>.r2.cloudflarestorage.com
+Storage__R2__AccountId=...
+Storage__R2__Bucket=...
+Storage__R2__AccessKey=...
+Storage__R2__SecretKey=...
 ```
 
 > In the repository, `SecretKey` and the connection string are empty. Fill them only locally

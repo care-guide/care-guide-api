@@ -11,9 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CareGuide.Infra\CareGuide.Infra.csproj" />
     <ProjectReference Include="..\CareGuide.Models\CareGuide.Models.csproj" />
     <ProjectReference Include="..\CareGuide.Security\CareGuide.Security.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CareGuide.Infra\Interfaces\**\*.cs" Link="PersistenceInterfaces\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\CareGuide.Infra\TransactionManagement\IEfTransactionUnitOfWork.cs" Link="PersistenceInterfaces\IEfTransactionUnitOfWork.cs" />
   </ItemGroup>
 
 </Project>

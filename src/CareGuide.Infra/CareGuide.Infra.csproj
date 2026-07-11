@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.14.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,8 +23,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CareGuide.Core\CareGuide.Core.csproj" />
     <ProjectReference Include="..\CareGuide.Models\CareGuide.Models.csproj" />
     <ProjectReference Include="..\CareGuide.Security\CareGuide.Security.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Interfaces\**\*.cs" />
+    <Compile Remove="TransactionManagement\IEfTransactionUnitOfWork.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,12 +1,17 @@
-﻿using CareGuide.Infra.Contexts;
+﻿using Amazon.Runtime;
+using Amazon.S3;
+using CareGuide.Core.Interfaces.Storage;
+using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Infra.Interfaces.Shared;
 using CareGuide.Infra.Repositories;
 using CareGuide.Infra.Repositories.Shared;
+using CareGuide.Infra.Storage;
 using CareGuide.Infra.TransactionManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace CareGuide.Infra
 {
@@ -16,6 +21,24 @@ namespace CareGuide.Infra
         {
             services.AddScoped<IEfTransactionUnitOfWork, EfTransactionUnitOfWork>();
             services.AddScoped<IQueryScope, PersonQueryScope>();
+
+            services.AddSingleton<IValidateOptions<R2StorageOptions>, R2StorageOptionsValidator>();
+            services.AddOptions<R2StorageOptions>()
+                .Bind(configuration.GetSection(R2StorageOptions.SectionName))
+                .ValidateOnStart();
+            services.AddSingleton<IAmazonS3>(provider =>
+            {
+                var options = provider.GetRequiredService<IOptions<R2StorageOptions>>().Value;
+                return new AmazonS3Client(
+                    new BasicAWSCredentials(options.AccessKey, options.SecretKey),
+                    new AmazonS3Config
+                    {
+                        ServiceURL = options.Endpoint,
+                        ForcePathStyle = true,
+                        AuthenticationRegion = "auto"
+                    });
+            });
+            services.AddSingleton<IObjectStorage, R2ObjectStorage>();
 
             services.AddDbContext<DatabaseContext>(opt =>
             {
