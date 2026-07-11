@@ -3,6 +3,7 @@ using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Event;
+using CareGuide.Models.DTOs.FileAsset;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints
@@ -37,6 +38,15 @@ namespace CareGuide.API.Endpoints
                  .Accepts<CreateEventDto>("application/json")
                  .Produces<EventDto>(StatusCodes.Status201Created)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
+
+            group.MapPost("/{id:guid}/files/uploads", InitiateFileUpload)
+                 .WithName("InitiateEventFileUpload")
+                 .WithSummary("Initiate a direct event file upload")
+                 .WithDescription("Creates a pending private file and returns a short-lived pre-signed PUT URL.")
+                 .Accepts<InitiateEventFileUploadDto>("application/json")
+                 .Produces<InitiateEventFileUploadResponseDto>(StatusCodes.Status201Created)
+                 .ProducesProblem(StatusCodes.Status400BadRequest)
+                 .ProducesProblem(StatusCodes.Status404NotFound);
 
             group.MapPut("/{id:guid}", Update)
                  .WithName("UpdateEvent")
@@ -87,6 +97,16 @@ namespace CareGuide.API.Endpoints
         {
             var result = await eventService.UpdateAsync(id, updateEventDto, cancellationToken);
             return Results.Ok(result);
+        }
+
+        private static async Task<IResult> InitiateFileUpload(
+            Guid id,
+            InitiateEventFileUploadDto dto,
+            IEventFileUploadService uploadService,
+            CancellationToken cancellationToken)
+        {
+            var result = await uploadService.InitiateAsync(id, dto, cancellationToken);
+            return Results.Created($"/events/{id}/files/{result.FileId}", result);
         }
 
         private static async Task<IResult> DeleteAll(IEventService eventService, CancellationToken cancellationToken)

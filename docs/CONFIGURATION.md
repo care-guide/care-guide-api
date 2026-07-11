@@ -36,6 +36,12 @@ the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `D
 | `Storage:R2:SecretKey` | R2 S3 secret key (**secret**) | *(via env/vault)* |
 | `Storage:R2:MinPresignedUrlExpirationSeconds` | Minimum allowed pre-signed URL lifetime | `60` |
 | `Storage:R2:MaxPresignedUrlExpirationSeconds` | Maximum allowed pre-signed URL lifetime | `3600` |
+| `FileUploads:MaxSizeBytes` | Maximum accepted direct-upload size | `10485760` |
+| `FileUploads:AllowedContentTypes` | MIME type allowlist for direct uploads | `["application/pdf", "image/jpeg", "image/png"]` |
+| `FileUploads:AllowedExtensions` | Filename extension allowlist for direct uploads | `[".pdf", ".jpg", ".jpeg", ".png"]` |
+| `FileUploads:HashAlgorithm` | Required expected-hash algorithm | `SHA256` |
+| `FileUploads:HashFormat` | Required expected-hash encoding | `Hex` |
+| `FileUploads:PresignedUrlExpirationSeconds` | Direct-upload URL lifetime | `300` |
 | `Logging:LogLevel` | Log levels | — |
 
 ## Ports
