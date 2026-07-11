@@ -16,7 +16,7 @@ Central documentation index for the project. Start here.
 | -------- | -------------- |
 | [../AGENTS.md](../AGENTS.md) | Conventions and architecture guide (AI-agent context) |
 | [STRUCTURE.md](STRUCTURE.md) | Project and layer structure of the solution |
-| [API.md](API.md) | REST conventions, errors (ProblemDetails), pagination and auth |
+| [API.md](API.md) | REST conventions, errors (RFC 9457 ProblemDetails), pagination and auth |
 | [MIGRATIONS.md](MIGRATIONS.md) | Create and apply EF Core migrations |
 | [TESTS.md](TESTS.md) | Unit test structure and execution |
 

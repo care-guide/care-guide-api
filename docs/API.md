@@ -25,9 +25,11 @@ Exception: account endpoints live under `/accounts` (authentication, outside the
 - Anonymous endpoints are marked with `AllowAnonymous` (e.g. create account, login, refresh).
 - Token and cookie details in [SECURITY.md](SECURITY.md).
 
-## Error format — RFC 7807 (ProblemDetails)
+## Error format — RFC 9457 (ProblemDetails)
 
-Every error returns `application/problem+json` via `ErrorHandlerMiddleware`. Structure:
+Every error returns `application/problem+json` via `ErrorHandlerMiddleware`, following
+[RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) (`ProblemDetails`, successor to RFC 7807).
+Structure:
 
 ```json
 {

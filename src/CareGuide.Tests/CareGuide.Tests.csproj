@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CareGuide.API\CareGuide.API.csproj" />
     <ProjectReference Include="..\CareGuide.Core\CareGuide.Core.csproj" />
     <ProjectReference Include="..\CareGuide.Infra\CareGuide.Infra.csproj" />
     <ProjectReference Include="..\CareGuide.Models\CareGuide.Models.csproj" />

@@ -2,11 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Text.Json;
 
 namespace CareGuide.API.Middlewares
 {
     public class ErrorHandlerMiddleware : IMiddleware
     {
+        private const string GenericPersistenceErrorDetail = "The request could not be completed because the data could not be persisted.";
+        private const string GenericInternalServerErrorDetail = "An internal server error occurred. Please try again later.";
+
         private static string PT(string slug) => $"https://problems-registry.smartbear.com/{slug}";
         private readonly ILogger<ErrorHandlerMiddleware> _logger;
         private readonly IWebHostEnvironment _env;
@@ -105,7 +109,7 @@ namespace CareGuide.API.Middlewares
                 extensions: new Dictionary<string, object> { ["errors"] = errors }
             );
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return WriteProblemDetailsAsync(context, problem);
         }
 
         private Task HandleEfConcurrencyExceptionAsync(HttpContext context, DbUpdateConcurrencyException ex)
@@ -130,7 +134,7 @@ namespace CareGuide.API.Middlewares
                 extensions: extensions
             );
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return WriteProblemDetailsAsync(context, problem);
         }
 
         private Task HandleEfUpdateExceptionAsync(HttpContext context, DbUpdateException ex)
@@ -146,12 +150,12 @@ namespace CareGuide.API.Middlewares
                 context,
                 context.Response.StatusCode,
                 title: "Failed to persist changes.",
-                detail: ex.Message,
+                detail: GetSafeDetail(ex, GenericPersistenceErrorDetail),
                 type: PT("server-error"),
                 extensions: extensions
             );
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return WriteProblemDetailsAsync(context, problem);
         }
 
         private Task HandleTimeoutExceptionAsync(HttpContext context, TimeoutException ex)
@@ -172,7 +176,7 @@ namespace CareGuide.API.Middlewares
                 extensions: extensions
             );
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return WriteProblemDetailsAsync(context, problem);
         }
 
         private Task HandleNotFoundExceptionAsync(HttpContext context, Exception ex)
@@ -193,7 +197,7 @@ namespace CareGuide.API.Middlewares
                 extensions: extensions
             );
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return WriteProblemDetailsAsync(context, problem);
         }
 
         private Task HandleRateLimitExceededAsync(HttpContext context)
@@ -220,7 +224,7 @@ namespace CareGuide.API.Middlewares
 
             _logger.LogWarning("Rate limit exceeded for IP {Ip}", context.Connection.RemoteIpAddress?.ToString());
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return WriteProblemDetailsAsync(context, problem);
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
@@ -261,12 +265,35 @@ namespace CareGuide.API.Middlewares
                 context,
                 statusCode,
                 title: "An unexpected error occurred.",
-                detail: exception.Message,
+                detail: GetExceptionDetail(exception, statusCode),
                 type: type,
                 extensions: extensions
             );
 
-            return context.Response.WriteAsJsonAsync(problem);
+            return WriteProblemDetailsAsync(context, problem);
+        }
+
+        private static Task WriteProblemDetailsAsync(HttpContext context, ProblemDetails problem)
+        {
+            return context.Response.WriteAsJsonAsync(
+                problem,
+                (JsonSerializerOptions?)null,
+                "application/problem+json",
+                context.RequestAborted);
+        }
+
+        private string GetSafeDetail(Exception exception, string productionDetail)
+        {
+            return _env.IsDevelopment()
+                ? exception.Message
+                : productionDetail;
+        }
+
+        private string GetExceptionDetail(Exception exception, int statusCode)
+        {
+            return statusCode == StatusCodes.Status500InternalServerError
+                ? GetSafeDetail(exception, GenericInternalServerErrorDetail)
+                : exception.Message;
         }
 
         private void LogException(Exception ex, int statusCode)
