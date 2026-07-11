@@ -29,8 +29,7 @@ namespace CareGuide.Models.Validators.Address
                 .MaximumLength(100).WithMessage("State must not exceed 100 characters.");
 
             RuleFor(x => x.Type)
-                .MaximumLength(DatabaseConstants.MaxLengthStandardText).WithMessage($"Type must not exceed {DatabaseConstants.MaxLengthStandardText} characters.")
-                .When(x => !string.IsNullOrWhiteSpace(x.Type));
+                .IsInEnum().WithMessage("Type is invalid.");
 
             RuleFor(x => x.Complement)
                 .MaximumLength(DatabaseConstants.MaxLengthStandardText).WithMessage($"Complement must not exceed {DatabaseConstants.MaxLengthStandardText} characters.")

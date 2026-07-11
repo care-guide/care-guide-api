@@ -1,4 +1,5 @@
 using CareGuide.Models.Entities.Shared;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Models.Entities
 {
@@ -6,7 +7,7 @@ namespace CareGuide.Models.Entities
     {
         public required string PostalCode { get; set; }
         public int? Number { get; set; }
-        public string? Type { get; set; }
+        public required AddressType Type { get; set; }
         public required string City { get; set; }
         public string? Complement { get; set; }
         public required string Country { get; set; }

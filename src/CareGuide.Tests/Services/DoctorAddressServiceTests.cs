@@ -3,6 +3,7 @@ using CareGuide.Core.Services;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.DoctorAddress;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Tests.Services;
 
@@ -25,6 +26,7 @@ public class DoctorAddressServiceTests
     {
         Id = id,
         PostalCode = "12345-000",
+        Type = AddressType.Clinic,
         City = "Sao Paulo",
         Country = "Brazil",
         State = "SP"
@@ -52,7 +54,7 @@ public class DoctorAddressServiceTests
         {
             new() { DoctorId = doctorId, AddressId = addressId, Address = MakeAddress(addressId) }
         };
-        var dtos = new List<DoctorAddressDto> { new(doctorId, addressId, "12345-000", null, null, "Sao Paulo", null, "Brazil", null, null, "SP") };
+        var dtos = new List<DoctorAddressDto> { new(doctorId, addressId, "12345-000", null, AddressType.Clinic, "Sao Paulo", null, "Brazil", null, null, "SP") };
 
         _repository.GetAllByDoctorWithAddressesAsync(1, 10, doctorId, Arg.Any<CancellationToken>()).Returns(doctorAddresses);
         _mapper.Map<List<DoctorAddressDto>>(doctorAddresses).Returns(dtos);
@@ -80,7 +82,7 @@ public class DoctorAddressServiceTests
         var doctorId = Guid.NewGuid();
         var addressId = Guid.NewGuid();
         var doctorAddress = new DoctorAddress { DoctorId = doctorId, AddressId = addressId, Address = MakeAddress(addressId) };
-        var expected = new DoctorAddressDto(doctorId, addressId, "12345-000", null, null, "Sao Paulo", null, "Brazil", null, null, "SP");
+        var expected = new DoctorAddressDto(doctorId, addressId, "12345-000", null, AddressType.Clinic, "Sao Paulo", null, "Brazil", null, null, "SP");
 
         _repository.GetByDoctorWithAddressAsync(addressId, doctorId, Arg.Any<CancellationToken>()).Returns(doctorAddress);
         _mapper.Map<DoctorAddressDto>(doctorAddress).Returns(expected);
@@ -135,7 +137,7 @@ public class DoctorAddressServiceTests
         var addressId = Guid.NewGuid();
         var dto = new CreateDoctorAddressDto(addressId);
         var createdDoctorAddress = new DoctorAddress { DoctorId = doctorId, AddressId = addressId, Address = MakeAddress(addressId) };
-        var expected = new DoctorAddressDto(doctorId, addressId, "12345-000", null, null, "Sao Paulo", null, "Brazil", null, null, "SP");
+        var expected = new DoctorAddressDto(doctorId, addressId, "12345-000", null, AddressType.Clinic, "Sao Paulo", null, "Brazil", null, null, "SP");
 
         _addressRepository.ExistsAsync(addressId, Arg.Any<CancellationToken>()).Returns(true);
         _repository.GetByDoctorWithAddressAsync(addressId, doctorId, Arg.Any<CancellationToken>()).Returns(createdDoctorAddress);

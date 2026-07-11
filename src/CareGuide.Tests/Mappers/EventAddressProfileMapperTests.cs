@@ -1,6 +1,7 @@
 using AutoMapper;
 using CareGuide.Models.DTOs.EventAddress;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 using CareGuide.Models.Mappers.EventAddress;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,7 +33,7 @@ public class EventAddressProfileMapperTests
                 Id = addressId,
                 PostalCode = "12345-000",
                 Number = 100,
-                Type = "Home",
+                Type = AddressType.Clinic,
                 City = "Sao Paulo",
                 Complement = "Apt 1",
                 Country = "Brazil",
@@ -48,7 +49,7 @@ public class EventAddressProfileMapperTests
         dto.AddressId.Should().Be(addressId);
         dto.PostalCode.Should().Be("12345-000");
         dto.Number.Should().Be(100);
-        dto.Type.Should().Be("Home");
+        dto.Type.Should().Be(AddressType.Clinic);
         dto.City.Should().Be("Sao Paulo");
         dto.Complement.Should().Be("Apt 1");
         dto.Country.Should().Be("Brazil");

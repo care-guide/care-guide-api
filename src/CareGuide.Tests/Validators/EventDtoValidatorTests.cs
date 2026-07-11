@@ -54,13 +54,29 @@ public class EventDtoValidatorTests
         _createValidator.Validate(dto).IsValid.Should().BeTrue();
     }
 
-    [Fact(DisplayName = "Create: RecurrenceFrequency zero fails validation")]
-    public void Create_RecurrenceFrequencyZero_Fails()
+    [Fact(DisplayName = "Create: valid recurrence passes validation")]
+    public void Create_ValidRecurrence_Passes()
     {
-        var dto = new CreateEventDto("Checkup", StartDate, null, EventType.Appointment, false, RecurrenceType.Weekly, 0, null);
+        var dto = new CreateEventDto("Checkup", StartDate, null, EventType.Appointment, false, RecurrenceType.Appointment, RecurrenceFrequency.Weekly, null);
+        _createValidator.Validate(dto).IsValid.Should().BeTrue();
+    }
+
+    [Fact(DisplayName = "Create: invalid RecurrenceFrequency fails validation")]
+    public void Create_InvalidRecurrenceFrequency_Fails()
+    {
+        var dto = new CreateEventDto("Checkup", StartDate, null, EventType.Appointment, false, RecurrenceType.Appointment, (RecurrenceFrequency)999, null);
         var result = _createValidator.Validate(dto);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "RecurrenceFrequency");
+    }
+
+    [Fact(DisplayName = "Create: invalid RecurrenceType fails validation")]
+    public void Create_InvalidRecurrenceType_Fails()
+    {
+        var dto = new CreateEventDto("Checkup", StartDate, null, EventType.Appointment, false, (RecurrenceType)999, RecurrenceFrequency.Weekly, null);
+        var result = _createValidator.Validate(dto);
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == "RecurrenceType");
     }
 
     [Fact(DisplayName = "Create: Details exceeding 1000 chars fails validation")]
@@ -108,10 +124,10 @@ public class EventDtoValidatorTests
         result.Errors.Should().Contain(e => e.PropertyName == "EndDate");
     }
 
-    [Fact(DisplayName = "Update: RecurrenceFrequency negative fails validation")]
-    public void Update_RecurrenceFrequencyNegative_Fails()
+    [Fact(DisplayName = "Update: invalid RecurrenceFrequency fails validation")]
+    public void Update_InvalidRecurrenceFrequency_Fails()
     {
-        var dto = new UpdateEventDto(Guid.NewGuid(), "Checkup", StartDate, null, EventType.Appointment, false, RecurrenceType.Monthly, -1, null);
+        var dto = new UpdateEventDto(Guid.NewGuid(), "Checkup", StartDate, null, EventType.Appointment, false, RecurrenceType.Surgery, (RecurrenceFrequency)999, null);
         var result = _updateValidator.Validate(dto);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "RecurrenceFrequency");

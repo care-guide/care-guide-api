@@ -1,6 +1,7 @@
 using AutoMapper;
 using CareGuide.Models.DTOs.EventAppointment;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 using CareGuide.Models.Mappers.EventAppointment;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +31,7 @@ public class EventAppointmentMapperTests
             Id = Guid.NewGuid(),
             EventId = eventId,
             Doctor = "Dr. House",
-            Type = "Checkup",
+            Type = EventAppointmentType.Routine,
         };
 
         var dto = _mapper.Map<EventAppointmentDto>(entity);
@@ -38,39 +39,39 @@ public class EventAppointmentMapperTests
         dto.Id.Should().Be(entity.Id);
         dto.EventId.Should().Be(eventId);
         dto.Doctor.Should().Be("Dr. House");
-        dto.Type.Should().Be("Checkup");
+        dto.Type.Should().Be(EventAppointmentType.Routine);
     }
 
-    [Fact(DisplayName = "EventAppointment→EventAppointmentDto: null fields map to null")]
-    public void Map_EventAppointmentToDto_NullFields_MapToNull()
+    [Fact(DisplayName = "EventAppointment→EventAppointmentDto: null Doctor maps to null")]
+    public void Map_EventAppointmentToDto_NullDoctor_MapsToNull()
     {
-        var entity = new EventAppointment { EventId = Guid.NewGuid(), Doctor = null, Type = null };
+        var entity = new EventAppointment { EventId = Guid.NewGuid(), Doctor = null, Type = EventAppointmentType.Emergency };
 
         var dto = _mapper.Map<EventAppointmentDto>(entity);
 
         dto.Doctor.Should().BeNull();
-        dto.Type.Should().BeNull();
+        dto.Type.Should().Be(EventAppointmentType.Emergency);
     }
 
     [Fact(DisplayName = "CreateEventAppointmentDto→EventAppointment: all fields map correctly")]
     public void Map_CreateEventAppointmentDtoToEntity_MapsFields()
     {
-        var dto = new CreateEventAppointmentDto("Dr. House", "Checkup");
+        var dto = new CreateEventAppointmentDto("Dr. House", EventAppointmentType.FollowUp);
 
         var entity = _mapper.Map<EventAppointment>(dto);
 
         entity.Doctor.Should().Be("Dr. House");
-        entity.Type.Should().Be("Checkup");
+        entity.Type.Should().Be(EventAppointmentType.FollowUp);
     }
 
     [Fact(DisplayName = "UpdateEventAppointmentDto→EventAppointment: all fields map correctly")]
     public void Map_UpdateEventAppointmentDtoToEntity_MapsFields()
     {
-        var dto = new UpdateEventAppointmentDto("New Doctor", "New Type");
+        var dto = new UpdateEventAppointmentDto("New Doctor", EventAppointmentType.Specialized);
 
         var entity = _mapper.Map<EventAppointment>(dto);
 
         entity.Doctor.Should().Be("New Doctor");
-        entity.Type.Should().Be("New Type");
+        entity.Type.Should().Be(EventAppointmentType.Specialized);
     }
 }

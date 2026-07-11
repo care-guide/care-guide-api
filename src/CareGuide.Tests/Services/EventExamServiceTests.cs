@@ -3,6 +3,7 @@ using CareGuide.Core.Services;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.EventExam;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Tests.Services;
 
@@ -36,8 +37,8 @@ public class EventExamServiceTests
     public async Task GetByEventIdAsync_Found_ReturnsMappedDto()
     {
         var eventId = Guid.NewGuid();
-        var exam = new EventExam { EventId = eventId, Type = "Blood Test" };
-        var expected = new EventExamDto(exam.Id, eventId, "Blood Test");
+        var exam = new EventExam { EventId = eventId, Type = EventExamType.Blood };
+        var expected = new EventExamDto(exam.Id, eventId, EventExamType.Blood);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(exam);
         _mapper.Map<EventExamDto>(exam).Returns(expected);
@@ -59,7 +60,7 @@ public class EventExamServiceTests
     public async Task CreateAsync_EventNotOwned_ThrowsUnauthorizedAccessException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventExamDto("Blood Test");
+        var dto = new CreateEventExamDto(EventExamType.Blood);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns((Event?)null);
 
@@ -72,10 +73,10 @@ public class EventExamServiceTests
     public async Task CreateAsync_AlreadyExists_ThrowsInvalidOperationException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventExamDto("Blood Test");
+        var dto = new CreateEventExamDto(EventExamType.Blood);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(new Event { Id = eventId, PersonId = Guid.NewGuid(), Name = "Event", StartDate = DateTime.UtcNow, Type = Models.Enums.EventType.Exam });
-        _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(new EventExam { EventId = eventId });
+        _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(new EventExam { EventId = eventId, Type = EventExamType.Blood });
 
         var act = async () => await _sut.CreateAsync(eventId, dto, CancellationToken.None);
 
@@ -86,9 +87,9 @@ public class EventExamServiceTests
     public async Task CreateAsync_ValidDto_SetsEventIdAndPersists()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventExamDto("Blood Test");
-        var entity = new EventExam { EventId = Guid.Empty, Type = "Blood Test" };
-        var expected = new EventExamDto(entity.Id, eventId, "Blood Test");
+        var dto = new CreateEventExamDto(EventExamType.Blood);
+        var entity = new EventExam { EventId = Guid.Empty, Type = EventExamType.Blood };
+        var expected = new EventExamDto(entity.Id, eventId, EventExamType.Blood);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(new Event { Id = eventId, PersonId = Guid.NewGuid(), Name = "Event", StartDate = DateTime.UtcNow, Type = Models.Enums.EventType.Exam });
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns((EventExam?)null);
@@ -113,7 +114,7 @@ public class EventExamServiceTests
     public async Task UpdateAsync_NotFound_ThrowsKeyNotFoundException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new UpdateEventExamDto("Blood Test");
+        var dto = new UpdateEventExamDto(EventExamType.Blood);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns((EventExam?)null);
 
@@ -126,9 +127,9 @@ public class EventExamServiceTests
     public async Task UpdateAsync_ValidData_UpdatesFieldsAndReturnsDto()
     {
         var eventId = Guid.NewGuid();
-        var existing = new EventExam { EventId = eventId, Type = "Old" };
-        var dto = new UpdateEventExamDto("New Type");
-        var expected = new EventExamDto(existing.Id, eventId, "New Type");
+        var existing = new EventExam { EventId = eventId, Type = EventExamType.Blood };
+        var dto = new UpdateEventExamDto(EventExamType.Imaging);
+        var expected = new EventExamDto(existing.Id, eventId, EventExamType.Imaging);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(existing);
         _repository.UpdateAsync(existing, Arg.Any<CancellationToken>()).Returns(existing);
@@ -136,7 +137,7 @@ public class EventExamServiceTests
 
         var result = await _sut.UpdateAsync(eventId, dto, CancellationToken.None);
 
-        existing.Type.Should().Be("New Type");
+        existing.Type.Should().Be(EventExamType.Imaging);
         result.Should().Be(expected);
     }
 
@@ -155,7 +156,7 @@ public class EventExamServiceTests
     public async Task DeleteAsync_Found_CallsDeleteAsync()
     {
         var eventId = Guid.NewGuid();
-        var exam = new EventExam { EventId = eventId };
+        var exam = new EventExam { EventId = eventId, Type = EventExamType.Blood };
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(exam);
 

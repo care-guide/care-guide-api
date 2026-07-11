@@ -3,6 +3,7 @@ using CareGuide.Core.Services;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.EventSurgery;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Tests.Services;
 
@@ -36,8 +37,8 @@ public class EventSurgeryServiceTests
     public async Task GetByEventIdAsync_Found_ReturnsMappedDto()
     {
         var eventId = Guid.NewGuid();
-        var surgery = new EventSurgery { EventId = eventId, Type = "Appendectomy" };
-        var expected = new EventSurgeryDto(surgery.Id, eventId, "Appendectomy");
+        var surgery = new EventSurgery { EventId = eventId, Type = EventSurgeryType.Curative };
+        var expected = new EventSurgeryDto(surgery.Id, eventId, EventSurgeryType.Curative);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(surgery);
         _mapper.Map<EventSurgeryDto>(surgery).Returns(expected);
@@ -59,7 +60,7 @@ public class EventSurgeryServiceTests
     public async Task CreateAsync_EventNotOwned_ThrowsUnauthorizedAccessException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventSurgeryDto("Appendectomy");
+        var dto = new CreateEventSurgeryDto(EventSurgeryType.Curative);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns((Event?)null);
 
@@ -72,10 +73,10 @@ public class EventSurgeryServiceTests
     public async Task CreateAsync_AlreadyExists_ThrowsInvalidOperationException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventSurgeryDto("Appendectomy");
+        var dto = new CreateEventSurgeryDto(EventSurgeryType.Curative);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(new Event { Id = eventId, PersonId = Guid.NewGuid(), Name = "Event", StartDate = DateTime.UtcNow, Type = Models.Enums.EventType.Surgery });
-        _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(new EventSurgery { EventId = eventId });
+        _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(new EventSurgery { EventId = eventId, Type = EventSurgeryType.Curative });
 
         var act = async () => await _sut.CreateAsync(eventId, dto, CancellationToken.None);
 
@@ -86,9 +87,9 @@ public class EventSurgeryServiceTests
     public async Task CreateAsync_ValidDto_SetsEventIdAndPersists()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventSurgeryDto("Appendectomy");
-        var entity = new EventSurgery { EventId = Guid.Empty, Type = "Appendectomy" };
-        var expected = new EventSurgeryDto(entity.Id, eventId, "Appendectomy");
+        var dto = new CreateEventSurgeryDto(EventSurgeryType.Curative);
+        var entity = new EventSurgery { EventId = Guid.Empty, Type = EventSurgeryType.Curative };
+        var expected = new EventSurgeryDto(entity.Id, eventId, EventSurgeryType.Curative);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(new Event { Id = eventId, PersonId = Guid.NewGuid(), Name = "Event", StartDate = DateTime.UtcNow, Type = Models.Enums.EventType.Surgery });
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns((EventSurgery?)null);
@@ -113,7 +114,7 @@ public class EventSurgeryServiceTests
     public async Task UpdateAsync_NotFound_ThrowsKeyNotFoundException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new UpdateEventSurgeryDto("Appendectomy");
+        var dto = new UpdateEventSurgeryDto(EventSurgeryType.Curative);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns((EventSurgery?)null);
 
@@ -126,9 +127,9 @@ public class EventSurgeryServiceTests
     public async Task UpdateAsync_ValidData_UpdatesFieldsAndReturnsDto()
     {
         var eventId = Guid.NewGuid();
-        var existing = new EventSurgery { EventId = eventId, Type = "Old Type" };
-        var dto = new UpdateEventSurgeryDto("New Type");
-        var expected = new EventSurgeryDto(existing.Id, eventId, "New Type");
+        var existing = new EventSurgery { EventId = eventId, Type = EventSurgeryType.Curative };
+        var dto = new UpdateEventSurgeryDto(EventSurgeryType.Palliative);
+        var expected = new EventSurgeryDto(existing.Id, eventId, EventSurgeryType.Palliative);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(existing);
         _repository.UpdateAsync(existing, Arg.Any<CancellationToken>()).Returns(existing);
@@ -136,7 +137,7 @@ public class EventSurgeryServiceTests
 
         var result = await _sut.UpdateAsync(eventId, dto, CancellationToken.None);
 
-        existing.Type.Should().Be("New Type");
+        existing.Type.Should().Be(EventSurgeryType.Palliative);
         result.Should().Be(expected);
     }
 
@@ -155,7 +156,7 @@ public class EventSurgeryServiceTests
     public async Task DeleteAsync_Found_CallsDeleteAsync()
     {
         var eventId = Guid.NewGuid();
-        var surgery = new EventSurgery { EventId = eventId };
+        var surgery = new EventSurgery { EventId = eventId, Type = EventSurgeryType.Curative };
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(surgery);
 

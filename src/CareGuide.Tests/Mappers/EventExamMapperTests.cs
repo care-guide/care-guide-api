@@ -1,6 +1,7 @@
 using AutoMapper;
 using CareGuide.Models.DTOs.EventExam;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 using CareGuide.Models.Mappers.EventExam;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,43 +30,33 @@ public class EventExamMapperTests
         {
             Id = Guid.NewGuid(),
             EventId = eventId,
-            Type = "Blood Test",
+            Type = EventExamType.Blood,
         };
 
         var dto = _mapper.Map<EventExamDto>(entity);
 
         dto.Id.Should().Be(entity.Id);
         dto.EventId.Should().Be(eventId);
-        dto.Type.Should().Be("Blood Test");
-    }
-
-    [Fact(DisplayName = "EventExam→EventExamDto: null fields map to null")]
-    public void Map_EventExamToDto_NullFields_MapToNull()
-    {
-        var entity = new EventExam { EventId = Guid.NewGuid(), Type = null };
-
-        var dto = _mapper.Map<EventExamDto>(entity);
-
-        dto.Type.Should().BeNull();
+        dto.Type.Should().Be(EventExamType.Blood);
     }
 
     [Fact(DisplayName = "CreateEventExamDto→EventExam: all fields map correctly")]
     public void Map_CreateEventExamDtoToEntity_MapsFields()
     {
-        var dto = new CreateEventExamDto("Blood Test");
+        var dto = new CreateEventExamDto(EventExamType.Imaging);
 
         var entity = _mapper.Map<EventExam>(dto);
 
-        entity.Type.Should().Be("Blood Test");
+        entity.Type.Should().Be(EventExamType.Imaging);
     }
 
     [Fact(DisplayName = "UpdateEventExamDto→EventExam: all fields map correctly")]
     public void Map_UpdateEventExamDtoToEntity_MapsFields()
     {
-        var dto = new UpdateEventExamDto("New Type");
+        var dto = new UpdateEventExamDto(EventExamType.Genetic);
 
         var entity = _mapper.Map<EventExam>(dto);
 
-        entity.Type.Should().Be("New Type");
+        entity.Type.Should().Be(EventExamType.Genetic);
     }
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using CareGuide.Models.DTOs.Address;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 using CareGuide.Models.Mappers.Address;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +27,7 @@ public class AddressMapperTests
             Id = Guid.NewGuid(),
             PostalCode = "12345-000",
             Number = 100,
-            Type = "Home",
+            Type = AddressType.Clinic,
             City = "Sao Paulo",
             Complement = "Apt 1",
             Country = "Brazil",
@@ -42,7 +43,7 @@ public class AddressMapperTests
         dto.Id.Should().Be(entity.Id);
         dto.PostalCode.Should().Be("12345-000");
         dto.Number.Should().Be(100);
-        dto.Type.Should().Be("Home");
+        dto.Type.Should().Be(AddressType.Clinic);
         dto.City.Should().Be("Sao Paulo");
         dto.Complement.Should().Be("Apt 1");
         dto.Country.Should().Be("Brazil");
@@ -56,13 +57,13 @@ public class AddressMapperTests
     [Fact(DisplayName = "CreateAddressDto→Address: all fields map correctly")]
     public void Map_CreateAddressDtoToEntity_MapsFields()
     {
-        var dto = new CreateAddressDto("98765-000", 200, "Work", "Rio de Janeiro", "Suite 2", "Brazil", "Downtown", "Near mall", "RJ");
+        var dto = new CreateAddressDto("98765-000", 200, AddressType.UrgencyEmergency, "Rio de Janeiro", "Suite 2", "Brazil", "Downtown", "Near mall", "RJ");
 
         var entity = _mapper.Map<Address>(dto);
 
         entity.PostalCode.Should().Be("98765-000");
         entity.Number.Should().Be(200);
-        entity.Type.Should().Be("Work");
+        entity.Type.Should().Be(AddressType.UrgencyEmergency);
         entity.City.Should().Be("Rio de Janeiro");
         entity.Complement.Should().Be("Suite 2");
         entity.Country.Should().Be("Brazil");
@@ -74,13 +75,13 @@ public class AddressMapperTests
     [Fact(DisplayName = "UpdateAddressDto→Address: all fields map correctly")]
     public void Map_UpdateAddressDtoToEntity_MapsFields()
     {
-        var dto = new UpdateAddressDto(Guid.NewGuid(), "11111-000", 300, "Other", "Curitiba", "Block C", "Brazil", "North", "Near school", "PR");
+        var dto = new UpdateAddressDto(Guid.NewGuid(), "11111-000", 300, AddressType.Other, "Curitiba", "Block C", "Brazil", "North", "Near school", "PR");
 
         var entity = _mapper.Map<Address>(dto);
 
         entity.PostalCode.Should().Be("11111-000");
         entity.Number.Should().Be(300);
-        entity.Type.Should().Be("Other");
+        entity.Type.Should().Be(AddressType.Other);
         entity.City.Should().Be("Curitiba");
         entity.Complement.Should().Be("Block C");
         entity.Country.Should().Be("Brazil");
