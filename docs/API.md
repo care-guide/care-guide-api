@@ -22,10 +22,15 @@ and account deletion require authentication.
 
 ## Authentication
 
-- **Bearer JWT** scheme in the `Authorization: Bearer <token>` header.
+- Browser clients receive the access token in the `sessionToken` **HttpOnly cookie** after login.
+- API clients may alternatively use the **Bearer JWT** scheme in the
+  `Authorization: Bearer <token>` header. When both are present, the header takes precedence.
 - The `/api/v1` group requires authentication (`RequireAuthorization`).
 - Anonymous endpoints are marked with `AllowAnonymous` (e.g. create account, login, refresh).
 - Token and cookie details in [SECURITY.md](SECURITY.md).
+
+Successful login returns account profile fields (`id`, `email`, `name`, `gender`, `birthday`) in the
+JSON body. Access and refresh tokens are written to HttpOnly cookies and are not returned in that body.
 
 ## Error format — RFC 9457 (ProblemDetails)
 

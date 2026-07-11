@@ -79,7 +79,7 @@ namespace CareGuide.Core.Services
             var accessToken = _jwtService.GenerateToken(user.Id, user.PersonId, user.Role == UserRole.Admin);
             var refreshToken = await _refreshTokenService.CreateAsync(user.Id, cancellationToken);
 
-            var userDto = await _userService.GetByIdDtoAsync(user.Id, cancellationToken);
+            var userDto = _mapper.Map<UserDto>(user);
 
             var personDto = user.PersonId.HasValue
                 ? await _personService.GetAsync(user.PersonId.Value, cancellationToken)
@@ -111,7 +111,7 @@ namespace CareGuide.Core.Services
             var newRefresh = await _refreshTokenService.RotateAsync(user.Id, refreshTokenDto.RefreshToken, cancellationToken);
             string newAccessToken = _jwtService.GenerateToken(user.Id, user.PersonId, user.Role == UserRole.Admin);
 
-            var userDto = await _userService.GetByIdDtoAsync(user.Id, cancellationToken);
+            var userDto = _mapper.Map<UserDto>(user);
             var personDto = await _personService.GetAsync(user.PersonId!.Value, cancellationToken);
 
             return new AccountDto(

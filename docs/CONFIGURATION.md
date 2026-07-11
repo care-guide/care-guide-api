@@ -15,6 +15,10 @@ See also: [EXECUTION.md](EXECUTION.md) · [SECURITY.md](SECURITY.md)
 | Environment variables | Override the files; **use for secrets** |
 | `.env` (project root) | Read by `docker-compose` to substitute `${VAR}` (DB user/password/ports). Gitignored; copy from `.env.example`. |
 
+The development seed runner also reads the root `.env`. Because it runs on the host rather than inside
+the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `DB_NAME`, `DB_USER` and
+`DB_PASSWORD`. See [database/seeds/README.md](../database/seeds/README.md).
+
 ## Configuration keys
 
 | Key | Description | Example |
@@ -33,6 +37,7 @@ See also: [EXECUTION.md](EXECUTION.md) · [SECURITY.md](SECURITY.md)
 | ------- | ---- | ------- |
 | API (Docker) | `8080` | `docker-compose` |
 | PostgreSQL (Docker) | `5434` | `docker-compose` |
+| PostgreSQL test database (Docker) | `5435` | `docker-compose` |
 | API (IIS Express) | `5000` | local via Visual Studio (see `launchSettings.json`) |
 
 Interactive documentation (Scalar, Development only): `http://localhost:<port>/scalar`.

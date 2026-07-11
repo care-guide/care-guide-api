@@ -18,6 +18,7 @@ Central documentation index for the project. Start here.
 | [STRUCTURE.md](STRUCTURE.md) | Project and layer structure of the solution |
 | [API.md](API.md) | REST conventions, errors (RFC 9457 ProblemDetails), pagination and auth |
 | [MIGRATIONS.md](MIGRATIONS.md) | Create and apply EF Core migrations |
+| [../database/seeds/README.md](../database/seeds/README.md) | Populate a local database with development data and test accounts |
 | [TESTS.md](TESTS.md) | Unit test structure and execution |
 
 ## Security and compliance

@@ -37,6 +37,7 @@ Full documentation index: [docs/README.md](docs/README.md).
 | Configuration and secrets | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) |
 | API conventions | [docs/API.md](docs/API.md) |
 | Migrations | [docs/MIGRATIONS.md](docs/MIGRATIONS.md) |
+| Development database seed | [database/seeds/README.md](database/seeds/README.md) |
 | Tests | [docs/TESTS.md](docs/TESTS.md) |
 | Security | [docs/SECURITY.md](docs/SECURITY.md) |
 | LGPD / Privacy | [docs/LGPD.md](docs/LGPD.md) |
