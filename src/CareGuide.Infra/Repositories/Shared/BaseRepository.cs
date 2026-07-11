@@ -1,4 +1,5 @@
 ﻿using CareGuide.Infra.Interfaces.Shared;
+using CareGuide.Models.Constants;
 using CareGuide.Models.Entities.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,17 @@ namespace CareGuide.Infra.Repositories.Shared
             this.context = context;
         }
 
+        protected static (int Page, int PageSize) NormalizePagination(int page, int pageSize)
+        {
+            var normalizedPage = page < 1 ? PaginationConstants.DefaultPage : page;
+            var normalizedPageSize = pageSize < 1 ? PaginationConstants.DefaultPageSize : Math.Min(pageSize, PaginationConstants.MaxPageSize);
+
+            return (normalizedPage, normalizedPageSize);
+        }
+
         public virtual async Task<List<TEntity>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         {
-            if (page < 1) throw new ArgumentException("Page must be greater than or equal to 1.", nameof(page));
-            if (pageSize < 1) throw new ArgumentException("PageSize must be greater than or equal to 1.", nameof(pageSize));
+            (page, pageSize) = NormalizePagination(page, pageSize);
 
             return await context.Set<TEntity>()
                 .Skip((page - 1) * pageSize)
@@ -31,8 +39,7 @@ namespace CareGuide.Infra.Repositories.Shared
 
         public virtual async Task<List<TEntity>> GetManyAsync(IEnumerable<Guid> ids, int page, int pageSize, CancellationToken cancellationToken = default)
         {
-            if (page < 1) throw new ArgumentException("Page must be greater than or equal to 1.", nameof(page));
-            if (pageSize < 1) throw new ArgumentException("PageSize must be greater than or equal to 1.", nameof(pageSize));
+            (page, pageSize) = NormalizePagination(page, pageSize);
 
             return await context.Set<TEntity>()
                 .Where(e => ids.Contains(e.Id))
