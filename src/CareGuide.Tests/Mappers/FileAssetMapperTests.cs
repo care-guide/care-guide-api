@@ -1,8 +1,8 @@
 using AutoMapper;
 using CareGuide.Models.DTOs.FileAsset;
 using CareGuide.Models.Entities;
-using CareGuide.Models.Mappers.FileAsset;
 using CareGuide.Models.Enums;
+using CareGuide.Models.Mappers.FileAsset;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CareGuide.Tests.Mappers;

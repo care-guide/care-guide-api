@@ -1,5 +1,5 @@
-using System.Text.Json.Serialization;
 using CareGuide.Models.Enums;
+using System.Text.Json.Serialization;
 
 namespace CareGuide.Models.DTOs.Event
 {
