@@ -112,6 +112,36 @@ FileLifecycle__CleanupIntervalMinutes=15
 > In the repository, `SecretKey` and the connection string are empty. Fill them only locally
 > (User Secrets) or via environment variable/vault in production — never commit the real values.
 
+### Enforced guard against committed secrets
+
+A populated secret field in tracked `appsettings*.json` is treated as a build-breaking error, not a
+warning:
+
+- **Pre-commit hook** (`scripts/hooks/pre-commit`): checks the staged content of every
+  `appsettings*.json` file and aborts the commit (non-zero exit) if `SecuritySettings:SecretKey`,
+  `ConnectionStrings:DatabaseConnection`, `Storage:R2:AccessKey` or `Storage:R2:SecretKey` is
+  non-empty. Not installed automatically (`.git/hooks` isn't versioned) — run once after cloning:
+
+  ```bash
+  sh scripts/install-hooks.sh
+  ```
+
+- **CI** (`.github/workflows/ci-dotnet.yml`): runs `python3 scripts/check-secrets.py` as the first
+  step of the build. It scans all tracked `appsettings*.json` files the same way and **fails the
+  job** if any secret field is populated, so a commit that bypasses the local hook (e.g. `--no-verify`
+  or a fresh clone without the hook installed) still cannot reach `main` green.
+
+Both entry points share the same checker (`scripts/check-secrets.py`), which only ever reports the
+file and key path (plus the value's length) — never the secret value itself — so it is also safe to
+run in CI logs.
+
+If you need to set the JWT signing key locally, do it via User Secrets, never by editing
+`appsettings.json`:
+
+```bash
+dotnet user-secrets set "SecuritySettings:SecretKey" "<value>" --project src/CareGuide.API/CareGuide.API.csproj
+```
+
 ---
 
 [Documentation index](README.md) · [Project README](../README.md)

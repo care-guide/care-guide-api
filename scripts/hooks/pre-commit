@@ -1,0 +1,48 @@
+#!/usr/bin/env sh
+# Care Guide API pre-commit hook.
+#
+# Blocks the commit if any staged appsettings*.json has a populated secret
+# field (JWT SecretKey, DB connection string, R2 keys, ...). Secrets must
+# only live in `dotnet user-secrets` locally, or environment variables /
+# a secrets vault in CI and production. See docs/CONFIGURATION.md (Secrets).
+#
+# Installed via: scripts/install-hooks.sh (see docs/CONFIGURATION.md).
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+STAGED_APPSETTINGS=$(git diff --cached --name-only --diff-filter=ACM -- "*appsettings*.json")
+
+if [ -z "$STAGED_APPSETTINGS" ]; then
+  exit 0
+fi
+
+PYTHON_BIN=""
+if command -v python3 >/dev/null 2>&1; then
+  PYTHON_BIN="python3"
+elif command -v python >/dev/null 2>&1; then
+  PYTHON_BIN="python"
+else
+  echo "pre-commit: python3 not found, cannot run secret check. Aborting commit." >&2
+  exit 1
+fi
+
+FAILED=0
+
+# Check the staged (index) content, not the working tree, so a blanked
+# working copy can't be used to sneak a populated staged version past the hook.
+for FILE in $STAGED_APPSETTINGS; do
+  TMP_FILE=$(mktemp)
+  if git show ":$FILE" > "$TMP_FILE" 2>/dev/null; then
+    if ! OUTPUT=$("$PYTHON_BIN" "$REPO_ROOT/scripts/check-secrets.py" "$TMP_FILE=$FILE" 2>&1); then
+      echo "$OUTPUT"
+      FAILED=1
+    fi
+  fi
+  rm -f "$TMP_FILE"
+done
+
+if [ "$FAILED" -ne 0 ]; then
+  exit 1
+fi
+
+exit 0
