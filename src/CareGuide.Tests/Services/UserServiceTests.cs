@@ -115,9 +115,23 @@ public class UserServiceTests
         var id = Guid.NewGuid();
         _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns((User?)null);
 
-        var act = async () => await _sut.UpdatePasswordAsync(id, new UpdatePasswordAccountDto("Str0ng@Pass!"));
+        var act = async () => await _sut.UpdatePasswordAsync(id, new UpdatePasswordAccountDto("Curr3nt@Pass!", "Str0ng@Pass!"));
 
         await act.Should().ThrowAsync<KeyNotFoundException>();
+    }
+
+    [Fact(DisplayName = "UpdatePasswordAsync: wrong current password throws UnauthorizedAccessException")]
+    public async Task UpdatePasswordAsync_WrongCurrentPassword_ThrowsUnauthorizedAccessException()
+    {
+        var id = Guid.NewGuid();
+        var hashedPassword = Security.Helpers.PasswordManagerHelper.HashPassword("Curr3nt@Pass!");
+        var user = new User { Id = id, PersonId = Guid.NewGuid(), Email = "test@test.com", Password = hashedPassword };
+
+        _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns(user);
+
+        var act = async () => await _sut.UpdatePasswordAsync(id, new UpdatePasswordAccountDto("Wr0ng@Pass!", "Str0ng@Pass!"));
+
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
     }
 
     [Fact(DisplayName = "UpdatePasswordAsync: same password throws InvalidOperationException")]
@@ -130,10 +144,42 @@ public class UserServiceTests
 
         _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns(user);
 
-        var act = async () => await _sut.UpdatePasswordAsync(id, new UpdatePasswordAccountDto(plainPassword));
+        var act = async () => await _sut.UpdatePasswordAsync(id, new UpdatePasswordAccountDto(plainPassword, plainPassword));
 
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*same as the current password*");
+    }
+
+    [Fact(DisplayName = "UpdatePasswordAsync: weak new password throws InvalidOperationException")]
+    public async Task UpdatePasswordAsync_WeakNewPassword_ThrowsInvalidOperationException()
+    {
+        var id = Guid.NewGuid();
+        var currentPassword = "Curr3nt@Pass!";
+        var hashedPassword = Security.Helpers.PasswordManagerHelper.HashPassword(currentPassword);
+        var user = new User { Id = id, PersonId = Guid.NewGuid(), Email = "test@test.com", Password = hashedPassword };
+
+        _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns(user);
+
+        var act = async () => await _sut.UpdatePasswordAsync(id, new UpdatePasswordAccountDto(currentPassword, "weakpassword"));
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+    }
+
+    [Fact(DisplayName = "UpdatePasswordAsync: valid data hashes new password and persists user")]
+    public async Task UpdatePasswordAsync_ValidData_HashesPasswordAndPersists()
+    {
+        var id = Guid.NewGuid();
+        var currentPassword = "Curr3nt@Pass!";
+        var newPassword = "Str0ng@New!";
+        var hashedPassword = Security.Helpers.PasswordManagerHelper.HashPassword(currentPassword);
+        var user = new User { Id = id, PersonId = Guid.NewGuid(), Email = "test@test.com", Password = hashedPassword };
+
+        _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns(user);
+
+        await _sut.UpdatePasswordAsync(id, new UpdatePasswordAccountDto(currentPassword, newPassword));
+
+        user.Password.Should().NotBe(hashedPassword, because: "password must be rehashed after update");
+        await _repository.Received(1).UpdateAsync(user, Arg.Any<CancellationToken>());
     }
 
     [Fact(DisplayName = "DeleteAsync: user not found throws KeyNotFoundException")]

@@ -163,6 +163,18 @@ public class AccountServiceTests
         await _refreshTokenService.Received(1).InvalidateAllAsync(userId, Arg.Any<CancellationToken>());
     }
 
+    [Fact(DisplayName = "UpdatePasswordAccountAsync: updates password and revokes refresh tokens")]
+    public async Task UpdatePasswordAccountAsync_ValidData_UpdatesPasswordAndInvalidatesRefreshTokens()
+    {
+        var userId = Guid.NewGuid();
+        var dto = new UpdatePasswordAccountDto("Curr3nt@Pass!", "Str0ng@New!");
+
+        await _sut.UpdatePasswordAccountAsync(userId, dto, CancellationToken.None);
+
+        await _userService.Received(1).UpdatePasswordAsync(userId, dto, Arg.Any<CancellationToken>());
+        await _refreshTokenService.Received(1).InvalidateAllAsync(userId, Arg.Any<CancellationToken>());
+    }
+
     [Fact(DisplayName = "DeleteAccountAsync: user not found throws KeyNotFoundException")]
     public async Task DeleteAccountAsync_UserNotFound_ThrowsKeyNotFoundException()
     {
