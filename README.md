@@ -45,22 +45,6 @@ Full documentation index: [docs/README.md](docs/README.md).
 | Security | [docs/SECURITY.md](docs/SECURITY.md) |
 | LGPD / Privacy | [docs/LGPD.md](docs/LGPD.md) |
 
-## Structure
-
-For more information about the structure of the solution, see the following [documentation](docs/STRUCTURE.md).
-
-## Execution
-
-For a step-by-step guide on how to run the application, see the following [documentation](docs/EXECUTION.md).
-
-## Migrations
-
-To learn how to create and run migrations in the project, see the following [documentation](docs/MIGRATIONS.md).
-
-## Tests
-
-For information about the unit test structure and how to run it, see the following [documentation](docs/TESTS.md).
-
 ## API Documentation (OpenAPI + Scalar)
 
 The API is documented using the **OpenAPI** standard and the interactive **Scalar** interface.

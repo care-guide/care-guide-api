@@ -83,8 +83,9 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnName("state");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
                         .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -93,7 +94,10 @@ namespace CareGuide.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("addresses", (string)null);
+                    b.ToTable("addresses", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Address_Type", "type IN ('CLI','URG','OTH')");
+                        });
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.Doctor", b =>
@@ -253,8 +257,8 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
-                    b.Property<int?>("RecurrenceFrequency")
-                        .HasColumnType("integer")
+                    b.Property<string>("RecurrenceFrequency")
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("recurrence_frequency");
 
                     b.Property<string>("RecurrenceType")
@@ -327,8 +331,9 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
                         .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -340,7 +345,10 @@ namespace CareGuide.Infra.Migrations
                     b.HasIndex("EventId")
                         .IsUnique();
 
-                    b.ToTable("event_appointments", (string)null);
+                    b.ToTable("event_appointments", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EventAppointment_Type", "type IN ('ROU','EME','FOL','SPE','PRE','SCR','OTH')");
+                        });
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.EventExam", b =>
@@ -365,8 +373,9 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
                         .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -378,7 +387,10 @@ namespace CareGuide.Infra.Migrations
                     b.HasIndex("EventId")
                         .IsUnique();
 
-                    b.ToTable("event_exams", (string)null);
+                    b.ToTable("event_exams", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EventExam_Type", "type IN ('BLO','IMG','ELE','IMM','MON','NEW','GEN','OTH')");
+                        });
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.EventFile", b =>
@@ -463,8 +475,9 @@ namespace CareGuide.Infra.Migrations
                         .HasColumnName("is_active");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)")
                         .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -476,7 +489,10 @@ namespace CareGuide.Infra.Migrations
                     b.HasIndex("EventId")
                         .IsUnique();
 
-                    b.ToTable("event_surgeries", (string)null);
+                    b.ToTable("event_surgeries", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EventSurgery_Type", "type IN ('CUR','PAL','DIA','REP','REC','OTH')");
+                        });
                 });
 
             modelBuilder.Entity("CareGuide.Models.Entities.FileAsset", b =>

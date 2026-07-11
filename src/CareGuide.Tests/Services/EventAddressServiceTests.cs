@@ -3,6 +3,7 @@ using CareGuide.Core.Services;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.EventAddress;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Tests.Services;
 
@@ -27,6 +28,7 @@ public class EventAddressServiceTests
     {
         Id = id,
         PostalCode = "12345-000",
+        Type = AddressType.Clinic,
         City = "Sao Paulo",
         Country = "Brazil",
         State = "SP",
@@ -40,7 +42,7 @@ public class EventAddressServiceTests
         var eventId = Guid.NewGuid();
         var addressId = Guid.NewGuid();
         var eventAddresses = new List<EventAddress> { new() { EventId = eventId, AddressId = addressId, Address = CreateAddress(addressId) } };
-        var dtos = new List<EventAddressDto> { new(eventId, addressId, "12345-000", null, null, "Sao Paulo", null, "Brazil", null, null, "SP") };
+        var dtos = new List<EventAddressDto> { new(eventId, addressId, "12345-000", null, AddressType.Clinic, "Sao Paulo", null, "Brazil", null, null, "SP") };
 
         _repository.GetAllByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(eventAddresses);
         _mapper.Map<List<EventAddressDto>>(eventAddresses).Returns(dtos);
@@ -112,7 +114,7 @@ public class EventAddressServiceTests
         var eventId = Guid.NewGuid();
         var addressId = Guid.NewGuid();
         var created = new EventAddress { EventId = eventId, AddressId = addressId, Address = CreateAddress(addressId) };
-        var expected = new EventAddressDto(eventId, addressId, "12345-000", null, null, "Sao Paulo", null, "Brazil", null, null, "SP");
+        var expected = new EventAddressDto(eventId, addressId, "12345-000", null, AddressType.Clinic, "Sao Paulo", null, "Brazil", null, null, "SP");
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(new Event { Id = eventId, PersonId = Guid.NewGuid(), Name = "Event", StartDate = DateTime.UtcNow, Type = Models.Enums.EventType.Appointment });
         _addressRepository.GetAsync(addressId, Arg.Any<CancellationToken>()).Returns(CreateAddress(addressId));

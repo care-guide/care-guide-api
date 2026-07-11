@@ -12,7 +12,7 @@ namespace CareGuide.Models.DTOs.Event
         [property: JsonConverter(typeof(JsonStringEnumConverter))] EventType Type,
         bool IsAllDay,
         [property: JsonConverter(typeof(JsonStringEnumConverter))] RecurrenceType? RecurrenceType,
-        int? RecurrenceFrequency,
+        [property: JsonConverter(typeof(JsonStringEnumConverter))] RecurrenceFrequency? RecurrenceFrequency,
         string? Details,
         DateTime CreatedAt,
         DateTime UpdatedAt

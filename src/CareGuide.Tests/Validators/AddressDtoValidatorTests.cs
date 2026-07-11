@@ -1,4 +1,5 @@
 using CareGuide.Models.DTOs.Address;
+using CareGuide.Models.Enums;
 using CareGuide.Models.Validators.Address;
 
 namespace CareGuide.Tests.Validators;
@@ -9,10 +10,10 @@ public class AddressDtoValidatorTests
     private readonly UpdateAddressDtoValidator _updateValidator = new();
 
     private static CreateAddressDto ValidCreateDto() =>
-        new("12345-000", 100, "Home", "Sao Paulo", "Apt 1", "Brazil", "Center", "Near park", "SP");
+        new("12345-000", 100, AddressType.Clinic, "Sao Paulo", "Apt 1", "Brazil", "Center", "Near park", "SP");
 
     private static UpdateAddressDto ValidUpdateDto(Guid? id = null) =>
-        new(id ?? Guid.NewGuid(), "12345-000", 100, "Home", "Sao Paulo", "Apt 1", "Brazil", "Center", "Near park", "SP");
+        new(id ?? Guid.NewGuid(), "12345-000", 100, AddressType.Clinic, "Sao Paulo", "Apt 1", "Brazil", "Center", "Near park", "SP");
 
     [Fact(DisplayName = "Create: valid dto passes validation")]
     public void Create_ValidDto_Passes()
@@ -124,10 +125,10 @@ public class AddressDtoValidatorTests
         result.Errors.Should().Contain(e => e.PropertyName == "ReferencePoint");
     }
 
-    [Fact(DisplayName = "Create: type exceeding max length fails validation")]
-    public void Create_TypeTooLong_Fails()
+    [Fact(DisplayName = "Create: invalid type fails validation")]
+    public void Create_InvalidType_Fails()
     {
-        var dto = ValidCreateDto() with { Type = new string('a', 256) };
+        var dto = ValidCreateDto() with { Type = (AddressType)999 };
         var result = _createValidator.Validate(dto);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Type");
@@ -145,7 +146,7 @@ public class AddressDtoValidatorTests
     [Fact(DisplayName = "Create: null optional fields pass validation")]
     public void Create_NullOptionalFields_Passes()
     {
-        var dto = ValidCreateDto() with { Type = null, Complement = null, District = null, ReferencePoint = null, Number = null };
+        var dto = ValidCreateDto() with { Complement = null, District = null, ReferencePoint = null, Number = null };
         _createValidator.Validate(dto).IsValid.Should().BeTrue();
     }
 

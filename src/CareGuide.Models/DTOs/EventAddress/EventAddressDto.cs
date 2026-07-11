@@ -1,3 +1,6 @@
+using CareGuide.Models.Enums;
+using System.Text.Json.Serialization;
+
 namespace CareGuide.Models.DTOs.EventAddress
 {
     public record EventAddressDto(
@@ -5,7 +8,7 @@ namespace CareGuide.Models.DTOs.EventAddress
         Guid AddressId,
         string PostalCode,
         int? Number,
-        string? Type,
+        [property: JsonConverter(typeof(JsonStringEnumConverter))] AddressType Type,
         string City,
         string? Complement,
         string Country,

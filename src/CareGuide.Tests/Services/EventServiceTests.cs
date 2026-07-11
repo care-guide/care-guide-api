@@ -117,9 +117,9 @@ public class EventServiceTests
     {
         var id = Guid.NewGuid();
         var existing = new Event { Id = id, PersonId = Guid.NewGuid(), Name = "Old Name", StartDate = StartDate, Type = EventType.Appointment };
-        var updateDto = new UpdateEventDto(id, "New Name", StartDate, null, EventType.Surgery, true, RecurrenceType.Weekly, 2, "New Details");
+        var updateDto = new UpdateEventDto(id, "New Name", StartDate, null, EventType.Surgery, true, RecurrenceType.Surgery, RecurrenceFrequency.Weekly, "New Details");
         var updated = existing;
-        var expected = new EventDto(id, existing.PersonId!.Value, "New Name", StartDate, null, EventType.Surgery, true, RecurrenceType.Weekly, 2, "New Details", DateTime.UtcNow, DateTime.UtcNow);
+        var expected = new EventDto(id, existing.PersonId!.Value, "New Name", StartDate, null, EventType.Surgery, true, RecurrenceType.Surgery, RecurrenceFrequency.Weekly, "New Details", DateTime.UtcNow, DateTime.UtcNow);
 
         _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns(existing);
         _repository.UpdateAsync(existing, Arg.Any<CancellationToken>()).Returns(updated);
@@ -130,8 +130,8 @@ public class EventServiceTests
         result.Name.Should().Be("New Name");
         result.Type.Should().Be(EventType.Surgery);
         result.IsAllDay.Should().BeTrue();
-        result.RecurrenceType.Should().Be(RecurrenceType.Weekly);
-        result.RecurrenceFrequency.Should().Be(2);
+        result.RecurrenceType.Should().Be(RecurrenceType.Surgery);
+        result.RecurrenceFrequency.Should().Be(RecurrenceFrequency.Weekly);
         result.Details.Should().Be("New Details");
     }
 

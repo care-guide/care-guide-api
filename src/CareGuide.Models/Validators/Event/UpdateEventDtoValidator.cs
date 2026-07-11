@@ -32,7 +32,7 @@ namespace CareGuide.Models.Validators.Event
                 .When(x => x.RecurrenceType.HasValue);
 
             RuleFor(x => x.RecurrenceFrequency)
-                .GreaterThan(0).WithMessage("RecurrenceFrequency must be greater than zero.")
+                .IsInEnum().WithMessage("RecurrenceFrequency must be a valid recurrence frequency.")
                 .When(x => x.RecurrenceFrequency.HasValue);
 
             RuleFor(x => x.Details)

@@ -34,8 +34,8 @@ public class EventMapperTests
             EndDate = new DateTime(2026, 1, 1, 11, 0, 0),
             Type = EventType.Appointment,
             IsAllDay = false,
-            RecurrenceType = RecurrenceType.Weekly,
-            RecurrenceFrequency = 2,
+            RecurrenceType = RecurrenceType.Appointment,
+            RecurrenceFrequency = RecurrenceFrequency.Weekly,
             Details = "Bring exam results",
             CreatedAt = new DateTime(2024, 1, 1),
             UpdatedAt = new DateTime(2024, 6, 1),
@@ -81,7 +81,7 @@ public class EventMapperTests
     [Fact(DisplayName = "CreateEventDto→Event: all fields map correctly")]
     public void Map_CreateDtoToEvent_MapsAllFields()
     {
-        var dto = new CreateEventDto("Surgery", new DateTime(2026, 2, 1), new DateTime(2026, 2, 1, 14, 0, 0), EventType.Surgery, false, RecurrenceType.Monthly, 1, "Pre-op notes");
+        var dto = new CreateEventDto("Surgery", new DateTime(2026, 2, 1), new DateTime(2026, 2, 1, 14, 0, 0), EventType.Surgery, false, RecurrenceType.Surgery, RecurrenceFrequency.Monthly, "Pre-op notes");
 
         var entity = _mapper.Map<Event>(dto);
 
@@ -89,8 +89,8 @@ public class EventMapperTests
         entity.StartDate.Should().Be(dto.StartDate);
         entity.EndDate.Should().Be(dto.EndDate);
         entity.Type.Should().Be(EventType.Surgery);
-        entity.RecurrenceType.Should().Be(RecurrenceType.Monthly);
-        entity.RecurrenceFrequency.Should().Be(1);
+        entity.RecurrenceType.Should().Be(RecurrenceType.Surgery);
+        entity.RecurrenceFrequency.Should().Be(RecurrenceFrequency.Monthly);
         entity.Details.Should().Be("Pre-op notes");
     }
 

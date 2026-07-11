@@ -1,9 +1,12 @@
+using CareGuide.Models.Enums;
+using System.Text.Json.Serialization;
+
 namespace CareGuide.Models.DTOs.EventAppointment
 {
     public record EventAppointmentDto(
         Guid Id,
         Guid EventId,
         string? Doctor,
-        string? Type
+        [property: JsonConverter(typeof(JsonStringEnumConverter))] EventAppointmentType Type
     );
 }

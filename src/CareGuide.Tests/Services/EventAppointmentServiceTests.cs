@@ -3,6 +3,7 @@ using CareGuide.Core.Services;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.EventAppointment;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Tests.Services;
 
@@ -36,8 +37,8 @@ public class EventAppointmentServiceTests
     public async Task GetByEventIdAsync_Found_ReturnsMappedDto()
     {
         var eventId = Guid.NewGuid();
-        var appointment = new EventAppointment { EventId = eventId, Doctor = "Dr. House", Type = "Checkup" };
-        var expected = new EventAppointmentDto(appointment.Id, eventId, "Dr. House", "Checkup");
+        var appointment = new EventAppointment { EventId = eventId, Doctor = "Dr. House", Type = EventAppointmentType.Routine };
+        var expected = new EventAppointmentDto(appointment.Id, eventId, "Dr. House", EventAppointmentType.Routine);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(appointment);
         _mapper.Map<EventAppointmentDto>(appointment).Returns(expected);
@@ -59,7 +60,7 @@ public class EventAppointmentServiceTests
     public async Task CreateAsync_EventNotOwned_ThrowsUnauthorizedAccessException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventAppointmentDto("Dr. House", "Checkup");
+        var dto = new CreateEventAppointmentDto("Dr. House", EventAppointmentType.Routine);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns((Event?)null);
 
@@ -72,10 +73,10 @@ public class EventAppointmentServiceTests
     public async Task CreateAsync_AlreadyExists_ThrowsInvalidOperationException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventAppointmentDto("Dr. House", "Checkup");
+        var dto = new CreateEventAppointmentDto("Dr. House", EventAppointmentType.Routine);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(new Event { Id = eventId, PersonId = Guid.NewGuid(), Name = "Event", StartDate = DateTime.UtcNow, Type = Models.Enums.EventType.Appointment });
-        _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(new EventAppointment { EventId = eventId });
+        _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(new EventAppointment { EventId = eventId, Type = EventAppointmentType.Routine });
 
         var act = async () => await _sut.CreateAsync(eventId, dto, CancellationToken.None);
 
@@ -86,9 +87,9 @@ public class EventAppointmentServiceTests
     public async Task CreateAsync_ValidDto_SetsEventIdAndPersists()
     {
         var eventId = Guid.NewGuid();
-        var dto = new CreateEventAppointmentDto("Dr. House", "Checkup");
-        var entity = new EventAppointment { EventId = Guid.Empty, Doctor = "Dr. House", Type = "Checkup" };
-        var expected = new EventAppointmentDto(entity.Id, eventId, "Dr. House", "Checkup");
+        var dto = new CreateEventAppointmentDto("Dr. House", EventAppointmentType.Routine);
+        var entity = new EventAppointment { EventId = Guid.Empty, Doctor = "Dr. House", Type = EventAppointmentType.Routine };
+        var expected = new EventAppointmentDto(entity.Id, eventId, "Dr. House", EventAppointmentType.Routine);
 
         _eventRepository.GetAsync(eventId, Arg.Any<CancellationToken>()).Returns(new Event { Id = eventId, PersonId = Guid.NewGuid(), Name = "Event", StartDate = DateTime.UtcNow, Type = Models.Enums.EventType.Appointment });
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns((EventAppointment?)null);
@@ -113,7 +114,7 @@ public class EventAppointmentServiceTests
     public async Task UpdateAsync_NotFound_ThrowsKeyNotFoundException()
     {
         var eventId = Guid.NewGuid();
-        var dto = new UpdateEventAppointmentDto("Dr. House", "Checkup");
+        var dto = new UpdateEventAppointmentDto("Dr. House", EventAppointmentType.Routine);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns((EventAppointment?)null);
 
@@ -126,9 +127,9 @@ public class EventAppointmentServiceTests
     public async Task UpdateAsync_ValidData_UpdatesFieldsAndReturnsDto()
     {
         var eventId = Guid.NewGuid();
-        var existing = new EventAppointment { EventId = eventId, Doctor = "Old Doctor", Type = "Old Type" };
-        var dto = new UpdateEventAppointmentDto("New Doctor", "New Type");
-        var expected = new EventAppointmentDto(existing.Id, eventId, "New Doctor", "New Type");
+        var existing = new EventAppointment { EventId = eventId, Doctor = "Old Doctor", Type = EventAppointmentType.Routine };
+        var dto = new UpdateEventAppointmentDto("New Doctor", EventAppointmentType.Emergency);
+        var expected = new EventAppointmentDto(existing.Id, eventId, "New Doctor", EventAppointmentType.Emergency);
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(existing);
         _repository.UpdateAsync(existing, Arg.Any<CancellationToken>()).Returns(existing);
@@ -137,7 +138,7 @@ public class EventAppointmentServiceTests
         var result = await _sut.UpdateAsync(eventId, dto, CancellationToken.None);
 
         existing.Doctor.Should().Be("New Doctor");
-        existing.Type.Should().Be("New Type");
+        existing.Type.Should().Be(EventAppointmentType.Emergency);
         result.Should().Be(expected);
     }
 
@@ -156,7 +157,7 @@ public class EventAppointmentServiceTests
     public async Task DeleteAsync_Found_CallsDeleteAsync()
     {
         var eventId = Guid.NewGuid();
-        var appointment = new EventAppointment { EventId = eventId };
+        var appointment = new EventAppointment { EventId = eventId, Type = EventAppointmentType.Routine };
 
         _repository.GetByEventIdAsync(eventId, Arg.Any<CancellationToken>()).Returns(appointment);
 

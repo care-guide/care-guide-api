@@ -1,6 +1,7 @@
 using AutoMapper;
 using CareGuide.Models.DTOs.EventSurgery;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 using CareGuide.Models.Mappers.EventSurgery;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,43 +30,33 @@ public class EventSurgeryMapperTests
         {
             Id = Guid.NewGuid(),
             EventId = eventId,
-            Type = "Appendectomy",
+            Type = EventSurgeryType.Curative,
         };
 
         var dto = _mapper.Map<EventSurgeryDto>(entity);
 
         dto.Id.Should().Be(entity.Id);
         dto.EventId.Should().Be(eventId);
-        dto.Type.Should().Be("Appendectomy");
-    }
-
-    [Fact(DisplayName = "EventSurgery→EventSurgeryDto: null Type maps to null")]
-    public void Map_EventSurgeryToDto_NullType_MapsToNull()
-    {
-        var entity = new EventSurgery { EventId = Guid.NewGuid(), Type = null };
-
-        var dto = _mapper.Map<EventSurgeryDto>(entity);
-
-        dto.Type.Should().BeNull();
+        dto.Type.Should().Be(EventSurgeryType.Curative);
     }
 
     [Fact(DisplayName = "CreateEventSurgeryDto→EventSurgery: all fields map correctly")]
     public void Map_CreateEventSurgeryDtoToEntity_MapsFields()
     {
-        var dto = new CreateEventSurgeryDto("Appendectomy");
+        var dto = new CreateEventSurgeryDto(EventSurgeryType.Diagnostic);
 
         var entity = _mapper.Map<EventSurgery>(dto);
 
-        entity.Type.Should().Be("Appendectomy");
+        entity.Type.Should().Be(EventSurgeryType.Diagnostic);
     }
 
     [Fact(DisplayName = "UpdateEventSurgeryDto→EventSurgery: all fields map correctly")]
     public void Map_UpdateEventSurgeryDtoToEntity_MapsFields()
     {
-        var dto = new UpdateEventSurgeryDto("New Type");
+        var dto = new UpdateEventSurgeryDto(EventSurgeryType.Reconstructive);
 
         var entity = _mapper.Map<EventSurgery>(dto);
 
-        entity.Type.Should().Be("New Type");
+        entity.Type.Should().Be(EventSurgeryType.Reconstructive);
     }
 }

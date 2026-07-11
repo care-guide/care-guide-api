@@ -1,4 +1,5 @@
 using CareGuide.Models.DTOs.EventSurgery;
+using CareGuide.Models.Enums;
 using CareGuide.Models.Validators.EventSurgery;
 
 namespace CareGuide.Tests.Validators;
@@ -13,21 +14,14 @@ public class EventSurgeryDtoValidatorTests
     [Fact(DisplayName = "Create: valid dto passes validation")]
     public void Create_ValidDto_Passes()
     {
-        var dto = new CreateEventSurgeryDto("Appendectomy");
+        var dto = new CreateEventSurgeryDto(EventSurgeryType.Curative);
         _createValidator.Validate(dto).IsValid.Should().BeTrue();
     }
 
-    [Fact(DisplayName = "Create: null Type passes validation")]
-    public void Create_NullType_Passes()
+    [Fact(DisplayName = "Create: invalid Type fails validation")]
+    public void Create_InvalidType_Fails()
     {
-        var dto = new CreateEventSurgeryDto(null);
-        _createValidator.Validate(dto).IsValid.Should().BeTrue();
-    }
-
-    [Fact(DisplayName = "Create: Type exceeding 255 chars fails validation")]
-    public void Create_TypeTooLong_Fails()
-    {
-        var dto = new CreateEventSurgeryDto(new string('a', 256));
+        var dto = new CreateEventSurgeryDto((EventSurgeryType)999);
         var result = _createValidator.Validate(dto);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Type");
@@ -38,21 +32,14 @@ public class EventSurgeryDtoValidatorTests
     [Fact(DisplayName = "Update: valid dto passes validation")]
     public void Update_ValidDto_Passes()
     {
-        var dto = new UpdateEventSurgeryDto("Appendectomy");
+        var dto = new UpdateEventSurgeryDto(EventSurgeryType.Palliative);
         _updateValidator.Validate(dto).IsValid.Should().BeTrue();
     }
 
-    [Fact(DisplayName = "Update: null Type passes validation")]
-    public void Update_NullType_Passes()
+    [Fact(DisplayName = "Update: invalid Type fails validation")]
+    public void Update_InvalidType_Fails()
     {
-        var dto = new UpdateEventSurgeryDto(null);
-        _updateValidator.Validate(dto).IsValid.Should().BeTrue();
-    }
-
-    [Fact(DisplayName = "Update: Type exceeding 255 chars fails validation")]
-    public void Update_TypeTooLong_Fails()
-    {
-        var dto = new UpdateEventSurgeryDto(new string('a', 256));
+        var dto = new UpdateEventSurgeryDto((EventSurgeryType)999);
         var result = _updateValidator.Validate(dto);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "Type");

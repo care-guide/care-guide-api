@@ -13,6 +13,7 @@ namespace CareGuide.Infra.Mappings
         {
             var eventTypeConverter = new ValueConverter<EventType, string>(x => x.ToString(), x => (EventType)Enum.Parse(typeof(EventType), x));
             var recurrenceTypeConverter = new ValueConverter<RecurrenceType?, string?>(x => x == null ? null : x.ToString(), x => x == null ? null : (RecurrenceType)Enum.Parse(typeof(RecurrenceType), x));
+            var recurrenceFrequencyConverter = new ValueConverter<RecurrenceFrequency?, string?>(x => x == null ? null : x.ToString(), x => x == null ? null : (RecurrenceFrequency)Enum.Parse(typeof(RecurrenceFrequency), x));
 
             builder.ToTable("events");
             builder.HasKey(x => x.Id);
@@ -25,7 +26,7 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Type).IsRequired().HasColumnType("varchar(20)").HasConversion(eventTypeConverter).HasColumnName("type");
             builder.Property(x => x.IsAllDay).IsRequired().HasDefaultValue(false).HasColumnName("is_all_day");
             builder.Property(x => x.RecurrenceType).HasColumnType("varchar(20)").HasConversion(recurrenceTypeConverter).HasColumnName("recurrence_type");
-            builder.Property(x => x.RecurrenceFrequency).HasColumnName("recurrence_frequency");
+            builder.Property(x => x.RecurrenceFrequency).HasColumnType("varchar(20)").HasConversion(recurrenceFrequencyConverter).HasColumnName("recurrence_frequency");
             builder.Property(x => x.Details).HasColumnType("text").HasMaxLength(DatabaseConstants.MaxLengthLargeText).HasColumnName("details");
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");

@@ -14,9 +14,7 @@ namespace CareGuide.Models.Validators.EventAppointment
                 .When(x => !string.IsNullOrWhiteSpace(x.Doctor));
 
             RuleFor(x => x.Type)
-                .MaximumLength(DatabaseConstants.MaxLengthStandardText)
-                .WithMessage($"Type must not exceed {DatabaseConstants.MaxLengthStandardText} characters.")
-                .When(x => !string.IsNullOrWhiteSpace(x.Type));
+                .IsInEnum().WithMessage("Type is invalid.");
         }
     }
 }

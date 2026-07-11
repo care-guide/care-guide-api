@@ -12,7 +12,7 @@ namespace CareGuide.Models.Entities
         public required EventType Type { get; set; }
         public bool IsAllDay { get; set; } = false;
         public RecurrenceType? RecurrenceType { get; set; }
-        public int? RecurrenceFrequency { get; set; }
+        public RecurrenceFrequency? RecurrenceFrequency { get; set; }
         public string? Details { get; set; }
 
         public Person Person { get; set; } = null!;
