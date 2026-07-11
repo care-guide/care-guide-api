@@ -81,7 +81,7 @@ public class PersonPhoneEndpoints() : IEndpoint
     private static async Task<IResult> Create(CreatePhoneDto createPhoneDto, IPersonPhoneService personPhoneService, CancellationToken cancellationToken)
     {
         var created = await personPhoneService.CreateAsync(createPhoneDto, cancellationToken);
-        return Results.Created($"/person-phones/{created.PhoneId}", created);
+        return Results.Created($"/api/v1/person-phones/{created.PhoneId}", created);
     }
 
     private static async Task<IResult> Update(Guid phoneId, UpdatePhoneDto updatePhoneDto, IPersonPhoneService personPhoneService, CancellationToken cancellationToken)

@@ -80,7 +80,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Create(CreateDoctorDto createDoctorDto, IDoctorService doctorService, CancellationToken cancellationToken)
         {
             var created = await doctorService.CreateAsync(createDoctorDto, cancellationToken);
-            return Results.Created($"/doctors/{created.Id}", created);
+            return Results.Created($"/api/v1/doctors/{created.Id}", created);
         }
 
         private static async Task<IResult> Update(Guid id, UpdateDoctorDto updateDoctorDto, IDoctorService doctorService, CancellationToken cancellationToken)

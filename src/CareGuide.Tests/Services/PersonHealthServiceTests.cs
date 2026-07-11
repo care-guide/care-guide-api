@@ -177,4 +177,14 @@ public class PersonHealthServiceTests
 
         await _repository.Received(1).DeleteAsync(id, Arg.Any<CancellationToken>());
     }
+
+    [Fact(DisplayName = "DeleteByIdsAsync: delegates to repository DeleteManyAsync")]
+    public async Task DeleteByIdsAsync_DelegatesToRepository()
+    {
+        var ids = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+        await _sut.DeleteByIdsAsync(ids, CancellationToken.None);
+
+        await _repository.Received(1).DeleteManyAsync(ids, Arg.Any<CancellationToken>());
+    }
 }

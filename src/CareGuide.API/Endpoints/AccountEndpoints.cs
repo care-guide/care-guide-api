@@ -86,7 +86,7 @@ public class AccountEndpoints() : IEndpoint
             accountDto.Birthday
         );
 
-        return Results.Created($"/accounts/{result.Id}", result);
+        return Results.Created($"/api/v1/accounts/{result.Id}", result);
     }
 
     private static async Task<IResult> Login(LoginAccountDto loginAccount, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)

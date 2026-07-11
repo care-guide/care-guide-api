@@ -10,5 +10,6 @@ namespace CareGuide.Core.Interfaces
         Task<PersonHealthDto> UpdateAsync(Guid id, UpdatePersonHealthDto personHealth, CancellationToken cancellationToken);
         Task DeleteAllByPersonAsync(CancellationToken cancellationToken);
         Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task DeleteByIdsAsync(List<Guid> ids, CancellationToken cancellationToken);
     }
 }

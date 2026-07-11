@@ -90,7 +90,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Create(CreateEventDto createEventDto, IEventService eventService, CancellationToken cancellationToken)
         {
             var created = await eventService.CreateAsync(createEventDto, cancellationToken);
-            return Results.Created($"/events/{created.Id}", created);
+            return Results.Created($"/api/v1/events/{created.Id}", created);
         }
 
         private static async Task<IResult> Update(Guid id, UpdateEventDto updateEventDto, IEventService eventService, CancellationToken cancellationToken)
@@ -106,7 +106,7 @@ namespace CareGuide.API.Endpoints
             CancellationToken cancellationToken)
         {
             var result = await uploadService.InitiateAsync(id, dto, cancellationToken);
-            return Results.Created($"/events/{id}/files/{result.FileId}", result);
+            return Results.Created($"/api/v1/events/{id}/files/{result.FileId}", result);
         }
 
         private static async Task<IResult> DeleteAll(IEventService eventService, CancellationToken cancellationToken)

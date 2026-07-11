@@ -48,7 +48,7 @@ public class DoctorSpecialtyEndpoints() : IEndpoint
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
-        group.MapDelete("/all", DeleteAll)
+        group.MapDelete("/doctor", DeleteAll)
              .WithName("DeleteAllDoctorSpecialties")
              .WithSummary("Delete all doctor specialties")
              .WithDescription("Deletes all specialty records associated with a specific doctor.")
@@ -81,7 +81,7 @@ public class DoctorSpecialtyEndpoints() : IEndpoint
     private static async Task<IResult> Create(Guid doctorId, [FromBody] CreateDoctorSpecialtyDto createDoctorSpecialtyDto, [FromServices] IDoctorSpecialtyService doctorSpecialtyService, CancellationToken cancellationToken)
     {
         var created = await doctorSpecialtyService.CreateAsync(doctorId, createDoctorSpecialtyDto, cancellationToken);
-        return Results.Created($"/doctors/{doctorId}/specialties/{created.Id}", created);
+        return Results.Created($"/api/v1/doctors/{doctorId}/specialties/{created.Id}", created);
     }
 
     private static async Task<IResult> Update(Guid doctorId, Guid id, [FromBody] UpdateDoctorSpecialtyDto updateDoctorSpecialtyDto, [FromServices] IDoctorSpecialtyService doctorSpecialtyService, CancellationToken cancellationToken)
