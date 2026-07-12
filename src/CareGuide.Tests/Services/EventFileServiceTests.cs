@@ -31,7 +31,7 @@ public class EventFileServiceTests
 
     // ── GetAllByEventIdAsync ──────────────────────────────────────────────────
 
-    [Fact(DisplayName = "GetAllByEventIdAsync: returns mapped list")]
+    [Fact(DisplayName = "GetAllByEventIdAsync: returns paged envelope with real total")]
     public async Task GetAllByEventIdAsync_ReturnsMappedList()
     {
         var eventId = Guid.NewGuid();
@@ -39,24 +39,28 @@ public class EventFileServiceTests
         var eventFiles = new List<EventFile> { new() { EventId = eventId, FileId = fileId, File = new FileAsset { Id = fileId, Name = "a.pdf", Size = 1, Hash = "h" } } };
         var dtos = new List<EventFileDto> { new(eventId, fileId, "a.pdf", 1, "h", "application/pdf") };
 
-        _repository.GetAllByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(eventFiles);
+        _repository.GetAllByEventAsync(1, 10, eventId, Arg.Any<CancellationToken>()).Returns(eventFiles);
+        _repository.CountByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(1);
         _mapper.Map<List<EventFileDto>>(eventFiles).Returns(dtos);
 
-        var result = await _sut.GetAllByEventIdAsync(eventId, CancellationToken.None);
+        var result = await _sut.GetAllByEventIdAsync(1, 10, eventId, CancellationToken.None);
 
-        result.Should().HaveCount(1);
+        result.Items.Should().HaveCount(1);
+        result.Total.Should().Be(1);
     }
 
     [Fact(DisplayName = "GetAllByEventIdAsync: empty result returns empty collection")]
     public async Task GetAllByEventIdAsync_Empty_ReturnsEmptyCollection()
     {
         var eventId = Guid.NewGuid();
-        _repository.GetAllByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(new List<EventFile>());
+        _repository.GetAllByEventAsync(1, 10, eventId, Arg.Any<CancellationToken>()).Returns(new List<EventFile>());
+        _repository.CountByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(0);
         _mapper.Map<List<EventFileDto>>(Arg.Any<List<EventFile>>()).Returns(new List<EventFileDto>());
 
-        var result = await _sut.GetAllByEventIdAsync(eventId, CancellationToken.None);
+        var result = await _sut.GetAllByEventIdAsync(1, 10, eventId, CancellationToken.None);
 
-        result.Should().BeEmpty();
+        result.Items.Should().BeEmpty();
+        result.Total.Should().Be(0);
     }
 
     // ── AttachAsync ───────────────────────────────────────────────────────────

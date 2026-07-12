@@ -80,6 +80,21 @@ namespace CareGuide.Infra.Repositories.Shared
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<(List<TEntity> Items, int Total, int Page, int PageSize)> GetAllByPersonPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        {
+            (page, pageSize) = NormalizePagination(page, pageSize);
+
+            var query = Scoped.AsNoTracking();
+
+            var total = await query.CountAsync(cancellationToken);
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (items, total, page, pageSize);
+        }
+
         public async Task<TEntity?> GetFirstByPersonAsync(CancellationToken cancellationToken = default)
         {
             return await Scoped.FirstOrDefaultAsync(cancellationToken);

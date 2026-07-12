@@ -2,6 +2,7 @@
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.PersonDisease;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -17,10 +18,10 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<List<PersonDiseaseDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<PersonDiseaseDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            var list = await _personDiseaseRepository.GetAllByPersonAsync(page, pageSize, cancellationToken);
-            return _mapper.Map<List<PersonDiseaseDto>>(list);
+            var (items, total, normalizedPage, normalizedPageSize) = await _personDiseaseRepository.GetAllByPersonPagedAsync(page, pageSize, cancellationToken);
+            return new PagedResult<PersonDiseaseDto>(_mapper.Map<List<PersonDiseaseDto>>(items), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<PersonDiseaseDto> GetAsync(Guid id, CancellationToken cancellationToken)

@@ -9,5 +9,7 @@ namespace CareGuide.Core.Interfaces
         Task<PersonDto> CreateAsync(CreatePersonDto createPerson, CancellationToken cancellationToken);
         Task<PersonDto> UpdateAsync(Guid id, PersonDto updatePerson, CancellationToken cancellationToken);
         Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task<MyProfileDto> GetMyProfileAsync(Guid personId, CancellationToken cancellationToken);
+        Task<MyProfileDto> UpdateMyProfileAsync(Guid personId, UpdatePersonProfileDto updateProfile, CancellationToken cancellationToken);
     }
 }

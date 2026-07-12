@@ -1,5 +1,6 @@
 using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.Entities;
 using CareGuide.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,8 @@ namespace CareGuide.Infra.Repositories
 
         public async Task<List<DoctorAddress>> GetAllByDoctorWithAddressesAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken = default)
         {
+            (page, pageSize) = PaginationNormalizer.Normalize(page, pageSize);
+
             var personId = _userSessionContext.PersonId;
 
             return await _context.DoctorAddresses
@@ -27,6 +30,15 @@ namespace CareGuide.Infra.Repositories
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<int> CountByDoctorAsync(Guid doctorId, CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.DoctorAddresses
+                .Where(da => da.DoctorId == doctorId && da.Doctor.PersonId == personId)
+                .CountAsync(cancellationToken);
         }
 
         public async Task<DoctorAddress?> GetByDoctorWithAddressAsync(Guid addressId, Guid doctorId, CancellationToken cancellationToken = default)

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.DoctorSpecialty;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -17,14 +19,17 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<DoctorSpecialtyDto>> GetAllByDoctorAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken)
+        public async Task<PagedResult<DoctorSpecialtyDto>> GetAllByDoctorAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken)
         {
-            var specialties = await _doctorSpecialtyRepository.GetAllByDoctorAsync(page, pageSize, doctorId, cancellationToken);
+            var (normalizedPage, normalizedPageSize) = PaginationNormalizer.Normalize(page, pageSize);
 
-            if (specialties.Count == 0)
+            var specialties = await _doctorSpecialtyRepository.GetAllByDoctorAsync(normalizedPage, normalizedPageSize, doctorId, cancellationToken);
+            var total = await _doctorSpecialtyRepository.CountByDoctorAsync(doctorId, cancellationToken);
+
+            if (total == 0)
                 throw new KeyNotFoundException($"No specialty records found for the doctor with ID {doctorId}.");
 
-            return _mapper.Map<List<DoctorSpecialtyDto>>(specialties);
+            return new PagedResult<DoctorSpecialtyDto>(_mapper.Map<List<DoctorSpecialtyDto>>(specialties), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<DoctorSpecialtyDto> GetAsync(Guid id, Guid doctorId, CancellationToken cancellationToken)
@@ -72,7 +77,7 @@ namespace CareGuide.Core.Services
 
         public async Task DeleteAllByDoctorAsync(Guid doctorId, CancellationToken cancellationToken)
         {
-            var specialties = await _doctorSpecialtyRepository.GetAllByDoctorAsync(1, int.MaxValue, doctorId, cancellationToken);
+            var specialties = await _doctorSpecialtyRepository.GetAllByDoctorUnpagedAsync(doctorId, cancellationToken);
 
             if (specialties.Count == 0)
                 return;

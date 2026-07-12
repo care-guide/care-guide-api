@@ -128,7 +128,7 @@ public class DoctorServiceTests
         result.Details.Should().Be("New Details");
     }
 
-    [Fact(DisplayName = "GetAllByPersonAsync: returns mapped list")]
+    [Fact(DisplayName = "GetAllByPersonAsync: returns paged envelope with real total")]
     public async Task GetAllByPersonAsync_ReturnsPagedMappedList()
     {
         var doctors = new List<Doctor>
@@ -138,11 +138,15 @@ public class DoctorServiceTests
         };
         var dtos = doctors.Select(d => new DoctorDto(d.Id, d.PersonId!.Value, d.Name, null, DateTime.UtcNow, DateTime.UtcNow)).ToList();
 
-        _repository.GetAllByPersonAsync(1, 10, Arg.Any<CancellationToken>()).Returns(doctors);
+        _repository.GetAllByPersonPagedAsync(1, 10, Arg.Any<CancellationToken>()).Returns((doctors, 27, 1, 10));
         _mapper.Map<List<DoctorDto>>(doctors).Returns(dtos);
 
         var result = await _sut.GetAllByPersonAsync(1, 10, CancellationToken.None);
 
-        result.Should().HaveCount(2);
+        result.Items.Should().HaveCount(2);
+        result.Total.Should().Be(27);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(10);
+        result.HasNext.Should().BeTrue();
     }
 }

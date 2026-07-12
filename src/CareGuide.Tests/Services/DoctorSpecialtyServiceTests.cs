@@ -25,6 +25,7 @@ public class DoctorSpecialtyServiceTests
         var doctorId = Guid.NewGuid();
         _repository.GetAllByDoctorAsync(Arg.Any<int>(), Arg.Any<int>(), doctorId, Arg.Any<CancellationToken>())
             .Returns(new List<DoctorSpecialty>());
+        _repository.CountByDoctorAsync(doctorId, Arg.Any<CancellationToken>()).Returns(0);
 
         var act = async () => await _sut.GetAllByDoctorAsync(1, 10, doctorId, CancellationToken.None);
 
@@ -32,7 +33,7 @@ public class DoctorSpecialtyServiceTests
             .WithMessage($"*{doctorId}*");
     }
 
-    [Fact(DisplayName = "GetAllByDoctorAsync: results found returns mapped collection")]
+    [Fact(DisplayName = "GetAllByDoctorAsync: results found returns paged envelope with real total")]
     public async Task GetAllByDoctorAsync_HasResults_ReturnsMappedCollection()
     {
         var doctorId = Guid.NewGuid();
@@ -43,11 +44,14 @@ public class DoctorSpecialtyServiceTests
         var dtos = specialties.Select(s => new DoctorSpecialtyDto(s.Id, s.DoctorId, s.Name)).ToList();
 
         _repository.GetAllByDoctorAsync(1, 10, doctorId, Arg.Any<CancellationToken>()).Returns(specialties);
+        _repository.CountByDoctorAsync(doctorId, Arg.Any<CancellationToken>()).Returns(1);
         _mapper.Map<List<DoctorSpecialtyDto>>(specialties).Returns(dtos);
 
         var result = await _sut.GetAllByDoctorAsync(1, 10, doctorId, CancellationToken.None);
 
-        result.Should().HaveCount(1);
+        result.Items.Should().HaveCount(1);
+        result.Total.Should().Be(1);
+        result.HasNext.Should().BeFalse();
     }
 
     [Fact(DisplayName = "GetAsync: specialty not found throws UnauthorizedAccessException")]
@@ -165,7 +169,7 @@ public class DoctorSpecialtyServiceTests
     public async Task DeleteAllByDoctorAsync_NoSpecialties_SkipsDelete()
     {
         var doctorId = Guid.NewGuid();
-        _repository.GetAllByDoctorAsync(Arg.Any<int>(), Arg.Any<int>(), doctorId, Arg.Any<CancellationToken>())
+        _repository.GetAllByDoctorUnpagedAsync(doctorId, Arg.Any<CancellationToken>())
             .Returns(new List<DoctorSpecialty>());
 
         await _sut.DeleteAllByDoctorAsync(doctorId, CancellationToken.None);

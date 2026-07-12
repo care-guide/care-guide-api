@@ -1,5 +1,6 @@
 ﻿using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.Entities;
 using CareGuide.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,8 @@ namespace CareGuide.Infra.Repositories
 
         public async Task<List<DoctorSpecialty>> GetAllByDoctorAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken = default)
         {
+            (page, pageSize) = PaginationNormalizer.Normalize(page, pageSize);
+
             var personId = _userSessionContext.PersonId;
 
             return await _context.DoctorSpecialties
@@ -34,6 +37,24 @@ namespace CareGuide.Infra.Repositories
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<DoctorSpecialty>> GetAllByDoctorUnpagedAsync(Guid doctorId, CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.DoctorSpecialties
+                .Where(x => x.DoctorId == doctorId && x.Doctor.PersonId == personId)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<int> CountByDoctorAsync(Guid doctorId, CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.DoctorSpecialties
+                .Where(x => x.DoctorId == doctorId && x.Doctor.PersonId == personId)
+                .CountAsync(cancellationToken);
         }
 
         public async Task<List<DoctorSpecialty>> GetManyByIdsAsync(IEnumerable<Guid> ids, Guid doctorId, CancellationToken cancellationToken = default)

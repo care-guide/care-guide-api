@@ -3,6 +3,7 @@ using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.DoctorAddress;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints;
@@ -20,7 +21,7 @@ public class DoctorAddressEndpoints() : IEndpoint
              .WithName("GetAllDoctorAddresses")
              .WithSummary("Get all doctor addresses")
              .WithDescription("Retrieves all address records attached to a specific doctor using pagination parameters.")
-             .Produces<IReadOnlyCollection<DoctorAddressDto>>(StatusCodes.Status200OK)
+             .Produces<PagedResult<DoctorAddressDto>>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
