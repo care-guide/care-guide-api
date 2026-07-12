@@ -1,7 +1,7 @@
 # Tests
 
 > Test conventions (AAA, NSubstitute, FluentAssertions) and where to create each file: see
-> [AGENTS.md](../AGENTS.md) → Tests.
+> [AGENTS.md](../../AGENTS.md) → Tests.
 
 ## Overview
 
@@ -130,4 +130,4 @@ Passed!  – Failed: 0, Passed: <N>, Skipped: 0, Total: <N>
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)

@@ -3,7 +3,7 @@
 Operational procedures for Care Guide private file storage. Commands and values below are placeholders;
 never paste production credentials or valid signed URLs into tickets or chat.
 
-See [FILE_STORAGE.md](FILE_STORAGE.md) for architecture and HTTP flow.
+See [FILE_STORAGE.md](../architecture/FILE_STORAGE.md) for architecture and HTTP flow.
 
 ## Credential rotation
 

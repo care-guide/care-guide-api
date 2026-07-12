@@ -32,17 +32,17 @@ Full documentation index: [docs/README.md](docs/README.md).
 | Topic | Document |
 | ----- | -------- |
 | Conventions and architecture (AI agents) | [AGENTS.md](AGENTS.md) |
-| Solution structure | [docs/STRUCTURE.md](docs/STRUCTURE.md) |
-| Execution | [docs/EXECUTION.md](docs/EXECUTION.md) |
-| Configuration and secrets | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) |
-| Private R2 file flow | [docs/FILE_STORAGE.md](docs/FILE_STORAGE.md) |
-| R2 operations runbook | [docs/R2_RUNBOOK.md](docs/R2_RUNBOOK.md) |
-| API conventions | [docs/API.md](docs/API.md) |
-| Migrations | [docs/MIGRATIONS.md](docs/MIGRATIONS.md) |
+| Solution structure | [docs/architecture/STRUCTURE.md](docs/architecture/STRUCTURE.md) |
+| Execution | [docs/getting-started/EXECUTION.md](docs/getting-started/EXECUTION.md) |
+| Configuration and secrets | [docs/getting-started/CONFIGURATION.md](docs/getting-started/CONFIGURATION.md) |
+| Private R2 file flow | [docs/architecture/FILE_STORAGE.md](docs/architecture/FILE_STORAGE.md) |
+| R2 operations runbook | [docs/operations/R2_RUNBOOK.md](docs/operations/R2_RUNBOOK.md) |
+| API conventions | [docs/architecture/API.md](docs/architecture/API.md) |
+| Migrations | [docs/development/MIGRATIONS.md](docs/development/MIGRATIONS.md) |
 | Development database seed | [database/seeds/README.md](database/seeds/README.md) |
-| Tests | [docs/TESTS.md](docs/TESTS.md) |
-| Security | [docs/SECURITY.md](docs/SECURITY.md) |
-| LGPD / Privacy | [docs/LGPD.md](docs/LGPD.md) |
+| Tests | [docs/development/TESTS.md](docs/development/TESTS.md) |
+| Security | [docs/security/SECURITY.md](docs/security/SECURITY.md) |
+| LGPD / Privacy | [docs/security/LGPD.md](docs/security/LGPD.md) |
 | ER Diagram | <a href="https://miro.com/app/board/uXjVNh5qees=/" target="_blank" rel="noopener noreferrer">ER Diagram (Miro)</a> |
 
 ## API Documentation (OpenAPI + Scalar)

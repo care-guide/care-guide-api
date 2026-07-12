@@ -2,7 +2,7 @@
 
 Below is a description of the main projects and folders that make up the Care Guide solution.
 For the code conventions of each layer (where to create each artifact, DTO/validator/mapper patterns),
-see [AGENTS.md](../AGENTS.md).
+see [AGENTS.md](../../AGENTS.md).
 
 ```text
 src/
@@ -18,7 +18,7 @@ database/
 
 `database/seeds` is development tooling rather than an application layer. Its runner reads the local
 `.env`, hashes development passwords through `CareGuide.Security`, and populates relationally valid
-data after migrations have been applied. See [the seed guide](../database/seeds/README.md).
+data after migrations have been applied. See [the seed guide](../../database/seeds/README.md).
 
 ## Dependency flow
 
@@ -56,8 +56,8 @@ passwords.
 ### CareGuide.Tests
 
 Project responsible for the solution's unit and integration tests. Ensures quality and correct behavior
-of the implemented features, following good test automation practices. See [TESTS.md](TESTS.md).
+of the implemented features, following good test automation practices. See [TESTS.md](../development/TESTS.md).
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)

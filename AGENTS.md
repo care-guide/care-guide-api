@@ -7,13 +7,13 @@ Context guide for AI agents. Read this file before any analysis or changes.
 | Topic | Doc |
 | ----- | --- |
 | Documentation index | [`docs/README.md`](docs/README.md) |
-| Solution structure | [`docs/STRUCTURE.md`](docs/STRUCTURE.md) |
-| API conventions (errors, pagination, auth) | [`docs/API.md`](docs/API.md) |
-| Security (auth, passwords, secrets) | [`docs/SECURITY.md`](docs/SECURITY.md) |
-| LGPD / data privacy | [`docs/LGPD.md`](docs/LGPD.md) |
-| Configuration & secrets | [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) |
-| Migrations | [`docs/MIGRATIONS.md`](docs/MIGRATIONS.md) |
-| Tests | [`docs/TESTS.md`](docs/TESTS.md) |
+| Solution structure | [`docs/architecture/STRUCTURE.md`](docs/architecture/STRUCTURE.md) |
+| API conventions (errors, pagination, auth) | [`docs/architecture/API.md`](docs/architecture/API.md) |
+| Security (auth, passwords, secrets) | [`docs/security/SECURITY.md`](docs/security/SECURITY.md) |
+| LGPD / data privacy | [`docs/security/LGPD.md`](docs/security/LGPD.md) |
+| Configuration & secrets | [`docs/getting-started/CONFIGURATION.md`](docs/getting-started/CONFIGURATION.md) |
+| Migrations | [`docs/development/MIGRATIONS.md`](docs/development/MIGRATIONS.md) |
+| Tests | [`docs/development/TESTS.md`](docs/development/TESTS.md) |
 
 ---
 
@@ -189,7 +189,7 @@ Expected result: `Failed: 0`. If any test breaks, the change must be fixed befor
 - Async exceptions: `await act.Should().ThrowAsync<TException>()`
 - Rollback in services with UoW: simulate exception with `Task.FromException<T>()`
 
-Full documentation: [`docs/TESTS.md`](docs/TESTS.md)
+Full documentation: [`docs/development/TESTS.md`](docs/development/TESTS.md)
 
 ---
 
