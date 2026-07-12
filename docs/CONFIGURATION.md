@@ -27,7 +27,7 @@ the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `D
 | `SecuritySettings:SecretKey` | JWT signing key (**secret**) | *(via env/vault)* |
 | `SecuritySettings:Issuer` | Token issuer | `CareGuideAPI` |
 | `SecuritySettings:Audience` | Token audience | `CareGuideClient` |
-| `CorsOrigins` | Allowed origins (array) | `["https://careguide.dev"]` |
+| `CorsOrigins` | Allowed origins for credentialed CORS (array, explicit — no wildcard) | `["https://careguide.dev"]` |
 | `AllowedHosts` | Allowed hosts | `*` |
 | `Storage:R2:Endpoint` | HTTPS endpoint of the S3-compatible R2 account | `https://<account-id>.r2.cloudflarestorage.com` |
 | `Storage:R2:AccountId` | Cloudflare account identifier | *(via env/vault)* |
@@ -52,6 +52,16 @@ All duration values are integers in seconds, minutes or days as stated in the ke
 integer bytes. Content types and extensions are arrays; extensions include the leading dot. Startup
 validation rejects missing R2 settings, non-HTTPS endpoints, empty allowlists, unsupported hash format,
 unsafe URL lifetimes and invalid lifecycle periods.
+
+### CORS
+
+`CorsOrigins` feeds the `"CorsPolicy"` registered in `Program.cs`, which calls `AllowCredentials()`
+so browsers include the auth cookie on cross-origin requests (e.g. a web SPA hosted on a different
+origin). Because the CORS spec forbids combining credentialed requests with a wildcard origin, the
+policy always resolves origins via `WithOrigins(corsOrigins)` — `AllowAnyOrigin()` must never be
+added back. Add every web frontend origin that needs cookie-authenticated access to `CorsOrigins`;
+anything not listed is rejected by the browser's preflight check. Non-browser clients (mobile apps,
+server-to-server calls) are not subject to CORS and are unaffected by this setting.
 
 ### R2 values and secret delivery
 
@@ -111,6 +121,36 @@ FileLifecycle__CleanupIntervalMinutes=15
 
 > In the repository, `SecretKey` and the connection string are empty. Fill them only locally
 > (User Secrets) or via environment variable/vault in production — never commit the real values.
+
+### Enforced guard against committed secrets
+
+A populated secret field in tracked `appsettings*.json` is treated as a build-breaking error, not a
+warning:
+
+- **Pre-commit hook** (`scripts/hooks/pre-commit`): checks the staged content of every
+  `appsettings*.json` file and aborts the commit (non-zero exit) if `SecuritySettings:SecretKey`,
+  `ConnectionStrings:DatabaseConnection`, `Storage:R2:AccessKey` or `Storage:R2:SecretKey` is
+  non-empty. Not installed automatically (`.git/hooks` isn't versioned) — run once after cloning:
+
+  ```bash
+  sh scripts/install-hooks.sh
+  ```
+
+- **CI** (`.github/workflows/ci-dotnet.yml`): runs `python3 scripts/check-secrets.py` as the first
+  step of the build. It scans all tracked `appsettings*.json` files the same way and **fails the
+  job** if any secret field is populated, so a commit that bypasses the local hook (e.g. `--no-verify`
+  or a fresh clone without the hook installed) still cannot reach `main` green.
+
+Both entry points share the same checker (`scripts/check-secrets.py`), which only ever reports the
+file and key path (plus the value's length) — never the secret value itself — so it is also safe to
+run in CI logs.
+
+If you need to set the JWT signing key locally, do it via User Secrets, never by editing
+`appsettings.json`:
+
+```bash
+dotnet user-secrets set "SecuritySettings:SecretKey" "<value>" --project src/CareGuide.API/CareGuide.API.csproj
+```
 
 ---
 

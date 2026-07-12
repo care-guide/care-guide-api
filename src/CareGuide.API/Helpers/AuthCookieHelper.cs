@@ -1,7 +1,15 @@
-﻿namespace CareGuide.API.Helpers
+﻿using CareGuide.Models.Constants;
+
+namespace CareGuide.API.Helpers
 {
     public class AuthCookieHelper
     {
+        public static bool IsNativeClient(HttpRequest request)
+        {
+            return request.Headers.TryGetValue(AuthClientConstants.ClientTypeHeaderName, out var value)
+                && string.Equals(value, AuthClientConstants.MobileClientTypeValue, StringComparison.OrdinalIgnoreCase);
+        }
+
         public static void AppendRefreshToken(HttpResponse response, string refreshToken, int days = 7)
         {
             var cookieOptions = new CookieOptions

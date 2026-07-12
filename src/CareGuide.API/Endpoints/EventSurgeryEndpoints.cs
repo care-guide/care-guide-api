@@ -56,7 +56,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Create(Guid eventId, [FromBody] CreateEventSurgeryDto createEventSurgeryDto, [FromServices] IEventSurgeryService eventSurgeryService, CancellationToken cancellationToken)
         {
             var created = await eventSurgeryService.CreateAsync(eventId, createEventSurgeryDto, cancellationToken);
-            return Results.Created($"/events/{eventId}/surgery", created);
+            return Results.Created($"/api/v1/events/{eventId}/surgery", created);
         }
 
         private static async Task<IResult> Update(Guid eventId, [FromBody] UpdateEventSurgeryDto updateEventSurgeryDto, [FromServices] IEventSurgeryService eventSurgeryService, CancellationToken cancellationToken)

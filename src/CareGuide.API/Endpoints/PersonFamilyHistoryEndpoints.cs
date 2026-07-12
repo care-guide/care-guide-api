@@ -3,6 +3,7 @@ using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.PersonFamilyHistory;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints
@@ -20,7 +21,7 @@ namespace CareGuide.API.Endpoints
                  .WithName("GetAllPersonFamilyHistories")
                  .WithSummary("Get all family histories")
                  .WithDescription("Retrieves all family histories for the authenticated person using pagination parameters.")
-                 .Produces<List<PersonFamilyHistoryDto>>(StatusCodes.Status200OK)
+                 .Produces<PagedResult<PersonFamilyHistoryDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapGet("/{id:guid}", GetById)
@@ -80,7 +81,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Create(CreatePersonFamilyHistoryDto createPersonFamilyHistoryDto, IPersonFamilyHistoryService personFamilyHistoryService, CancellationToken cancellationToken)
         {
             var created = await personFamilyHistoryService.CreateAsync(createPersonFamilyHistoryDto, cancellationToken);
-            return Results.Created($"/person-family-histories/{created.Id}", created);
+            return Results.Created($"/api/v1/person-family-histories/{created.Id}", created);
         }
 
         private static async Task<IResult> Update(Guid id, UpdatePersonFamilyHistoryDto updatePersonFamilyHistoryDto, IPersonFamilyHistoryService personFamilyHistoryService, CancellationToken cancellationToken)

@@ -1,7 +1,9 @@
 using AutoMapper;
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.DoctorAddress;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -19,14 +21,17 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<DoctorAddressDto>> GetAllByDoctorAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken)
+        public async Task<PagedResult<DoctorAddressDto>> GetAllByDoctorAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken)
         {
-            var doctorAddresses = await _doctorAddressRepository.GetAllByDoctorWithAddressesAsync(page, pageSize, doctorId, cancellationToken);
+            var (normalizedPage, normalizedPageSize) = PaginationNormalizer.Normalize(page, pageSize);
 
-            if (doctorAddresses.Count == 0)
+            var doctorAddresses = await _doctorAddressRepository.GetAllByDoctorWithAddressesAsync(normalizedPage, normalizedPageSize, doctorId, cancellationToken);
+            var total = await _doctorAddressRepository.CountByDoctorAsync(doctorId, cancellationToken);
+
+            if (total == 0)
                 throw new KeyNotFoundException($"No address records found for the doctor with ID {doctorId}.");
 
-            return _mapper.Map<List<DoctorAddressDto>>(doctorAddresses);
+            return new PagedResult<DoctorAddressDto>(_mapper.Map<List<DoctorAddressDto>>(doctorAddresses), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<DoctorAddressDto> GetAsync(Guid addressId, Guid doctorId, CancellationToken cancellationToken)

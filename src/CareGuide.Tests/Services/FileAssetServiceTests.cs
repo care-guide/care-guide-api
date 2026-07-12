@@ -55,7 +55,7 @@ public class FileAssetServiceTests
     {
         var id = Guid.NewGuid();
         var entity = new FileAsset { Id = id, Name = "report.pdf", Size = 2048, Hash = new string('a', 64) };
-        var expected = new FileAssetDto(id, "report.pdf", 2048, new string('a', 64), "files/key", "application/pdf", StorageProvider.CloudflareR2, FileUploadStatus.Uploaded, DateTime.UtcNow, DateTime.UtcNow);
+        var expected = new FileAssetDto(id, "report.pdf", 2048, new string('a', 64), "application/pdf", StorageProvider.CloudflareR2, FileUploadStatus.Uploaded, DateTime.UtcNow, DateTime.UtcNow);
 
         _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns(entity);
         _mapper.Map<FileAssetDto>(entity).Returns(expected);
@@ -78,7 +78,7 @@ public class FileAssetServiceTests
     {
         var createDto = new CreateFileAssetDto("report.pdf", 2048, new string('a', 64), "application/pdf");
         var entity = new FileAsset { Name = "report.pdf", Size = 2048, Hash = new string('a', 64) };
-        var expected = new FileAssetDto(entity.Id, "report.pdf", 2048, new string('a', 64), "files/key", "application/pdf", StorageProvider.CloudflareR2, FileUploadStatus.Pending, DateTime.UtcNow, DateTime.UtcNow);
+        var expected = new FileAssetDto(entity.Id, "report.pdf", 2048, new string('a', 64), "application/pdf", StorageProvider.CloudflareR2, FileUploadStatus.Pending, DateTime.UtcNow, DateTime.UtcNow);
 
         _mapper.Map<FileAsset>(createDto).Returns(entity);
         _mapper.Map<FileAssetDto>(entity).Returns(expected);
@@ -126,7 +126,7 @@ public class FileAssetServiceTests
         var id = Guid.NewGuid();
         var existing = new FileAsset { Id = id, Name = "old.pdf", Size = 1024, Hash = new string('b', 64) };
         var updateDto = new UpdateFileAssetDto(id, "new.pdf", 4096, new string('c', 64), "application/pdf");
-        var expected = new FileAssetDto(id, "new.pdf", 4096, new string('c', 64), "files/key", "application/pdf", StorageProvider.CloudflareR2, FileUploadStatus.Uploaded, DateTime.UtcNow, DateTime.UtcNow);
+        var expected = new FileAssetDto(id, "new.pdf", 4096, new string('c', 64), "application/pdf", StorageProvider.CloudflareR2, FileUploadStatus.Uploaded, DateTime.UtcNow, DateTime.UtcNow);
 
         _repository.GetAsync(id, Arg.Any<CancellationToken>()).Returns(existing);
         _repository.UpdateAsync(existing, Arg.Any<CancellationToken>()).Returns(existing);

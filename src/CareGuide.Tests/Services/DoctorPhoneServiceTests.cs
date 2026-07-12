@@ -34,13 +34,14 @@ public class DoctorPhoneServiceTests
     {
         var doctorId = Guid.NewGuid();
         _repository.GetAllByDoctorWithPhonesAsync(1, 10, doctorId, Arg.Any<CancellationToken>()).Returns(new List<DoctorPhone>());
+        _repository.CountByDoctorAsync(doctorId, Arg.Any<CancellationToken>()).Returns(0);
 
         var act = async () => await _sut.GetAllByDoctorAsync(1, 10, doctorId, CancellationToken.None);
 
         await act.Should().ThrowAsync<KeyNotFoundException>().WithMessage($"*{doctorId}*");
     }
 
-    [Fact(DisplayName = "GetAllByDoctorAsync: found returns mapped list")]
+    [Fact(DisplayName = "GetAllByDoctorAsync: found returns paged envelope with real total")]
     public async Task GetAllByDoctorAsync_Found_ReturnsMappedList()
     {
         var doctorId = Guid.NewGuid();
@@ -52,11 +53,14 @@ public class DoctorPhoneServiceTests
         var dtos = new List<DoctorPhoneDto> { new(doctorId, phoneId, "912345678", "11", PhoneType.CEL) };
 
         _repository.GetAllByDoctorWithPhonesAsync(1, 10, doctorId, Arg.Any<CancellationToken>()).Returns(doctorPhones);
+        _repository.CountByDoctorAsync(doctorId, Arg.Any<CancellationToken>()).Returns(1);
         _mapper.Map<List<DoctorPhoneDto>>(doctorPhones).Returns(dtos);
 
         var result = await _sut.GetAllByDoctorAsync(1, 10, doctorId, CancellationToken.None);
 
-        result.Should().HaveCount(1);
+        result.Items.Should().HaveCount(1);
+        result.Total.Should().Be(1);
+        result.HasNext.Should().BeFalse();
     }
 
     // ── GetAsync ──────────────────────────────────────────────────────────────
@@ -218,7 +222,7 @@ public class DoctorPhoneServiceTests
     public async Task DeleteAllByDoctorAsync_EmptyList_SkipsOperation()
     {
         var doctorId = Guid.NewGuid();
-        _repository.GetAllByDoctorWithPhonesAsync(1, int.MaxValue, doctorId, Arg.Any<CancellationToken>()).Returns(new List<DoctorPhone>());
+        _repository.GetAllByDoctorUnpagedAsync(doctorId, Arg.Any<CancellationToken>()).Returns(new List<DoctorPhone>());
 
         await _sut.DeleteAllByDoctorAsync(doctorId, CancellationToken.None);
 
@@ -231,7 +235,7 @@ public class DoctorPhoneServiceTests
         var doctorId = Guid.NewGuid();
         var phoneId = Guid.NewGuid();
         var doctorPhones = new List<DoctorPhone> { new() { DoctorId = doctorId, PhoneId = phoneId } };
-        _repository.GetAllByDoctorWithPhonesAsync(1, int.MaxValue, doctorId, Arg.Any<CancellationToken>()).Returns(doctorPhones);
+        _repository.GetAllByDoctorUnpagedAsync(doctorId, Arg.Any<CancellationToken>()).Returns(doctorPhones);
 
         await _sut.DeleteAllByDoctorAsync(doctorId, CancellationToken.None);
 

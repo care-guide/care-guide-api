@@ -3,6 +3,7 @@ using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.PersonDisease;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints
@@ -20,7 +21,7 @@ namespace CareGuide.API.Endpoints
                  .WithName("GetAllPersonDiseases")
                  .WithSummary("Get all diseases")
                  .WithDescription("Retrieves all diseases for the authenticated person using pagination parameters.")
-                 .Produces<List<PersonDiseaseDto>>(StatusCodes.Status200OK)
+                 .Produces<PagedResult<PersonDiseaseDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapGet("/{id:guid}", GetById)
@@ -80,7 +81,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Create(CreatePersonDiseaseDto createPersonDisease, IPersonDiseaseService personDiseaseService, CancellationToken cancellationToken)
         {
             var created = await personDiseaseService.CreateAsync(createPersonDisease, cancellationToken);
-            return Results.Created($"/person-diseases/{created.Id}", created);
+            return Results.Created($"/api/v1/person-diseases/{created.Id}", created);
         }
 
         private static async Task<IResult> Update(Guid id, UpdatePersonDiseaseDto updatePersonDisease, IPersonDiseaseService personDiseaseService, CancellationToken cancellationToken)

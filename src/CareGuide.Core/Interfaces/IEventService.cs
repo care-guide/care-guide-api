@@ -1,10 +1,18 @@
 using CareGuide.Models.DTOs.Event;
+using CareGuide.Models.DTOs.Shared;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Core.Interfaces
 {
     public interface IEventService
     {
-        Task<List<EventDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken);
+        Task<PagedResult<EventDto>> GetAllByPersonAsync(
+            DateTime? from,
+            DateTime? to,
+            EventSortOrder sortOrder,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken);
         Task<EventDto> GetAsync(Guid id, CancellationToken cancellationToken);
         Task<EventDto> CreateAsync(CreateEventDto eventDto, CancellationToken cancellationToken);
         Task<EventDto> UpdateAsync(Guid id, UpdateEventDto eventDto, CancellationToken cancellationToken);

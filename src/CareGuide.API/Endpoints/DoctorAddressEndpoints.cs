@@ -3,6 +3,7 @@ using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.DoctorAddress;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints;
@@ -20,7 +21,7 @@ public class DoctorAddressEndpoints() : IEndpoint
              .WithName("GetAllDoctorAddresses")
              .WithSummary("Get all doctor addresses")
              .WithDescription("Retrieves all address records attached to a specific doctor using pagination parameters.")
-             .Produces<IReadOnlyCollection<DoctorAddressDto>>(StatusCodes.Status200OK)
+             .Produces<PagedResult<DoctorAddressDto>>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
@@ -47,7 +48,7 @@ public class DoctorAddressEndpoints() : IEndpoint
              .Produces(StatusCodes.Status204NoContent)
              .ProducesProblem(StatusCodes.Status400BadRequest);
 
-        group.MapDelete("/all", DeleteAll)
+        group.MapDelete("/doctor", DeleteAll)
              .WithName("DeleteAllDoctorAddresses")
              .WithSummary("Detach all addresses from doctor")
              .WithDescription("Detaches all address records from a specific doctor.")
@@ -72,7 +73,7 @@ public class DoctorAddressEndpoints() : IEndpoint
     private static async Task<IResult> Create(Guid doctorId, CreateDoctorAddressDto createDoctorAddressDto, IDoctorAddressService doctorAddressService, CancellationToken cancellationToken)
     {
         var created = await doctorAddressService.CreateAsync(doctorId, createDoctorAddressDto, cancellationToken);
-        return Results.Created($"/doctors/{doctorId}/addresses/{created.AddressId}", created);
+        return Results.Created($"/api/v1/doctors/{doctorId}/addresses/{created.AddressId}", created);
     }
 
     private static async Task<IResult> DeleteAll(Guid doctorId, IDoctorAddressService doctorAddressService, CancellationToken cancellationToken)

@@ -4,6 +4,8 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Event;
 using CareGuide.Models.DTOs.FileAsset;
+using CareGuide.Models.DTOs.Shared;
+using CareGuide.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints
@@ -20,8 +22,10 @@ namespace CareGuide.API.Endpoints
             group.MapGet("/", GetAll)
                  .WithName("GetAllEvents")
                  .WithSummary("Get all events")
-                 .WithDescription("Retrieves all events for the authenticated person using pagination parameters.")
-                 .Produces<List<EventDto>>(StatusCodes.Status200OK)
+                 .WithDescription("Retrieves all events for the authenticated person using pagination parameters. " +
+                    "Optionally filters by `startDate` using the inclusive `from`/`to` range and orders results by `startDate` " +
+                    "('Asc' by default, or 'Desc').")
+                 .Produces<PagedResult<EventDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapGet("/{id:guid}", GetById)
@@ -72,12 +76,19 @@ namespace CareGuide.API.Endpoints
                  .ProducesProblem(StatusCodes.Status400BadRequest);
         }
 
-        private static async Task<IResult> GetAll(int page, int pageSize, IEventService eventService, CancellationToken cancellationToken)
+        private static async Task<IResult> GetAll(
+            int page,
+            int pageSize,
+            IEventService eventService,
+            CancellationToken cancellationToken,
+            DateTime? from = null,
+            DateTime? to = null,
+            EventSortOrder sort = EventSortOrder.Asc)
         {
             page = page == 0 ? PaginationConstants.DefaultPage : page;
             pageSize = pageSize == 0 ? PaginationConstants.DefaultPageSize : pageSize;
 
-            var result = await eventService.GetAllByPersonAsync(page, pageSize, cancellationToken);
+            var result = await eventService.GetAllByPersonAsync(from, to, sort, page, pageSize, cancellationToken);
             return Results.Ok(result);
         }
 
@@ -90,7 +101,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Create(CreateEventDto createEventDto, IEventService eventService, CancellationToken cancellationToken)
         {
             var created = await eventService.CreateAsync(createEventDto, cancellationToken);
-            return Results.Created($"/events/{created.Id}", created);
+            return Results.Created($"/api/v1/events/{created.Id}", created);
         }
 
         private static async Task<IResult> Update(Guid id, UpdateEventDto updateEventDto, IEventService eventService, CancellationToken cancellationToken)
@@ -106,7 +117,7 @@ namespace CareGuide.API.Endpoints
             CancellationToken cancellationToken)
         {
             var result = await uploadService.InitiateAsync(id, dto, cancellationToken);
-            return Results.Created($"/events/{id}/files/{result.FileId}", result);
+            return Results.Created($"/api/v1/events/{id}/files/{result.FileId}", result);
         }
 
         private static async Task<IResult> DeleteAll(IEventService eventService, CancellationToken cancellationToken)

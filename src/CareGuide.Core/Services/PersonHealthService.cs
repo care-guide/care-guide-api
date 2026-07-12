@@ -2,6 +2,7 @@
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.PersonHealth;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -17,10 +18,10 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<List<PersonHealthDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<PersonHealthDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            var list = await _personHealthRepository.GetAllByPersonAsync(page, pageSize, cancellationToken);
-            return _mapper.Map<List<PersonHealthDto>>(list);
+            var (items, total, normalizedPage, normalizedPageSize) = await _personHealthRepository.GetAllByPersonPagedAsync(page, pageSize, cancellationToken);
+            return new PagedResult<PersonHealthDto>(_mapper.Map<List<PersonHealthDto>>(items), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<PersonHealthDto> GetAsync(Guid id, CancellationToken cancellationToken)
@@ -86,6 +87,11 @@ namespace CareGuide.Core.Services
                 throw new KeyNotFoundException($"Person health with id {id} not found.");
 
             await _personHealthRepository.DeleteAsync(entity.Id, cancellationToken);
+        }
+
+        public async Task DeleteByIdsAsync(List<Guid> ids, CancellationToken cancellationToken)
+        {
+            await _personHealthRepository.DeleteManyAsync(ids, cancellationToken);
         }
     }
 }

@@ -2,8 +2,10 @@
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Infra.TransactionManagement;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.DoctorPhone;
 using CareGuide.Models.DTOs.Phone;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -23,14 +25,17 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<DoctorPhoneDto>> GetAllByDoctorAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken)
+        public async Task<PagedResult<DoctorPhoneDto>> GetAllByDoctorAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken)
         {
-            var doctorPhones = await _doctorPhoneRepository.GetAllByDoctorWithPhonesAsync(page, pageSize, doctorId, cancellationToken);
+            var (normalizedPage, normalizedPageSize) = PaginationNormalizer.Normalize(page, pageSize);
 
-            if (doctorPhones.Count == 0)
+            var doctorPhones = await _doctorPhoneRepository.GetAllByDoctorWithPhonesAsync(normalizedPage, normalizedPageSize, doctorId, cancellationToken);
+            var total = await _doctorPhoneRepository.CountByDoctorAsync(doctorId, cancellationToken);
+
+            if (total == 0)
                 throw new KeyNotFoundException($"No phone records found for the doctor with ID {doctorId}.");
 
-            return _mapper.Map<List<DoctorPhoneDto>>(doctorPhones);
+            return new PagedResult<DoctorPhoneDto>(_mapper.Map<List<DoctorPhoneDto>>(doctorPhones), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<DoctorPhoneDto> GetAsync(Guid phoneId, Guid doctorId, CancellationToken cancellationToken)
@@ -99,7 +104,7 @@ namespace CareGuide.Core.Services
 
         public async Task DeleteAllByDoctorAsync(Guid doctorId, CancellationToken cancellationToken)
         {
-            var doctorPhones = await _doctorPhoneRepository.GetAllByDoctorWithPhonesAsync(1, int.MaxValue, doctorId, cancellationToken);
+            var doctorPhones = await _doctorPhoneRepository.GetAllByDoctorUnpagedAsync(doctorId, cancellationToken);
 
             if (doctorPhones.Count == 0)
                 return;

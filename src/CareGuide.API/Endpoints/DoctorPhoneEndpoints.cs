@@ -4,6 +4,7 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.DoctorPhone;
 using CareGuide.Models.DTOs.Phone;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints;
@@ -21,7 +22,7 @@ public class DoctorPhoneEndpoints() : IEndpoint
              .WithName("GetAllDoctorPhones")
              .WithSummary("Get all doctor phones")
              .WithDescription("Retrieves all phone records associated with a specific doctor using pagination parameters.")
-             .Produces<IReadOnlyCollection<DoctorPhoneDto>>(StatusCodes.Status200OK)
+             .Produces<PagedResult<DoctorPhoneDto>>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status404NotFound);
 
@@ -57,7 +58,7 @@ public class DoctorPhoneEndpoints() : IEndpoint
              .Produces(StatusCodes.Status204NoContent)
              .ProducesProblem(StatusCodes.Status400BadRequest);
 
-        group.MapDelete("/all", DeleteAll)
+        group.MapDelete("/doctor", DeleteAll)
              .WithName("DeleteAllDoctorPhones")
              .WithSummary("Delete all doctor phones")
              .WithDescription("Deletes all phone records associated with a specific doctor.")
@@ -82,7 +83,7 @@ public class DoctorPhoneEndpoints() : IEndpoint
     private static async Task<IResult> Create(Guid doctorId, CreatePhoneDto createPhoneDto, IDoctorPhoneService doctorPhoneService, CancellationToken cancellationToken)
     {
         var created = await doctorPhoneService.CreateAsync(doctorId, createPhoneDto, cancellationToken);
-        return Results.Created($"/doctors/{doctorId}/phones/{created.PhoneId}", created);
+        return Results.Created($"/api/v1/doctors/{doctorId}/phones/{created.PhoneId}", created);
     }
 
     private static async Task<IResult> Update(Guid doctorId, Guid phoneId, UpdatePhoneDto updatePhoneDto, IDoctorPhoneService doctorPhoneService, CancellationToken cancellationToken)

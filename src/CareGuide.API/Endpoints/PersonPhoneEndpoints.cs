@@ -4,6 +4,7 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.PersonPhone;
 using CareGuide.Models.DTOs.Phone;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints;
@@ -21,7 +22,7 @@ public class PersonPhoneEndpoints() : IEndpoint
              .WithName("GetAllPersonPhones")
              .WithSummary("Get all person phones")
              .WithDescription("Retrieves all phone records associated with the authenticated person using pagination parameters.")
-             .Produces<IReadOnlyCollection<PersonPhoneDto>>(StatusCodes.Status200OK)
+             .Produces<PagedResult<PersonPhoneDto>>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest);
 
         group.MapGet("/{phoneId:guid}", GetById)
@@ -81,7 +82,7 @@ public class PersonPhoneEndpoints() : IEndpoint
     private static async Task<IResult> Create(CreatePhoneDto createPhoneDto, IPersonPhoneService personPhoneService, CancellationToken cancellationToken)
     {
         var created = await personPhoneService.CreateAsync(createPhoneDto, cancellationToken);
-        return Results.Created($"/person-phones/{created.PhoneId}", created);
+        return Results.Created($"/api/v1/person-phones/{created.PhoneId}", created);
     }
 
     private static async Task<IResult> Update(Guid phoneId, UpdatePhoneDto updatePhoneDto, IPersonPhoneService personPhoneService, CancellationToken cancellationToken)

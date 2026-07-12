@@ -1,7 +1,9 @@
 using CareGuide.API.Endpoints.Shared;
 using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.EventFile;
+using CareGuide.Models.DTOs.Shared;
 
 namespace CareGuide.API.Endpoints
 {
@@ -17,8 +19,9 @@ namespace CareGuide.API.Endpoints
             group.MapGet("/", GetAllByEventId)
                  .WithName("GetEventFiles")
                  .WithSummary("Get event files")
-                 .WithDescription("Retrieves all files attached to a specific event.")
-                 .Produces<IReadOnlyCollection<EventFileDto>>(StatusCodes.Status200OK);
+                 .WithDescription("Retrieves all files attached to a specific event using pagination parameters.")
+                 .Produces<PagedResult<EventFileDto>>(StatusCodes.Status200OK)
+                 .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapPost("/{fileId:guid}", Attach)
                  .WithName("AttachEventFile")
@@ -52,16 +55,19 @@ namespace CareGuide.API.Endpoints
                  .ProducesProblem(StatusCodes.Status404NotFound);
         }
 
-        private static async Task<IResult> GetAllByEventId(Guid eventId, IEventFileService eventFileService, CancellationToken cancellationToken)
+        private static async Task<IResult> GetAllByEventId(Guid eventId, int page, int pageSize, IEventFileService eventFileService, CancellationToken cancellationToken)
         {
-            var result = await eventFileService.GetAllByEventIdAsync(eventId, cancellationToken);
+            page = page == 0 ? PaginationConstants.DefaultPage : page;
+            pageSize = pageSize == 0 ? PaginationConstants.DefaultPageSize : pageSize;
+
+            var result = await eventFileService.GetAllByEventIdAsync(page, pageSize, eventId, cancellationToken);
             return Results.Ok(result);
         }
 
         private static async Task<IResult> Attach(Guid eventId, Guid fileId, IEventFileService eventFileService, CancellationToken cancellationToken)
         {
             var created = await eventFileService.AttachAsync(eventId, fileId, cancellationToken);
-            return Results.Created($"/events/{eventId}/files/{fileId}", created);
+            return Results.Created($"/api/v1/events/{eventId}/files/{fileId}", created);
         }
 
         private static async Task<IResult> Detach(Guid eventId, Guid fileId, IEventFileService eventFileService, CancellationToken cancellationToken)

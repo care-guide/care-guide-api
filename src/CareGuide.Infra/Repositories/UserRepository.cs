@@ -22,5 +22,11 @@ namespace CareGuide.Infra.Repositories
             return await _context.Set<User>()
                 .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
         }
+
+        public async Task<User?> GetByPersonIdAsync(Guid personId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Set<User>()
+                .FirstOrDefaultAsync(u => u.PersonId == personId, cancellationToken);
+        }
     }
 }

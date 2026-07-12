@@ -10,11 +10,13 @@ namespace CareGuide.Core.Services
     public class PersonService : IPersonService
     {
         private readonly IPersonRepository _personRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public PersonService(IPersonRepository personRepository, IMapper mapper)
+        public PersonService(IPersonRepository personRepository, IUserRepository userRepository, IMapper mapper)
         {
             _personRepository = personRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
@@ -67,5 +69,57 @@ namespace CareGuide.Core.Services
             await _personRepository.DeleteAsync(existingPerson.Id, cancellationToken);
         }
 
+        public async Task<MyProfileDto> GetMyProfileAsync(Guid personId, CancellationToken cancellationToken = default)
+        {
+            if (personId == Guid.Empty)
+                throw new UnauthorizedAccessException("No authenticated person for this session.");
+
+            var person = await _personRepository.GetAsync(personId, cancellationToken);
+
+            if (person == null)
+                throw new KeyNotFoundException();
+
+            var user = await _userRepository.GetByPersonIdAsync(personId, cancellationToken)
+                ?? throw new KeyNotFoundException();
+
+            return MapToMyProfileDto(person, user.Email);
+        }
+
+        public async Task<MyProfileDto> UpdateMyProfileAsync(Guid personId, UpdatePersonProfileDto updateProfile, CancellationToken cancellationToken = default)
+        {
+            if (personId == Guid.Empty)
+                throw new UnauthorizedAccessException("No authenticated person for this session.");
+
+            var existingPerson = await _personRepository.GetAsync(personId, cancellationToken);
+
+            if (existingPerson == null)
+                throw new KeyNotFoundException();
+
+            existingPerson.Name = updateProfile.Name;
+            existingPerson.Gender = updateProfile.Gender;
+            existingPerson.Birthday = updateProfile.Birthday;
+            existingPerson.Picture = updateProfile.Picture;
+
+            var updatedPerson = await _personRepository.UpdateAsync(existingPerson, cancellationToken);
+
+            var user = await _userRepository.GetByPersonIdAsync(personId, cancellationToken)
+                ?? throw new KeyNotFoundException();
+
+            return MapToMyProfileDto(updatedPerson, user.Email);
+        }
+
+        private MyProfileDto MapToMyProfileDto(Person person, string email)
+        {
+            var personDto = _mapper.Map<PersonDto>(person);
+
+            return new MyProfileDto(
+                personDto.Id,
+                personDto.Name,
+                personDto.Gender,
+                personDto.Birthday,
+                personDto.Picture,
+                email
+            );
+        }
     }
 }
