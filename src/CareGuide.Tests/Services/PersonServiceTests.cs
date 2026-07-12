@@ -138,8 +138,6 @@ public class PersonServiceTests
         await _repository.Received(1).DeleteAsync(id, Arg.Any<CancellationToken>());
     }
 
-    // ── GetMyProfileAsync ─────────────────────────────────────────────────────
-
     [Fact(DisplayName = "GetMyProfileAsync: empty personId throws UnauthorizedAccessException")]
     public async Task GetMyProfileAsync_EmptyPersonId_ThrowsUnauthorizedAccessException()
     {
@@ -193,8 +191,6 @@ public class PersonServiceTests
         result.Picture.Should().Be("http://pic.url");
         result.Email.Should().Be("alice@example.com");
     }
-
-    // ── UpdateMyProfileAsync ──────────────────────────────────────────────────
 
     [Fact(DisplayName = "UpdateMyProfileAsync: empty personId throws UnauthorizedAccessException")]
     public async Task UpdateMyProfileAsync_EmptyPersonId_ThrowsUnauthorizedAccessException()
