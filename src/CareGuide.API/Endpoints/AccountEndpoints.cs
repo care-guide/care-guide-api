@@ -5,6 +5,7 @@ using CareGuide.API.Middlewares;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Account;
+using CareGuide.Models.DTOs.Person;
 using CareGuide.Security.Interfaces;
 
 namespace CareGuide.API.Endpoints;
@@ -87,6 +88,21 @@ public class AccountEndpoints() : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        group.MapGet("/me", GetMyProfile)
+             .WithSummary("Get My Profile")
+             .WithDescription("Returns the authenticated person's profile, resolved from the session identity.")
+             .Produces<MyProfileDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        group.MapPut("/me", UpdateMyProfile)
+             .WithSummary("Update My Profile")
+             .WithDescription("Updates the authenticated person's editable profile fields (name, gender, birthday, picture).")
+             .Accepts<UpdatePersonProfileDto>("application/json")
+             .Produces<MyProfileDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
 
     internal static async Task<IResult> Create(CreateAccountDto createAccount, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
@@ -217,5 +233,17 @@ public class AccountEndpoints() : IEndpoint
     {
         await accountService.DeleteAccountAsync(id, cancellationToken);
         return Results.NoContent();
+    }
+
+    private static async Task<IResult> GetMyProfile(IUserSessionContext session, IPersonService personService, CancellationToken cancellationToken)
+    {
+        var profile = await personService.GetMyProfileAsync(session.PersonId, cancellationToken);
+        return Results.Ok(profile);
+    }
+
+    private static async Task<IResult> UpdateMyProfile(UpdatePersonProfileDto updateProfile, IUserSessionContext session, IPersonService personService, CancellationToken cancellationToken)
+    {
+        var profile = await personService.UpdateMyProfileAsync(session.PersonId, updateProfile, cancellationToken);
+        return Results.Ok(profile);
     }
 }
