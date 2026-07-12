@@ -7,6 +7,8 @@ namespace CareGuide.Models.DTOs.EventAppointment
         Guid Id,
         Guid EventId,
         string? Doctor,
+        Guid? DoctorId,
+        string? DoctorName,
         [property: JsonConverter(typeof(JsonStringEnumConverter))] EventAppointmentType Type
     );
 }

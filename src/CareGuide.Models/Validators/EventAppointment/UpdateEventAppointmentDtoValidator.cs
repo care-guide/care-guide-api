@@ -13,6 +13,10 @@ namespace CareGuide.Models.Validators.EventAppointment
                 .WithMessage($"Doctor must not exceed {DatabaseConstants.MaxLengthStandardText} characters.")
                 .When(x => !string.IsNullOrWhiteSpace(x.Doctor));
 
+            RuleFor(x => x.DoctorId)
+                .NotEqual(Guid.Empty).WithMessage("DoctorId must not be an empty GUID.")
+                .When(x => x.DoctorId.HasValue);
+
             RuleFor(x => x.Type)
                 .IsInEnum().WithMessage("Type is invalid.");
         }

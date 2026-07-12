@@ -23,13 +23,16 @@ namespace CareGuide.Infra.Mappings
             builder.Property(x => x.Id).HasColumnName("id");
             builder.Property(x => x.EventId).IsRequired().HasColumnName("event_id");
             builder.Property(x => x.Doctor).HasMaxLength(DatabaseConstants.MaxLengthStandardText).HasColumnName("doctor");
+            builder.Property(x => x.DoctorId).HasColumnName("doctor_id");
             builder.Property(x => x.Type).IsRequired().HasMaxLength(3).HasColumnName("type").HasConversion(typeConverter);
             builder.Property(x => x.CreatedAt).IsRequired().HasColumnName("created_at");
             builder.Property(x => x.UpdatedAt).IsRequired().HasColumnName("updated_at");
 
             builder.HasIndex(x => x.EventId).IsUnique();
+            builder.HasIndex(x => x.DoctorId);
 
             builder.HasOne(x => x.Event).WithOne().HasForeignKey<EventAppointment>(x => x.EventId).HasConstraintName("fk_event_appointment_event").OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(x => x.DoctorRef).WithMany().HasForeignKey(x => x.DoctorId).HasConstraintName("fk_event_appointment_doctor").OnDelete(DeleteBehavior.SetNull);
         }
 
         private static string ConvertTypeToString(EventAppointmentType type)

@@ -10,13 +10,26 @@ namespace CareGuide.Core.Services
     {
         private readonly IEventAppointmentRepository _eventAppointmentRepository;
         private readonly IEventRepository _eventRepository;
+        private readonly IDoctorRepository _doctorRepository;
         private readonly IMapper _mapper;
 
-        public EventAppointmentService(IEventAppointmentRepository eventAppointmentRepository, IEventRepository eventRepository, IMapper mapper)
+        public EventAppointmentService(IEventAppointmentRepository eventAppointmentRepository, IEventRepository eventRepository, IDoctorRepository doctorRepository, IMapper mapper)
         {
             _eventAppointmentRepository = eventAppointmentRepository;
             _eventRepository = eventRepository;
+            _doctorRepository = doctorRepository;
             _mapper = mapper;
+        }
+
+        private async Task EnsureDoctorOwnedAsync(Guid? doctorId, CancellationToken cancellationToken)
+        {
+            if (!doctorId.HasValue)
+                return;
+
+            var doctor = await _doctorRepository.GetAsync(doctorId.Value, cancellationToken);
+
+            if (doctor == null)
+                throw new UnauthorizedAccessException("You are not authorized to link this doctor or it does not exist.");
         }
 
         public async Task<EventAppointmentDto> GetByEventIdAsync(Guid eventId, CancellationToken cancellationToken)
@@ -44,10 +57,17 @@ namespace CareGuide.Core.Services
             if (existing != null)
                 throw new InvalidOperationException($"An appointment already exists for the event with ID {eventId}.");
 
+            await EnsureDoctorOwnedAsync(eventAppointmentDto.DoctorId, cancellationToken);
+
             var entity = _mapper.Map<EventAppointment>(eventAppointmentDto);
             entity.EventId = eventId;
 
-            var created = await _eventAppointmentRepository.AddAsync(entity, cancellationToken);
+            await _eventAppointmentRepository.AddAsync(entity, cancellationToken);
+
+            var created = await _eventAppointmentRepository.GetByEventIdAsync(eventId, cancellationToken);
+
+            if (created == null)
+                throw new InvalidOperationException("The created appointment could not be retrieved.");
 
             return _mapper.Map<EventAppointmentDto>(created);
         }
@@ -62,10 +82,18 @@ namespace CareGuide.Core.Services
             if (appointment == null)
                 throw new KeyNotFoundException($"No appointment found for the event with ID {eventId}.");
 
+            await EnsureDoctorOwnedAsync(eventAppointmentDto.DoctorId, cancellationToken);
+
             appointment.Doctor = eventAppointmentDto.Doctor;
+            appointment.DoctorId = eventAppointmentDto.DoctorId;
             appointment.Type = eventAppointmentDto.Type;
 
-            var updated = await _eventAppointmentRepository.UpdateAsync(appointment, cancellationToken);
+            await _eventAppointmentRepository.UpdateAsync(appointment, cancellationToken);
+
+            var updated = await _eventAppointmentRepository.GetByEventIdAsync(eventId, cancellationToken);
+
+            if (updated == null)
+                throw new InvalidOperationException("The updated appointment could not be retrieved.");
 
             return _mapper.Map<EventAppointmentDto>(updated);
         }
