@@ -5,10 +5,6 @@ using Microsoft.Extensions.Options;
 
 namespace CareGuide.Tests.Configuration;
 
-/// <summary>
-/// Verifies the "CorsPolicy" configured in Program.cs: credentialed cross-origin requests are
-/// allowed only for explicit origins sourced from configuration, never a wildcard.
-/// </summary>
 public class CorsPolicyTests
 {
     private const string AllowedOrigin = "https://careguide.dev";
@@ -19,7 +15,6 @@ public class CorsPolicyTests
         var options = new CorsOptions();
         options.AddPolicy("CorsPolicy", policy =>
         {
-            // Mirrors src/CareGuide.API/Program.cs AddCors configuration exactly.
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
@@ -90,8 +85,6 @@ public class CorsPolicyTests
         var policy = await provider.GetPolicyAsync(context, "CorsPolicy");
         var result = service.EvaluatePolicy(context, policy!);
 
-        // No Origin header means the request never entered the CORS pipeline as a cross-origin
-        // request, so no Access-Control-Allow-Origin is emitted, regardless of the policy config.
         result.AllowedOrigin.Should().BeNull();
     }
 }
