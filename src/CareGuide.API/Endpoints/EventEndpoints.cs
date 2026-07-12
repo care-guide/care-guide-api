@@ -5,6 +5,7 @@ using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Event;
 using CareGuide.Models.DTOs.FileAsset;
 using CareGuide.Models.DTOs.Shared;
+using CareGuide.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints
@@ -21,7 +22,9 @@ namespace CareGuide.API.Endpoints
             group.MapGet("/", GetAll)
                  .WithName("GetAllEvents")
                  .WithSummary("Get all events")
-                 .WithDescription("Retrieves all events for the authenticated person using pagination parameters.")
+                 .WithDescription("Retrieves all events for the authenticated person using pagination parameters. " +
+                    "Optionally filters by `startDate` using the inclusive `from`/`to` range and orders results by `startDate` " +
+                    "('Asc' by default, or 'Desc').")
                  .Produces<PagedResult<EventDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
@@ -73,12 +76,19 @@ namespace CareGuide.API.Endpoints
                  .ProducesProblem(StatusCodes.Status400BadRequest);
         }
 
-        private static async Task<IResult> GetAll(int page, int pageSize, IEventService eventService, CancellationToken cancellationToken)
+        private static async Task<IResult> GetAll(
+            int page,
+            int pageSize,
+            IEventService eventService,
+            CancellationToken cancellationToken,
+            DateTime? from = null,
+            DateTime? to = null,
+            EventSortOrder sort = EventSortOrder.Asc)
         {
             page = page == 0 ? PaginationConstants.DefaultPage : page;
             pageSize = pageSize == 0 ? PaginationConstants.DefaultPageSize : pageSize;
 
-            var result = await eventService.GetAllByPersonAsync(page, pageSize, cancellationToken);
+            var result = await eventService.GetAllByPersonAsync(from, to, sort, page, pageSize, cancellationToken);
             return Results.Ok(result);
         }
 

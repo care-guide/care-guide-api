@@ -2,8 +2,10 @@ using AutoMapper;
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.Event;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
+using CareGuide.Models.Enums;
 
 namespace CareGuide.Core.Services
 {
@@ -18,9 +20,22 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<EventDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<EventDto>> GetAllByPersonAsync(
+            DateTime? from,
+            DateTime? to,
+            EventSortOrder sortOrder,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken)
         {
-            var (items, total, normalizedPage, normalizedPageSize) = await _eventRepository.GetAllByPersonPagedAsync(page, pageSize, cancellationToken);
+            if (from.HasValue && to.HasValue && from.Value > to.Value)
+                throw new ArgumentException("The 'from' date must not be later than the 'to' date.", nameof(from));
+
+            var (normalizedPage, normalizedPageSize) = PaginationNormalizer.Normalize(page, pageSize);
+
+            var items = await _eventRepository.GetAllByPersonAsync(from, to, sortOrder, normalizedPage, normalizedPageSize, cancellationToken);
+            var total = await _eventRepository.CountByPersonAsync(from, to, cancellationToken);
+
             return new PagedResult<EventDto>(_mapper.Map<List<EventDto>>(items), normalizedPage, normalizedPageSize, total);
         }
 
