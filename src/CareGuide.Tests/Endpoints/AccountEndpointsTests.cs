@@ -110,9 +110,9 @@ public class AccountEndpointsTests
         var refreshDto = new RefreshTokenDto("body-token", "user@test.com");
         var httpContext = NewHttpContext(nativeClient: false);
 
-        var result = await AccountEndpoints.Refresh(refreshDto, _accountService, httpContext, CancellationToken.None);
+        var act = () => AccountEndpoints.Refresh(refreshDto, _accountService, httpContext, CancellationToken.None);
 
-        result.Should().BeOfType<UnauthorizedHttpResult>();
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
         await _accountService.DidNotReceive().RefreshTokenAsync(Arg.Any<RefreshTokenDto>(), Arg.Any<CancellationToken>());
     }
 
@@ -162,9 +162,9 @@ public class AccountEndpointsTests
         var refreshDto = new RefreshTokenDto(string.Empty, "user@test.com");
         var httpContext = NewHttpContext(nativeClient: true);
 
-        var result = await AccountEndpoints.Refresh(refreshDto, _accountService, httpContext, CancellationToken.None);
+        var act = () => AccountEndpoints.Refresh(refreshDto, _accountService, httpContext, CancellationToken.None);
 
-        result.Should().BeOfType<UnauthorizedHttpResult>();
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
         await _accountService.DidNotReceive().RefreshTokenAsync(Arg.Any<RefreshTokenDto>(), Arg.Any<CancellationToken>());
     }
 }
