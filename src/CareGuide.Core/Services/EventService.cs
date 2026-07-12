@@ -1,8 +1,8 @@
 using AutoMapper;
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
-using CareGuide.Models.DTOs.Event;
 using CareGuide.Models.Constants;
+using CareGuide.Models.DTOs.Event;
 using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 using CareGuide.Models.Enums;
