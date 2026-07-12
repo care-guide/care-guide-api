@@ -1,30 +1,10 @@
 #!/usr/bin/env python3
-"""
-Fails (non-zero exit) if any tracked appsettings*.json file contains a populated
-secret field (JWT signing key, connection string with credentials, storage
-secret keys, etc). Secrets must only live in `dotnet user-secrets` locally, or
-in environment variables / a secrets vault in CI and production.
-
-See docs/CONFIGURATION.md (Secrets) and docs/SECURITY.md (7. Secret management).
-
-Usage:
-    python3 scripts/check-secrets.py [file ...]
-
-If no files are given, all tracked appsettings*.json files in the repo are
-checked (via `git ls-files`).
-
-IMPORTANT: this script must never print the offending value, only the file
-and the key path, to avoid leaking secrets into hook/CI logs.
-"""
-
 from __future__ import annotations
 
 import json
 import subprocess
 import sys
 
-# Dotted paths (within the parsed JSON) that must never hold a non-empty
-# string in tracked configuration.
 SECRET_FIELD_PATHS = [
     ("ConnectionStrings", "DatabaseConnection"),
     ("SecuritySettings", "SecretKey"),
@@ -53,12 +33,6 @@ def get_path(data: dict, path: tuple[str, ...]):
 
 
 def check_file(path: str, display_name: str | None = None) -> list[str]:
-    """Returns a list of violation descriptions (key path only, never the value).
-
-    `display_name` lets callers (e.g. the pre-commit hook, which checks a
-    temp copy of the staged content) report the real repo-relative path
-    instead of a temp file path.
-    """
     label = display_name or path
     try:
         with open(path, "r", encoding="utf-8-sig") as f:
@@ -85,8 +59,6 @@ def check_file(path: str, display_name: str | None = None) -> list[str]:
 
 
 def main(argv: list[str]) -> int:
-    # Supports "path" or "path=Display/Name.json" pairs, so the pre-commit
-    # hook can check a temp file while reporting the real repo path.
     args = argv[1:]
     files: list[tuple[str, str | None]]
     if args:

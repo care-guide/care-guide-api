@@ -1,13 +1,4 @@
 #!/usr/bin/env sh
-# Installs the repo's tracked git hooks (scripts/hooks/*) into .git/hooks,
-# since .git/hooks itself is not versioned by git.
-#
-# Usage:
-#   sh scripts/install-hooks.sh
-#
-# Run this once after cloning. See docs/CONFIGURATION.md (Secrets) for details
-# on what the pre-commit hook enforces.
-
 set -e
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
