@@ -6,6 +6,8 @@ namespace CareGuide.Infra.Interfaces
     {
         Task AddAsync(PersonPhone entity, CancellationToken cancellationToken = default);
         Task<List<PersonPhone>> GetAllByPersonWithPhonesAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+        Task<int> CountByPersonAsync(CancellationToken cancellationToken = default);
+        Task<List<PersonPhone>> GetAllByPersonUnpagedAsync(CancellationToken cancellationToken = default);
         Task<PersonPhone?> GetByPersonWithPhoneAsync(Guid phoneId, CancellationToken cancellationToken = default);
         Task<List<PersonPhone>> GetManyByPersonAndPhoneIdsAsync(IEnumerable<Guid> phoneIds, CancellationToken cancellationToken = default);
         Task DeleteAllByPersonAsync(CancellationToken cancellationToken = default);

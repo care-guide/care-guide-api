@@ -4,6 +4,7 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.DoctorPhone;
 using CareGuide.Models.DTOs.Phone;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints;
@@ -21,7 +22,7 @@ public class DoctorPhoneEndpoints() : IEndpoint
              .WithName("GetAllDoctorPhones")
              .WithSummary("Get all doctor phones")
              .WithDescription("Retrieves all phone records associated with a specific doctor using pagination parameters.")
-             .Produces<IReadOnlyCollection<DoctorPhoneDto>>(StatusCodes.Status200OK)
+             .Produces<PagedResult<DoctorPhoneDto>>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status404NotFound);
 

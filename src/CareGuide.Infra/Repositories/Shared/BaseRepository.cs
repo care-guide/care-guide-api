@@ -15,12 +15,7 @@ namespace CareGuide.Infra.Repositories.Shared
         }
 
         protected static (int Page, int PageSize) NormalizePagination(int page, int pageSize)
-        {
-            var normalizedPage = page < 1 ? PaginationConstants.DefaultPage : page;
-            var normalizedPageSize = pageSize < 1 ? PaginationConstants.DefaultPageSize : Math.Min(pageSize, PaginationConstants.MaxPageSize);
-
-            return (normalizedPage, normalizedPageSize);
-        }
+            => PaginationNormalizer.Normalize(page, pageSize);
 
         public virtual async Task<List<TEntity>> GetAllAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         {
@@ -30,6 +25,21 @@ namespace CareGuide.Infra.Repositories.Shared
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
+        }
+
+        public virtual async Task<(List<TEntity> Items, int Total, int Page, int PageSize)> GetAllPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        {
+            (page, pageSize) = NormalizePagination(page, pageSize);
+
+            var query = context.Set<TEntity>().AsNoTracking();
+
+            var total = await query.CountAsync(cancellationToken);
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (items, total, page, pageSize);
         }
 
         public virtual async Task<TEntity?> GetAsync(Guid id, CancellationToken cancellationToken = default)

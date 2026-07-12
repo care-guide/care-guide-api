@@ -12,10 +12,9 @@ namespace CareGuide.API.Extensions
         {
             services.AddRateLimiter(options =>
             {
-                // General: sliding window, 60 req/min per IP
                 options.AddPolicy(GeneralPolicy, httpContext =>
                     RateLimitPartition.GetSlidingWindowLimiter(
-                        partitionKey: ResolveClientIp(httpContext),
+                        partitionKey: ResolveIdentityPartitionKey(httpContext),
                         factory: _ => new SlidingWindowRateLimiterOptions
                         {
                             PermitLimit = 60,
@@ -56,7 +55,20 @@ namespace CareGuide.API.Extensions
             return services;
         }
 
-        private static string ResolveClientIp(HttpContext context)
+        internal static string ResolveIdentityPartitionKey(HttpContext context)
+        {
+            var user = context.User;
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                var userId = user.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+                if (!string.IsNullOrWhiteSpace(userId))
+                    return $"user:{userId}";
+            }
+
+            return $"ip:{ResolveClientIp(context)}";
+        }
+
+        internal static string ResolveClientIp(HttpContext context)
         {
             var forwarded = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(forwarded))

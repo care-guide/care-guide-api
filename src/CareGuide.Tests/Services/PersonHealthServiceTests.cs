@@ -65,12 +65,14 @@ public class PersonHealthServiceTests
         };
         var dtos = entities.Select(e => new PersonHealthDto(e.Id, personId, e.BloodType, e.Height, e.Weight, null, DateTime.UtcNow, DateTime.UtcNow)).ToList();
 
-        _repository.GetAllByPersonAsync(1, 10, Arg.Any<CancellationToken>()).Returns(entities);
+        _repository.GetAllByPersonPagedAsync(1, 10, Arg.Any<CancellationToken>()).Returns((entities, 1, 1, 10));
         _mapper.Map<List<PersonHealthDto>>(entities).Returns(dtos);
 
         var result = await _sut.GetAllByPersonAsync(1, 10, CancellationToken.None);
 
-        result.Should().HaveCount(1);
+        result.Items.Should().HaveCount(1);
+        result.Total.Should().Be(1);
+        result.HasNext.Should().BeFalse();
     }
 
     [Fact(DisplayName = "CreateAsync: null dto throws ArgumentNullException")]

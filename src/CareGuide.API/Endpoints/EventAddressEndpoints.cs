@@ -1,7 +1,9 @@
 using CareGuide.API.Endpoints.Shared;
 using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.EventAddress;
+using CareGuide.Models.DTOs.Shared;
 
 namespace CareGuide.API.Endpoints
 {
@@ -17,8 +19,8 @@ namespace CareGuide.API.Endpoints
             group.MapGet("/", GetAllByEventId)
                  .WithName("GetEventAddresses")
                  .WithSummary("Get event addresses")
-                 .WithDescription("Retrieves all addresses attached to a specific event.")
-                 .Produces<IReadOnlyCollection<EventAddressDto>>(StatusCodes.Status200OK)
+                 .WithDescription("Retrieves all addresses attached to a specific event using pagination parameters.")
+                 .Produces<PagedResult<EventAddressDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapPost("/{addressId:guid}", Attach)
@@ -37,9 +39,12 @@ namespace CareGuide.API.Endpoints
                  .ProducesProblem(StatusCodes.Status404NotFound);
         }
 
-        private static async Task<IResult> GetAllByEventId(Guid eventId, IEventAddressService eventAddressService, CancellationToken cancellationToken)
+        private static async Task<IResult> GetAllByEventId(Guid eventId, int page, int pageSize, IEventAddressService eventAddressService, CancellationToken cancellationToken)
         {
-            var result = await eventAddressService.GetAllByEventIdAsync(eventId, cancellationToken);
+            page = page == 0 ? PaginationConstants.DefaultPage : page;
+            pageSize = pageSize == 0 ? PaginationConstants.DefaultPageSize : pageSize;
+
+            var result = await eventAddressService.GetAllByEventIdAsync(page, pageSize, eventId, cancellationToken);
             return Results.Ok(result);
         }
 

@@ -3,6 +3,7 @@ using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.PersonAnnotation;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints;
@@ -20,7 +21,7 @@ public class PersonAnnotationEndpoints() : IEndpoint
              .WithName("GetAllPersonAnnotations")
              .WithSummary("Get all annotations")
              .WithDescription("Retrieves all annotations for the authenticated person using pagination parameters.")
-             .Produces<List<PersonAnnotationDto>>(StatusCodes.Status200OK)
+             .Produces<PagedResult<PersonAnnotationDto>>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest);
 
         group.MapGet("/{id:guid}", GetById)

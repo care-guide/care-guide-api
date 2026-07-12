@@ -2,6 +2,7 @@
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Models.DTOs.PersonAnnotation;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -17,10 +18,10 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<List<PersonAnnotationDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<PersonAnnotationDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            var list = await _personAnnotationRepository.GetAllByPersonAsync(page, pageSize, cancellationToken);
-            return _mapper.Map<List<PersonAnnotationDto>>(list);
+            var (items, total, normalizedPage, normalizedPageSize) = await _personAnnotationRepository.GetAllByPersonPagedAsync(page, pageSize, cancellationToken);
+            return new PagedResult<PersonAnnotationDto>(_mapper.Map<List<PersonAnnotationDto>>(items), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<PersonAnnotationDto> GetAsync(Guid id, CancellationToken cancellationToken)

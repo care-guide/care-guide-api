@@ -38,6 +38,7 @@ public class DoctorAddressServiceTests
         var doctorId = Guid.NewGuid();
         _repository.GetAllByDoctorWithAddressesAsync(Arg.Any<int>(), Arg.Any<int>(), doctorId, Arg.Any<CancellationToken>())
             .Returns(new List<DoctorAddress>());
+        _repository.CountByDoctorAsync(doctorId, Arg.Any<CancellationToken>()).Returns(0);
 
         var act = async () => await _sut.GetAllByDoctorAsync(1, 10, doctorId, CancellationToken.None);
 
@@ -45,7 +46,7 @@ public class DoctorAddressServiceTests
             .WithMessage($"*{doctorId}*");
     }
 
-    [Fact(DisplayName = "GetAllByDoctorAsync: results found returns mapped collection")]
+    [Fact(DisplayName = "GetAllByDoctorAsync: results found returns paged envelope with real total")]
     public async Task GetAllByDoctorAsync_HasResults_ReturnsMappedCollection()
     {
         var doctorId = Guid.NewGuid();
@@ -57,11 +58,14 @@ public class DoctorAddressServiceTests
         var dtos = new List<DoctorAddressDto> { new(doctorId, addressId, "12345-000", null, AddressType.Clinic, "Sao Paulo", null, "Brazil", null, null, "SP") };
 
         _repository.GetAllByDoctorWithAddressesAsync(1, 10, doctorId, Arg.Any<CancellationToken>()).Returns(doctorAddresses);
+        _repository.CountByDoctorAsync(doctorId, Arg.Any<CancellationToken>()).Returns(15);
         _mapper.Map<List<DoctorAddressDto>>(doctorAddresses).Returns(dtos);
 
         var result = await _sut.GetAllByDoctorAsync(1, 10, doctorId, CancellationToken.None);
 
-        result.Should().HaveCount(1);
+        result.Items.Should().HaveCount(1);
+        result.Total.Should().Be(15);
+        result.HasNext.Should().BeTrue();
     }
 
     [Fact(DisplayName = "GetAsync: not found throws UnauthorizedAccessException")]

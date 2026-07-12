@@ -3,6 +3,7 @@ using CareGuide.API.Extensions;
 using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Doctor;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints
@@ -20,7 +21,7 @@ namespace CareGuide.API.Endpoints
                  .WithName("GetAllDoctors")
                  .WithSummary("Get all doctors")
                  .WithDescription("Retrieves all doctors for the authenticated person using pagination parameters.")
-                 .Produces<List<DoctorDto>>(StatusCodes.Status200OK)
+                 .Produces<PagedResult<DoctorDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapGet("/{id:guid}", GetById)
