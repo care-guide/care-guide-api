@@ -1,4 +1,5 @@
-﻿using CareGuide.API.Endpoints.Shared;
+﻿using CareGuide.API.Endpoints;
+using CareGuide.API.Endpoints.Shared;
 
 namespace CareGuide.API.Extensions
 {
@@ -10,6 +11,7 @@ namespace CareGuide.API.Extensions
                 .GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .Where(type => typeof(IEndpoint).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                .Where(type => type != typeof(HealthCheckEndpoints))
                 .Select(type => Activator.CreateInstance(type) as IEndpoint)
                 .Where(endpoint => endpoint is not null);
 

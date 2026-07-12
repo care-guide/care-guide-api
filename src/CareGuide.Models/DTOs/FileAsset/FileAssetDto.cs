@@ -8,7 +8,6 @@ namespace CareGuide.Models.DTOs.FileAsset
         string Name,
         long Size,
         string Hash,
-        string StorageKey,
         string ContentType,
         [property: JsonConverter(typeof(JsonStringEnumConverter))] StorageProvider StorageProvider,
         [property: JsonConverter(typeof(JsonStringEnumConverter))] FileUploadStatus UploadStatus,
