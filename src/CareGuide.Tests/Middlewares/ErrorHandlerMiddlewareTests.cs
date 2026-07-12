@@ -79,9 +79,6 @@ public class ErrorHandlerMiddlewareTests
     [InlineData("auth")]
     public async Task InvokeAsync_RateLimitRejection_WritesSingleProblemJsonBodyWithRetryAfter(string policyName)
     {
-        // Simulates what OnRejected leaves behind for either policy: status 429 + a real
-        // Retry-After header (derived from the limiter's lease metadata), and NO body written
-        // (OnRejected must not write a body — ErrorHandlerMiddleware is the single writer).
         _ = policyName;
 
         const int retryAfterSeconds = 17;
@@ -113,9 +110,6 @@ public class ErrorHandlerMiddlewareTests
         using var reader = new StreamReader(context.Response.Body);
         var body = await reader.ReadToEndAsync();
 
-        // A single well-formed JSON document proves there was exactly one writer of the body:
-        // a double-write (plain text + problem+json, or problem+json twice) would either throw
-        // ("response already started") or produce concatenated/invalid JSON here.
         var problem = JsonNode.Parse(body)!.AsObject();
 
         problem["status"]!.GetValue<int>().Should().Be(StatusCodes.Status429TooManyRequests);

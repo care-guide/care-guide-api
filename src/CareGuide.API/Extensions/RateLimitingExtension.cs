@@ -39,11 +39,6 @@ namespace CareGuide.API.Extensions
 
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-                // Only status code + Retry-After header are set here. The response BODY is
-                // intentionally NOT written in this callback: ErrorHandlerMiddleware wraps the
-                // rate limiter in the pipeline and is the single writer of the 429 body
-                // (as application/problem+json). Writing a body here too would race with the
-                // middleware's write and risk an "response already started" conflict.
                 options.OnRejected = (context, cancellationToken) =>
                 {
                     if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))

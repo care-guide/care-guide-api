@@ -14,8 +14,6 @@ public class RateLimitingExtensionTests
     [InlineData(RateLimitingExtension.AuthPolicy)]
     public async Task OnRejected_SetsStatusAndHeader_ButNeverWritesBody(string policyName)
     {
-        // Policy name isn't used by OnRejected itself (it is shared across policies), but we assert
-        // the same single behavior is exercised for both "general" and "auth" as required.
         _ = policyName;
 
         var services = new ServiceCollection();
@@ -78,10 +76,6 @@ public class RateLimitingExtensionTests
         (await reader.ReadToEndAsync()).Should().BeEmpty();
     }
 
-    /// <summary>
-    /// Minimal fake <see cref="RateLimitLease"/> for a rejected acquisition, optionally carrying
-    /// Retry-After metadata the same way a real limiter's failed lease would.
-    /// </summary>
     private sealed class FakeRejectedLease : RateLimitLease
     {
         private readonly TimeSpan? _retryAfter;
