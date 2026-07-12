@@ -31,6 +31,8 @@ public class AccountServiceTests
         Guid.NewGuid(), DefaultPersonDto.Id, "test@test.com", DateTime.UtcNow, DateTime.UtcNow
     );
 
+    private const string WrongPasswordOrEmailMessage = "Invalid credentials.";
+
     public AccountServiceTests()
     {
         _userService = Substitute.For<IUserService>();
@@ -81,20 +83,20 @@ public class AccountServiceTests
         await _unitOfWork.DidNotReceive().CommitTransactionAsync(Arg.Any<CancellationToken>());
     }
 
-    [Fact(DisplayName = "LoginAccountAsync: user not found throws InvalidOperationException")]
-    public async Task LoginAccountAsync_UserNotFound_ThrowsInvalidOperationException()
+    [Fact(DisplayName = "LoginAccountAsync: user not found throws UnauthorizedAccessException with generic message")]
+    public async Task LoginAccountAsync_UserNotFound_ThrowsUnauthorizedAccessException()
     {
         var loginDto = new LoginAccountDto("notfound@test.com", "Str0ng@Pass!");
         _userRepository.GetByEmailAsync(loginDto.Email, Arg.Any<CancellationToken>()).Returns((User?)null);
 
         var act = async () => await _sut.LoginAccountAsync(loginDto, CancellationToken.None);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("Wrong password or email");
+        (await act.Should().ThrowAsync<UnauthorizedAccessException>()
+            .WithMessage("Invalid credentials.")).Which.Message.Should().Be(WrongPasswordOrEmailMessage);
     }
 
-    [Fact(DisplayName = "LoginAccountAsync: wrong password throws InvalidOperationException")]
-    public async Task LoginAccountAsync_WrongPassword_ThrowsInvalidOperationException()
+    [Fact(DisplayName = "LoginAccountAsync: wrong password throws UnauthorizedAccessException with generic message")]
+    public async Task LoginAccountAsync_WrongPassword_ThrowsUnauthorizedAccessException()
     {
         var loginDto = new LoginAccountDto("user@test.com", "WrongP@ss1");
         var hashedCorrectPassword = Security.Helpers.PasswordManagerHelper.HashPassword("Correct@Pass1");
@@ -110,8 +112,34 @@ public class AccountServiceTests
 
         var act = async () => await _sut.LoginAccountAsync(loginDto, CancellationToken.None);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("Wrong password or email");
+        (await act.Should().ThrowAsync<UnauthorizedAccessException>()
+            .WithMessage("Invalid credentials.")).Which.Message.Should().Be(WrongPasswordOrEmailMessage);
+    }
+
+    [Fact(DisplayName = "LoginAccountAsync: unknown email and wrong password produce the identical error message (no user enumeration)")]
+    public async Task LoginAccountAsync_UnknownEmailAndWrongPassword_ProduceIdenticalMessage()
+    {
+        var unknownEmailDto = new LoginAccountDto("notfound@test.com", "Str0ng@Pass!");
+        _userRepository.GetByEmailAsync(unknownEmailDto.Email, Arg.Any<CancellationToken>()).Returns((User?)null);
+
+        var unknownEmailAct = async () => await _sut.LoginAccountAsync(unknownEmailDto, CancellationToken.None);
+        var unknownEmailException = await unknownEmailAct.Should().ThrowAsync<UnauthorizedAccessException>();
+
+        var wrongPasswordDto = new LoginAccountDto("user@test.com", "WrongP@ss1");
+        var hashedCorrectPassword = Security.Helpers.PasswordManagerHelper.HashPassword("Correct@Pass1");
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            PersonId = DefaultPersonDto.Id,
+            Email = "user@test.com",
+            Password = hashedCorrectPassword
+        };
+        _userRepository.GetByEmailAsync(wrongPasswordDto.Email, Arg.Any<CancellationToken>()).Returns(user);
+
+        var wrongPasswordAct = async () => await _sut.LoginAccountAsync(wrongPasswordDto, CancellationToken.None);
+        var wrongPasswordException = await wrongPasswordAct.Should().ThrowAsync<UnauthorizedAccessException>();
+
+        wrongPasswordException.Which.Message.Should().Be(unknownEmailException.Which.Message);
     }
 
     [Fact(DisplayName = "LoginAccountAsync: valid credentials returns AccountDto with tokens")]

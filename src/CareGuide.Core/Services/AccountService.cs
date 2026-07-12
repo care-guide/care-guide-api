@@ -74,7 +74,7 @@ namespace CareGuide.Core.Services
             User? user = await _userRepository.GetByEmailAsync(loginAccount.Email, cancellationToken);
 
             if (user == null || !PasswordManagerHelper.ValidatePassword(loginAccount.Password, user.Password))
-                throw new InvalidOperationException("Wrong password or email");
+                throw new UnauthorizedAccessException("Invalid credentials.");
 
             var accessToken = _jwtService.GenerateToken(user.Id, user.PersonId, user.Role == UserRole.Admin);
             var refreshToken = await _refreshTokenService.CreateAsync(user.Id, cancellationToken);

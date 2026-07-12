@@ -48,7 +48,8 @@ public class AccountEndpoints() : IEndpoint
              .Accepts<LoginAccountDto>("application/json")
              .Produces<AccountResponseDto>(StatusCodes.Status200OK)
              .Produces<AccountTokenResponseDto>(StatusCodes.Status200OK)
-             .ProducesProblem(StatusCodes.Status400BadRequest);
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/logout", Logout)
              .WithSummary("Logout")
@@ -189,7 +190,7 @@ public class AccountEndpoints() : IEndpoint
         var effectiveToken = isNativeClient ? refreshRequest.RefreshToken : cookieToken;
 
         if (string.IsNullOrWhiteSpace(effectiveToken))
-            return Results.Unauthorized();
+            throw new UnauthorizedAccessException("Invalid or missing refresh token.");
 
         var safeRequest = refreshRequest with { RefreshToken = effectiveToken };
         var accountDto = await accountService.RefreshTokenAsync(safeRequest, cancellationToken);
