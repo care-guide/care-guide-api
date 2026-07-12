@@ -68,8 +68,6 @@ builder.Services.AddOpenApi(ApiConstants.API_VERSION, options =>
         }
     });
 
-    // Only mark an operation as requiring Bearer auth when its endpoint doesn't allow anonymous
-    // access (e.g. anonymous account routes and the /health liveness probe are excluded).
     options.AddOperationTransformer((operation, transformerContext, cancellationToken) =>
     {
         var metadata = transformerContext.Description.ActionDescriptor.EndpointMetadata;
@@ -127,8 +125,6 @@ app.UseMiddleware<SessionMiddleware>();
 app.UseAuthorization();
 app.UseRateLimiter();
 
-// Anonymous liveness probe, intentionally mapped outside the authenticated "/api/v1" group below
-// (GET /health, /health/live) — see HealthCheckEndpoints for details.
 new HealthCheckEndpoints().RegisterEndpoints(app);
 
 app.MapGroup(ApiConstants.API_PREFIX)

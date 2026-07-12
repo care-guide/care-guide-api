@@ -7,8 +7,6 @@ namespace CareGuide.API.Extensions
     {
         public static void MapAllEndpoints(this IEndpointRouteBuilder endpoints)
         {
-            // HealthCheckEndpoints is mapped explicitly on the root app (outside the authenticated
-            // "/api/v1" group) in Program.cs, so it is excluded here to avoid double registration.
             var endpointDefinitions = AppDomain.CurrentDomain
                 .GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
