@@ -4,6 +4,7 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Event;
 using CareGuide.Models.DTOs.FileAsset;
+using CareGuide.Models.DTOs.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CareGuide.API.Endpoints
@@ -21,7 +22,7 @@ namespace CareGuide.API.Endpoints
                  .WithName("GetAllEvents")
                  .WithSummary("Get all events")
                  .WithDescription("Retrieves all events for the authenticated person using pagination parameters.")
-                 .Produces<List<EventDto>>(StatusCodes.Status200OK)
+                 .Produces<PagedResult<EventDto>>(StatusCodes.Status200OK)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapGet("/{id:guid}", GetById)

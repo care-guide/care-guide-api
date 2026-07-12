@@ -1,5 +1,6 @@
 using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.Entities;
 using CareGuide.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -24,14 +25,27 @@ namespace CareGuide.Infra.Repositories
             return entity;
         }
 
-        public async Task<List<EventAddress>> GetAllByEventAsync(Guid eventId, CancellationToken cancellationToken = default)
+        public async Task<List<EventAddress>> GetAllByEventAsync(int page, int pageSize, Guid eventId, CancellationToken cancellationToken = default)
         {
+            (page, pageSize) = PaginationNormalizer.Normalize(page, pageSize);
+
             var personId = _userSessionContext.PersonId;
 
             return await _context.EventAddresses
                 .Include(ea => ea.Address)
                 .Where(ea => ea.EventId == eventId && ea.Event.PersonId == personId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<int> CountByEventAsync(Guid eventId, CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.EventAddresses
+                .Where(ea => ea.EventId == eventId && ea.Event.PersonId == personId)
+                .CountAsync(cancellationToken);
         }
 
         public async Task<EventAddress?> GetByEventAndAddressAsync(Guid eventId, Guid addressId, CancellationToken cancellationToken = default)

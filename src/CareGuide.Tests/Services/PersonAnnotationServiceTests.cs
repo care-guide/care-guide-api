@@ -142,11 +142,13 @@ public class PersonAnnotationServiceTests
         };
         var dtos = annotations.Select(a => new PersonAnnotationDto(a.Id, personId, a.Details, null, DateTime.UtcNow, DateTime.UtcNow)).ToList();
 
-        _repository.GetAllByPersonAsync(1, 10, Arg.Any<CancellationToken>()).Returns(annotations);
+        _repository.GetAllByPersonPagedAsync(1, 10, Arg.Any<CancellationToken>()).Returns((annotations, 2, 1, 10));
         _mapper.Map<List<PersonAnnotationDto>>(annotations).Returns(dtos);
 
         var result = await _sut.GetAllByPersonAsync(1, 10, CancellationToken.None);
 
-        result.Should().HaveCount(2);
+        result.Items.Should().HaveCount(2);
+        result.Total.Should().Be(2);
+        result.HasNext.Should().BeFalse();
     }
 }

@@ -3,7 +3,9 @@ using CareGuide.Core.Interfaces;
 using CareGuide.Core.Interfaces.Storage;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Infra.TransactionManagement;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.EventFile;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 using CareGuide.Models.Enums;
 
@@ -34,11 +36,14 @@ namespace CareGuide.Core.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IReadOnlyCollection<EventFileDto>> GetAllByEventIdAsync(Guid eventId, CancellationToken cancellationToken)
+        public async Task<PagedResult<EventFileDto>> GetAllByEventIdAsync(int page, int pageSize, Guid eventId, CancellationToken cancellationToken)
         {
-            var eventFiles = await _eventFileRepository.GetAllByEventAsync(eventId, cancellationToken);
+            var (normalizedPage, normalizedPageSize) = PaginationNormalizer.Normalize(page, pageSize);
 
-            return _mapper.Map<List<EventFileDto>>(eventFiles);
+            var eventFiles = await _eventFileRepository.GetAllByEventAsync(normalizedPage, normalizedPageSize, eventId, cancellationToken);
+            var total = await _eventFileRepository.CountByEventAsync(eventId, cancellationToken);
+
+            return new PagedResult<EventFileDto>(_mapper.Map<List<EventFileDto>>(eventFiles), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<EventFileDto> AttachAsync(Guid eventId, Guid fileId, CancellationToken cancellationToken)

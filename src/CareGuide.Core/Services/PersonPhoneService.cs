@@ -2,8 +2,10 @@
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
 using CareGuide.Infra.TransactionManagement;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.PersonPhone;
 using CareGuide.Models.DTOs.Phone;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -23,14 +25,17 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<PersonPhoneDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<PersonPhoneDto>> GetAllByPersonAsync(int page, int pageSize, CancellationToken cancellationToken)
         {
-            var personPhones = await _personPhoneRepository.GetAllByPersonWithPhonesAsync(page, pageSize, cancellationToken);
+            var (normalizedPage, normalizedPageSize) = PaginationNormalizer.Normalize(page, pageSize);
 
-            if (personPhones.Count == 0)
+            var personPhones = await _personPhoneRepository.GetAllByPersonWithPhonesAsync(normalizedPage, normalizedPageSize, cancellationToken);
+            var total = await _personPhoneRepository.CountByPersonAsync(cancellationToken);
+
+            if (total == 0)
                 throw new KeyNotFoundException("No phone records found for the logged-in person.");
 
-            return _mapper.Map<List<PersonPhoneDto>>(personPhones);
+            return new PagedResult<PersonPhoneDto>(_mapper.Map<List<PersonPhoneDto>>(personPhones), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<PersonPhoneDto> GetAsync(Guid phoneId, CancellationToken cancellationToken)
@@ -95,7 +100,7 @@ namespace CareGuide.Core.Services
 
         public async Task DeleteAllByPersonAsync(CancellationToken cancellationToken)
         {
-            var personPhones = await _personPhoneRepository.GetAllByPersonWithPhonesAsync(1, int.MaxValue, cancellationToken);
+            var personPhones = await _personPhoneRepository.GetAllByPersonUnpagedAsync(cancellationToken);
 
             if (personPhones.Count == 0)
                 return;

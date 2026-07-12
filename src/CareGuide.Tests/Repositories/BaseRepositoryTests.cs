@@ -60,6 +60,71 @@ namespace CareGuide.Tests.Repositories
             result.Should().HaveCount(PaginationConstants.DefaultPageSize);
         }
 
+        [Fact(DisplayName = "GetAllPagedAsync: total reflects full seeded count, not the page's item count")]
+        public async Task GetAllPagedAsync_TotalReflectsFullCount_NotPageItemCount()
+        {
+            const int seeded = 27;
+            await SeedAsync(seeded);
+
+            using var context = CreateContext();
+            var repository = new PhoneRepository(context);
+
+            var (items, total, page, pageSize) = await repository.GetAllPagedAsync(1, 10, CancellationToken.None);
+
+            items.Should().HaveCount(10);
+            total.Should().Be(seeded);
+            total.Should().NotBe(items.Count);
+            page.Should().Be(1);
+            pageSize.Should().Be(10);
+        }
+
+        [Fact(DisplayName = "GetAllPagedAsync: last page returns remainder and total still reflects full count")]
+        public async Task GetAllPagedAsync_LastPage_ReturnsRemainder()
+        {
+            const int seeded = 25;
+            await SeedAsync(seeded);
+
+            using var context = CreateContext();
+            var repository = new PhoneRepository(context);
+
+            var (items, total, page, pageSize) = await repository.GetAllPagedAsync(3, 10, CancellationToken.None);
+
+            items.Should().HaveCount(5);
+            total.Should().Be(seeded);
+            page.Should().Be(3);
+            pageSize.Should().Be(10);
+        }
+
+        [Fact(DisplayName = "GetAllPagedAsync: pageSize above MaxPageSize is clamped and reflected in the returned PageSize")]
+        public async Task GetAllPagedAsync_PageSizeAboveMax_IsClamped()
+        {
+            await SeedAsync(PaginationConstants.MaxPageSize + 20);
+
+            using var context = CreateContext();
+            var repository = new PhoneRepository(context);
+
+            var (items, total, page, pageSize) = await repository.GetAllPagedAsync(1, PaginationConstants.MaxPageSize + 50, CancellationToken.None);
+
+            items.Should().HaveCount(PaginationConstants.MaxPageSize);
+            pageSize.Should().Be(PaginationConstants.MaxPageSize);
+            total.Should().Be(PaginationConstants.MaxPageSize + 20);
+        }
+
+        [Fact(DisplayName = "GetAllPagedAsync: page beyond the last page returns an empty item list but the true total")]
+        public async Task GetAllPagedAsync_PageBeyondLastPage_ReturnsEmptyItemsWithRealTotal()
+        {
+            const int seeded = 5;
+            await SeedAsync(seeded);
+
+            using var context = CreateContext();
+            var repository = new PhoneRepository(context);
+
+            var (items, total, _, _) = await repository.GetAllPagedAsync(5, 10, CancellationToken.None);
+
+            items.Should().BeEmpty();
+            total.Should().Be(seeded);
+        }
+
         [Fact(DisplayName = "DeleteAsync: physically removes entity")]
         public async Task DeleteAsync_PhysicallyRemovesEntity()
         {

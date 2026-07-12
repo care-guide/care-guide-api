@@ -36,7 +36,7 @@ public class EventAddressServiceTests
 
     // ── GetAllByEventIdAsync ──────────────────────────────────────────────────
 
-    [Fact(DisplayName = "GetAllByEventIdAsync: returns mapped list")]
+    [Fact(DisplayName = "GetAllByEventIdAsync: returns paged envelope with real total")]
     public async Task GetAllByEventIdAsync_ReturnsMappedList()
     {
         var eventId = Guid.NewGuid();
@@ -44,24 +44,28 @@ public class EventAddressServiceTests
         var eventAddresses = new List<EventAddress> { new() { EventId = eventId, AddressId = addressId, Address = CreateAddress(addressId) } };
         var dtos = new List<EventAddressDto> { new(eventId, addressId, "12345-000", null, AddressType.Clinic, "Sao Paulo", null, "Brazil", null, null, "SP") };
 
-        _repository.GetAllByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(eventAddresses);
+        _repository.GetAllByEventAsync(1, 10, eventId, Arg.Any<CancellationToken>()).Returns(eventAddresses);
+        _repository.CountByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(1);
         _mapper.Map<List<EventAddressDto>>(eventAddresses).Returns(dtos);
 
-        var result = await _sut.GetAllByEventIdAsync(eventId, CancellationToken.None);
+        var result = await _sut.GetAllByEventIdAsync(1, 10, eventId, CancellationToken.None);
 
-        result.Should().HaveCount(1);
+        result.Items.Should().HaveCount(1);
+        result.Total.Should().Be(1);
     }
 
     [Fact(DisplayName = "GetAllByEventIdAsync: empty result returns empty collection")]
     public async Task GetAllByEventIdAsync_Empty_ReturnsEmptyCollection()
     {
         var eventId = Guid.NewGuid();
-        _repository.GetAllByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(new List<EventAddress>());
+        _repository.GetAllByEventAsync(1, 10, eventId, Arg.Any<CancellationToken>()).Returns(new List<EventAddress>());
+        _repository.CountByEventAsync(eventId, Arg.Any<CancellationToken>()).Returns(0);
         _mapper.Map<List<EventAddressDto>>(Arg.Any<List<EventAddress>>()).Returns(new List<EventAddressDto>());
 
-        var result = await _sut.GetAllByEventIdAsync(eventId, CancellationToken.None);
+        var result = await _sut.GetAllByEventIdAsync(1, 10, eventId, CancellationToken.None);
 
-        result.Should().BeEmpty();
+        result.Items.Should().BeEmpty();
+        result.Total.Should().Be(0);
     }
 
     // ── AttachAsync ───────────────────────────────────────────────────────────
