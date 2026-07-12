@@ -1,5 +1,6 @@
 ﻿using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.Entities;
 using CareGuide.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,8 @@ namespace CareGuide.Infra.Repositories
 
         public async Task<List<PersonPhone>> GetAllByPersonWithPhonesAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         {
+            (page, pageSize) = PaginationNormalizer.Normalize(page, pageSize);
+
             var personId = _userSessionContext.PersonId;
 
             return await _context.PersonPhones
@@ -31,6 +34,24 @@ namespace CareGuide.Infra.Repositories
                 .Where(pp => pp.PersonId == personId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<int> CountByPersonAsync(CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.PersonPhones
+                .Where(pp => pp.PersonId == personId)
+                .CountAsync(cancellationToken);
+        }
+
+        public async Task<List<PersonPhone>> GetAllByPersonUnpagedAsync(CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.PersonPhones
+                .Where(pp => pp.PersonId == personId)
                 .ToListAsync(cancellationToken);
         }
 

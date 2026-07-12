@@ -133,6 +133,75 @@ namespace CareGuide.Tests.Repositories
             await act.Should().NotThrowAsync();
         }
 
+        [Fact(DisplayName = "GetAllByPersonPagedAsync: total is a real COUNT scoped to the session person, not items.Count")]
+        public async Task GetAllByPersonPagedAsync_TotalReflectsPersonScopedCount_NotPageItemCount()
+        {
+            using (var seedContext = CreateContext())
+            {
+                for (var i = 0; i < 23; i++)
+                    seedContext.PersonDiseases.Add(new PersonDisease { PersonId = _personAId, Name = $"Disease A{i}", DiseaseType = DiseaseType.Chronic });
+
+                for (var i = 0; i < 4; i++)
+                    seedContext.PersonDiseases.Add(new PersonDisease { PersonId = _personBId, Name = $"Disease B{i}", DiseaseType = DiseaseType.Respiratory });
+
+                await seedContext.SaveChangesAsync();
+            }
+
+            using var context = CreateContext();
+            var repository = CreateRepository(context, _personAId);
+
+            var (items, total, page, pageSize) = await repository.GetAllByPersonPagedAsync(1, 10, CancellationToken.None);
+
+            items.Should().HaveCount(10);
+            total.Should().Be(23);
+            total.Should().NotBe(items.Count);
+            page.Should().Be(1);
+            pageSize.Should().Be(10);
+        }
+
+        [Fact(DisplayName = "GetAllByPersonPagedAsync: last page returns remainder with correct total")]
+        public async Task GetAllByPersonPagedAsync_LastPage_ReturnsRemainder()
+        {
+            using (var seedContext = CreateContext())
+            {
+                for (var i = 0; i < 25; i++)
+                    seedContext.PersonDiseases.Add(new PersonDisease { PersonId = _personAId, Name = $"Disease {i}", DiseaseType = DiseaseType.Chronic });
+
+                await seedContext.SaveChangesAsync();
+            }
+
+            using var context = CreateContext();
+            var repository = CreateRepository(context, _personAId);
+
+            var (items, total, page, pageSize) = await repository.GetAllByPersonPagedAsync(3, 10, CancellationToken.None);
+
+            items.Should().HaveCount(5);
+            total.Should().Be(25);
+            page.Should().Be(3);
+            pageSize.Should().Be(10);
+        }
+
+        [Fact(DisplayName = "GetAllByPersonPagedAsync: pageSize above MaxPageSize is clamped")]
+        public async Task GetAllByPersonPagedAsync_PageSizeAboveMax_IsClamped()
+        {
+            using (var seedContext = CreateContext())
+            {
+                for (var i = 0; i < PaginationConstants.MaxPageSize + 20; i++)
+                    seedContext.PersonDiseases.Add(new PersonDisease { PersonId = _personAId, Name = $"Disease {i}", DiseaseType = DiseaseType.Chronic });
+
+                await seedContext.SaveChangesAsync();
+            }
+
+            using var context = CreateContext();
+            var repository = CreateRepository(context, _personAId);
+
+            var (items, total, page, pageSize) = await repository.GetAllByPersonPagedAsync(1, PaginationConstants.MaxPageSize + 50, CancellationToken.None);
+
+            items.Should().HaveCount(PaginationConstants.MaxPageSize);
+            pageSize.Should().Be(PaginationConstants.MaxPageSize);
+            total.Should().Be(PaginationConstants.MaxPageSize + 20);
+        }
+
         [Fact]
         public async Task ExistsAsync_WhenEntityBelongsToAnotherPerson_ReturnsFalse()
         {

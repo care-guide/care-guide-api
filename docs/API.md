@@ -91,7 +91,34 @@ Constants in `PaginationConstants`:
 | `DefaultPageSize` | `10` |
 | `MaxPageSize` | `100` |
 
-`page`/`pageSize` are normalized by `BaseRepository`/`BasePersonOwnedRepository`, never throw: `page < 1` → `DefaultPage`; `pageSize < 1` → `DefaultPageSize`; `pageSize > MaxPageSize` → `MaxPageSize`.
+`page`/`pageSize` are normalized (never throw) by `PaginationNormalizer.Normalize`, reused by
+`BaseRepository`/`BasePersonOwnedRepository` and by the join-table repositories (DoctorAddress,
+DoctorPhone, DoctorSpecialty, PersonPhone, EventAddress, EventFile): `page < 1` → `DefaultPage`;
+`pageSize < 1` → `DefaultPageSize`; `pageSize > MaxPageSize` → `MaxPageSize`.
+
+### Envelope
+
+Every collection endpoint returns the same envelope, `PagedResult<T>`
+(`CareGuide.Models/DTOs/Shared/PagedResult.cs`):
+
+```json
+{
+  "items": [ /* T[] */ ],
+  "page": 1,
+  "pageSize": 10,
+  "total": 42,
+  "hasNext": true
+}
+```
+
+- `total` is always a real `COUNT` query scoped with the same person/parent-resource predicate as
+  `items` (never `items.Count` or a constant), run alongside the paged query — no N+1, no
+  full-table load.
+- `hasNext` is computed as `page * pageSize < total`.
+- Applies uniformly to doctors, doctor sub-resources (addresses/phones/specialties), events, event
+  sub-resources (addresses/files), and all `person-*` resources. Singular per-event resources
+  (appointment, exam, medicine, surgery — one record per event) are not paginated; they are not
+  collections.
 
 ## Validation
 

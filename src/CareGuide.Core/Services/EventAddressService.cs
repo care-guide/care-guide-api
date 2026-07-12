@@ -1,7 +1,9 @@
 using AutoMapper;
 using CareGuide.Core.Interfaces;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.EventAddress;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Entities;
 
 namespace CareGuide.Core.Services
@@ -21,11 +23,14 @@ namespace CareGuide.Core.Services
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<EventAddressDto>> GetAllByEventIdAsync(Guid eventId, CancellationToken cancellationToken)
+        public async Task<PagedResult<EventAddressDto>> GetAllByEventIdAsync(int page, int pageSize, Guid eventId, CancellationToken cancellationToken)
         {
-            var eventAddresses = await _eventAddressRepository.GetAllByEventAsync(eventId, cancellationToken);
+            var (normalizedPage, normalizedPageSize) = PaginationNormalizer.Normalize(page, pageSize);
 
-            return _mapper.Map<List<EventAddressDto>>(eventAddresses);
+            var eventAddresses = await _eventAddressRepository.GetAllByEventAsync(normalizedPage, normalizedPageSize, eventId, cancellationToken);
+            var total = await _eventAddressRepository.CountByEventAsync(eventId, cancellationToken);
+
+            return new PagedResult<EventAddressDto>(_mapper.Map<List<EventAddressDto>>(eventAddresses), normalizedPage, normalizedPageSize, total);
         }
 
         public async Task<EventAddressDto> AttachAsync(Guid eventId, Guid addressId, CancellationToken cancellationToken)
