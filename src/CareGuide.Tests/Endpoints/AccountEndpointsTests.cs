@@ -85,8 +85,6 @@ public class AccountEndpointsTests
         var ok = result.Should().BeOfType<Ok<AccountResponseDto>>().Subject;
         ok.Value.Should().NotBeNull();
 
-        // AccountResponseDto has no token properties, so the body can never carry a token
-        // for a browser regardless of implementation drift.
         typeof(AccountResponseDto).GetProperty("SessionToken").Should().BeNull();
         typeof(AccountResponseDto).GetProperty("RefreshToken").Should().BeNull();
     }
@@ -141,7 +139,6 @@ public class AccountEndpointsTests
         var refreshDto = new RefreshTokenDto("old-native-refresh-token", "user@test.com");
         _accountService.RefreshTokenAsync(Arg.Any<RefreshTokenDto>(), Arg.Any<CancellationToken>()).Returns(rotatedAccountDto);
         var httpContext = NewHttpContext(nativeClient: true);
-        // Deliberately no cookie set: native clients must not require one.
 
         var result = await AccountEndpoints.Refresh(refreshDto, _accountService, httpContext, CancellationToken.None);
 

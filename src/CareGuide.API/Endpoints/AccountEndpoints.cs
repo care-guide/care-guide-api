@@ -170,7 +170,6 @@ public class AccountEndpoints() : IEndpoint
         var isNativeClient = AuthCookieHelper.IsNativeClient(httpContext.Request);
         var cookieToken = httpContext.Request.Cookies["refreshToken"];
 
-        // Browsers must always use the HttpOnly cookie; native clients send the refresh token in the body.
         var effectiveToken = isNativeClient ? refreshRequest.RefreshToken : cookieToken;
 
         if (string.IsNullOrWhiteSpace(effectiveToken))
