@@ -38,7 +38,7 @@ namespace CareGuide.API.Extensions
 
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-                options.OnRejected = async (context, cancellationToken) =>
+                options.OnRejected = (context, cancellationToken) =>
                 {
                     if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
                     {
@@ -47,8 +47,8 @@ namespace CareGuide.API.Extensions
                     }
 
                     context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                    await context.HttpContext.Response.WriteAsync(
-                        "Too many requests. Please try again later.", cancellationToken);
+
+                    return ValueTask.CompletedTask;
                 };
             });
 
