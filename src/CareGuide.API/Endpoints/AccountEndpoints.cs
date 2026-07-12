@@ -125,7 +125,7 @@ public class AccountEndpoints() : IEndpoint
                 accountDto.RefreshToken
             );
 
-            return Results.Created($"/accounts/{accountDto.Id}", tokenResult);
+            return Results.Created($"/api/v1/accounts/{accountDto.Id}", tokenResult);
         }
 
         var result = new AccountResponseDto(
@@ -136,7 +136,7 @@ public class AccountEndpoints() : IEndpoint
             accountDto.Birthday
         );
 
-        return Results.Created($"/accounts/{accountDto.Id}", result);
+        return Results.Created($"/api/v1/accounts/{result.Id}", result);
     }
 
     internal static async Task<IResult> Login(LoginAccountDto loginAccount, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)

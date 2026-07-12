@@ -81,7 +81,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Create(CreatePersonFamilyHistoryDto createPersonFamilyHistoryDto, IPersonFamilyHistoryService personFamilyHistoryService, CancellationToken cancellationToken)
         {
             var created = await personFamilyHistoryService.CreateAsync(createPersonFamilyHistoryDto, cancellationToken);
-            return Results.Created($"/person-family-histories/{created.Id}", created);
+            return Results.Created($"/api/v1/person-family-histories/{created.Id}", created);
         }
 
         private static async Task<IResult> Update(Guid id, UpdatePersonFamilyHistoryDto updatePersonFamilyHistoryDto, IPersonFamilyHistoryService personFamilyHistoryService, CancellationToken cancellationToken)

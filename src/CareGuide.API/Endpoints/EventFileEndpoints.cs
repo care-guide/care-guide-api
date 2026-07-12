@@ -20,7 +20,8 @@ namespace CareGuide.API.Endpoints
                  .WithName("GetEventFiles")
                  .WithSummary("Get event files")
                  .WithDescription("Retrieves all files attached to a specific event using pagination parameters.")
-                 .Produces<PagedResult<EventFileDto>>(StatusCodes.Status200OK);
+                 .Produces<PagedResult<EventFileDto>>(StatusCodes.Status200OK)
+                 .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapPost("/{fileId:guid}", Attach)
                  .WithName("AttachEventFile")
@@ -66,7 +67,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Attach(Guid eventId, Guid fileId, IEventFileService eventFileService, CancellationToken cancellationToken)
         {
             var created = await eventFileService.AttachAsync(eventId, fileId, cancellationToken);
-            return Results.Created($"/events/{eventId}/files/{fileId}", created);
+            return Results.Created($"/api/v1/events/{eventId}/files/{fileId}", created);
         }
 
         private static async Task<IResult> Detach(Guid eventId, Guid fileId, IEventFileService eventFileService, CancellationToken cancellationToken)

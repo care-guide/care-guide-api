@@ -20,7 +20,8 @@ namespace CareGuide.API.Endpoints
                  .WithName("GetEventAddresses")
                  .WithSummary("Get event addresses")
                  .WithDescription("Retrieves all addresses attached to a specific event using pagination parameters.")
-                 .Produces<PagedResult<EventAddressDto>>(StatusCodes.Status200OK);
+                 .Produces<PagedResult<EventAddressDto>>(StatusCodes.Status200OK)
+                 .ProducesProblem(StatusCodes.Status400BadRequest);
 
             group.MapPost("/{addressId:guid}", Attach)
                  .WithName("AttachEventAddress")
@@ -50,7 +51,7 @@ namespace CareGuide.API.Endpoints
         private static async Task<IResult> Attach(Guid eventId, Guid addressId, IEventAddressService eventAddressService, CancellationToken cancellationToken)
         {
             var created = await eventAddressService.AttachAsync(eventId, addressId, cancellationToken);
-            return Results.Created($"/events/{eventId}/addresses/{addressId}", created);
+            return Results.Created($"/api/v1/events/{eventId}/addresses/{addressId}", created);
         }
 
         private static async Task<IResult> Detach(Guid eventId, Guid addressId, IEventAddressService eventAddressService, CancellationToken cancellationToken)

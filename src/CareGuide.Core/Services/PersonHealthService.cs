@@ -88,5 +88,10 @@ namespace CareGuide.Core.Services
 
             await _personHealthRepository.DeleteAsync(entity.Id, cancellationToken);
         }
+
+        public async Task DeleteByIdsAsync(List<Guid> ids, CancellationToken cancellationToken)
+        {
+            await _personHealthRepository.DeleteManyAsync(ids, cancellationToken);
+        }
     }
 }

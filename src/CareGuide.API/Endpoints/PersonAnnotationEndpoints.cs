@@ -81,7 +81,7 @@ public class PersonAnnotationEndpoints() : IEndpoint
     private static async Task<IResult> Create(CreatePersonAnnotationDto createPersonAnnotation, IPersonAnnotationService personAnnotationService, CancellationToken cancellationToken)
     {
         var created = await personAnnotationService.CreateAsync(createPersonAnnotation, cancellationToken);
-        return Results.Created($"/person-annotations/{created.Id}", created);
+        return Results.Created($"/api/v1/person-annotations/{created.Id}", created);
     }
 
     private static async Task<IResult> Update(Guid id, UpdatePersonAnnotationDto updatePersonAnnotation, IPersonAnnotationService personAnnotationService, CancellationToken cancellationToken)
