@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using CareGuide.API.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 
 namespace CareGuide.Tests.Extensions;
