@@ -13,5 +13,7 @@ namespace CareGuide.Infra.Interfaces
             int page,
             int pageSize,
             CancellationToken cancellationToken);
+
+        Task<int> CountByPersonAsync(DateTime? from, DateTime? to, CancellationToken cancellationToken);
     }
 }

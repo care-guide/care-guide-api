@@ -146,11 +146,14 @@ public class EventServiceTests
         var dtos = events.Select(e => new EventDto(e.Id, e.PersonId!.Value, e.Name, e.StartDate, null, e.Type, false, null, null, null, DateTime.UtcNow, DateTime.UtcNow)).ToList();
 
         _repository.GetAllByPersonAsync(null, null, EventSortOrder.Asc, 1, 10, Arg.Any<CancellationToken>()).Returns(events);
+        _repository.CountByPersonAsync(null, null, Arg.Any<CancellationToken>()).Returns(2);
         _mapper.Map<List<EventDto>>(events).Returns(dtos);
 
         var result = await _sut.GetAllByPersonAsync(null, null, EventSortOrder.Asc, 1, 10, CancellationToken.None);
 
-        result.Should().HaveCount(2);
+        result.Items.Should().HaveCount(2);
+        result.Total.Should().Be(2);
+        result.HasNext.Should().BeFalse();
     }
 
     [Fact(DisplayName = "GetAllByPersonAsync: from later than to throws ArgumentException")]

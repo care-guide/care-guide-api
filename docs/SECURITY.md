@@ -27,12 +27,34 @@ Both the `sessionToken` (access, 15 min) and the `refreshToken` (7 days) are wri
 - `Secure = true` — only sent over HTTPS.
 - `SameSite = Strict` — CSRF protection.
 
-On successful login, the JSON response contains only account profile data. Tokens are not included in
-the response body; they are delivered through the cookies above. Non-browser API clients can send an
-access token with `Authorization: Bearer <token>`; that header takes precedence over `sessionToken`.
+On successful login, the JSON response contains only account profile data (`AccountResponseDto`).
+Tokens are not included in that body; they are delivered through the cookies above. Non-browser API
+clients can send an access token with `Authorization: Bearer <token>`; that header takes precedence
+over `sessionToken`.
 
-The `POST /api/v1/accounts/refresh` endpoint reads the refresh token **from the cookie**, not from
-the body, to avoid leaking it into client logs.
+### Native client token delivery (`X-Client-Type: mobile`)
+
+Native mobile clients cannot read `HttpOnly` cookies, so they need `sessionToken`/`refreshToken` in the
+JSON body. This is opt-in and explicit — the default (no header, all existing browser clients) is
+unchanged:
+
+- Send `X-Client-Type: mobile` on `POST /accounts`, `POST /accounts/login` and `POST /accounts/refresh`.
+- The response body becomes `AccountTokenResponseDto`: the same profile fields as `AccountResponseDto`
+  plus `sessionToken` and `refreshToken`.
+- The `HttpOnly; Secure; SameSite=Strict` cookies are still set on every response, native or not; native
+  clients may simply ignore them.
+- Without the header (or with any other value), the body stays `AccountResponseDto` and never carries a
+  token — browser behavior is unaffected.
+
+Selection logic lives in `AuthCookieHelper.IsNativeClient` (exact, case-insensitive header/value match;
+no heuristics).
+
+The `POST /api/v1/accounts/refresh` endpoint reads the refresh token **from the `refreshToken` cookie**
+for browser clients (body value is ignored/overwritten), to avoid leaking it into client logs. Native
+clients (`X-Client-Type: mobile`) instead send the refresh token in the JSON body — no cookie required
+for that path — and receive the rotated `sessionToken`/`refreshToken` pair back in the body. In both
+cases, the request only travels over the existing HTTPS path and tokens are never written to logs,
+`ProblemDetails` bodies, or OpenAPI examples.
 
 ---
 
@@ -50,7 +72,7 @@ Implemented in `PasswordManagerHelper`.
 
 | Policy | Target | Limit |
 | ------ | ------ | ----- |
-| `general` | Versioned API endpoints under `/api/v1` | 60 req/min per IP (sliding window) |
+| `general` | Versioned API endpoints under `/api/v1` | 60 req/min per authenticated user (sliding window); falls back to per-IP for anonymous requests |
 | `auth` | `/api/v1/accounts` create, login and refresh | 5 req/min per IP (fixed window) — anti brute-force |
 
 Account endpoints are registered under `/api/v1/accounts`. Create, login and refresh are anonymous
@@ -58,8 +80,13 @@ and explicitly use the stricter `auth` policy; protected account endpoints remai
 API group and require authentication. The endpoint-specific `auth` policy is the intended limiter for
 those three authentication routes.
 
+The `general` policy partitions authenticated traffic by the validated JWT `sub` (userId) claim rather
+than IP, so users sharing a public IP (e.g. mobile carrier CGNAT) do not throttle each other. The
+partition key is never taken from a client-supplied header. Genuinely anonymous requests to `general`
+endpoints, and all `auth`-policy requests, still partition by IP, resolved considering
+`X-Forwarded-For` (behind a proxy) — preserving brute-force protection on the authentication routes.
+
 Response when exceeded: **HTTP 429** with `Retry-After` and an `application/problem+json` body.
-The IP is resolved considering `X-Forwarded-For` (behind a proxy).
 
 ---
 

@@ -35,4 +35,8 @@
     <ProjectReference Include="..\CareGuide.Security\CareGuide.Security.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="CareGuide.Tests" />
+  </ItemGroup>
+
 </Project>

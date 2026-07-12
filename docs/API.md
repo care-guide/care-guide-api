@@ -29,8 +29,17 @@ and account deletion require authentication.
 - Anonymous endpoints are marked with `AllowAnonymous` (e.g. create account, login, refresh).
 - Token and cookie details in [SECURITY.md](SECURITY.md).
 
-Successful login returns account profile fields (`id`, `email`, `name`, `gender`, `birthday`) in the
-JSON body. Access and refresh tokens are written to HttpOnly cookies and are not returned in that body.
+By default, successful create/login/refresh return account profile fields (`id`, `email`, `name`,
+`gender`, `birthday`) as `AccountResponseDto` in the JSON body. Access and refresh tokens are written to
+HttpOnly cookies and are not returned in that body — this is unchanged for browser clients.
+
+Native (non-browser) clients that cannot read HttpOnly cookies can opt in to receiving the tokens in the
+body by sending the request header `X-Client-Type: mobile` on `POST /accounts`, `POST /accounts/login`
+and `POST /accounts/refresh`. When present, the body is `AccountTokenResponseDto` — the same profile
+fields plus `sessionToken` and `refreshToken`. Cookies are still set regardless of the header. Without
+the header, behavior for browsers is completely unchanged. `POST /accounts/refresh` reads the refresh
+token from the `refreshToken` cookie for browsers, or from the request body for native clients (no
+cookie required in that case). See [SECURITY.md](SECURITY.md) → Authentication for the full mechanism.
 
 ## Error format — RFC 9457 (ProblemDetails)
 
@@ -82,7 +91,34 @@ Constants in `PaginationConstants`:
 | `DefaultPageSize` | `10` |
 | `MaxPageSize` | `100` |
 
-`page`/`pageSize` are normalized by `BaseRepository`/`BasePersonOwnedRepository`, never throw: `page < 1` → `DefaultPage`; `pageSize < 1` → `DefaultPageSize`; `pageSize > MaxPageSize` → `MaxPageSize`.
+`page`/`pageSize` are normalized (never throw) by `PaginationNormalizer.Normalize`, reused by
+`BaseRepository`/`BasePersonOwnedRepository` and by the join-table repositories (DoctorAddress,
+DoctorPhone, DoctorSpecialty, PersonPhone, EventAddress, EventFile): `page < 1` → `DefaultPage`;
+`pageSize < 1` → `DefaultPageSize`; `pageSize > MaxPageSize` → `MaxPageSize`.
+
+### Envelope
+
+Every collection endpoint returns the same envelope, `PagedResult<T>`
+(`CareGuide.Models/DTOs/Shared/PagedResult.cs`):
+
+```json
+{
+  "items": [ /* T[] */ ],
+  "page": 1,
+  "pageSize": 10,
+  "total": 42,
+  "hasNext": true
+}
+```
+
+- `total` is always a real `COUNT` query scoped with the same person/parent-resource predicate as
+  `items` (never `items.Count` or a constant), run alongside the paged query — no N+1, no
+  full-table load.
+- `hasNext` is computed as `page * pageSize < total`.
+- Applies uniformly to doctors, doctor sub-resources (addresses/phones/specialties), events, event
+  sub-resources (addresses/files), and all `person-*` resources. Singular per-event resources
+  (appointment, exam, medicine, surgery — one record per event) are not paginated; they are not
+  collections.
 
 ## Validation
 

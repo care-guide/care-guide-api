@@ -1,5 +1,6 @@
 ﻿using CareGuide.Infra.Contexts;
 using CareGuide.Infra.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.Entities;
 using CareGuide.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,8 @@ namespace CareGuide.Infra.Repositories
 
         public async Task<List<DoctorPhone>> GetAllByDoctorWithPhonesAsync(int page, int pageSize, Guid doctorId, CancellationToken cancellationToken = default)
         {
+            (page, pageSize) = PaginationNormalizer.Normalize(page, pageSize);
+
             var personId = _userSessionContext.PersonId;
 
             return await _context.DoctorPhones
@@ -31,6 +34,24 @@ namespace CareGuide.Infra.Repositories
                 .Where(dp => dp.DoctorId == doctorId && dp.Doctor.PersonId == personId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<int> CountByDoctorAsync(Guid doctorId, CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.DoctorPhones
+                .Where(dp => dp.DoctorId == doctorId && dp.Doctor.PersonId == personId)
+                .CountAsync(cancellationToken);
+        }
+
+        public async Task<List<DoctorPhone>> GetAllByDoctorUnpagedAsync(Guid doctorId, CancellationToken cancellationToken = default)
+        {
+            var personId = _userSessionContext.PersonId;
+
+            return await _context.DoctorPhones
+                .Where(dp => dp.DoctorId == doctorId && dp.Doctor.PersonId == personId)
                 .ToListAsync(cancellationToken);
         }
 

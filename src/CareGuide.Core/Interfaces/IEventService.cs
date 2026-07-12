@@ -1,11 +1,12 @@
 using CareGuide.Models.DTOs.Event;
+using CareGuide.Models.DTOs.Shared;
 using CareGuide.Models.Enums;
 
 namespace CareGuide.Core.Interfaces
 {
     public interface IEventService
     {
-        Task<List<EventDto>> GetAllByPersonAsync(
+        Task<PagedResult<EventDto>> GetAllByPersonAsync(
             DateTime? from,
             DateTime? to,
             EventSortOrder sortOrder,

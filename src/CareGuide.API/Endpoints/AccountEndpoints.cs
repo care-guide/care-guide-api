@@ -3,7 +3,9 @@ using CareGuide.API.Extensions;
 using CareGuide.API.Helpers;
 using CareGuide.API.Middlewares;
 using CareGuide.Core.Interfaces;
+using CareGuide.Models.Constants;
 using CareGuide.Models.DTOs.Account;
+using CareGuide.Models.DTOs.Person;
 using CareGuide.Security.Interfaces;
 
 namespace CareGuide.API.Endpoints;
@@ -22,9 +24,14 @@ public class AccountEndpoints() : IEndpoint
              .RequireRateLimiting(RateLimitingExtension.AuthPolicy)
              .WithMetadata(new IgnoreSessionMiddleware())
              .WithSummary("Create Account")
-             .WithDescription("Creates a new account by creating a Person for personal information and a User for account credentials.")
+             .WithDescription(
+                 "Creates a new account by creating a Person for personal information and a User for account credentials. " +
+                 "By default (browser clients) tokens are only delivered via HttpOnly cookies and the body is `AccountResponseDto`. " +
+                 $"Native clients that send the `{AuthClientConstants.ClientTypeHeaderName}: {AuthClientConstants.MobileClientTypeValue}` header " +
+                 "additionally receive `sessionToken`/`refreshToken` in the JSON body as `AccountTokenResponseDto`.")
              .Accepts<CreateAccountDto>("application/json")
              .Produces<AccountResponseDto>(StatusCodes.Status201Created)
+             .Produces<AccountTokenResponseDto>(StatusCodes.Status201Created)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status409Conflict);
 
@@ -33,10 +40,16 @@ public class AccountEndpoints() : IEndpoint
              .RequireRateLimiting(RateLimitingExtension.AuthPolicy)
              .WithMetadata(new IgnoreSessionMiddleware())
              .WithSummary("Login")
-             .WithDescription("Authenticates a user and returns a JWT token and a refresh token.")
+             .WithDescription(
+                 "Authenticates a user and returns a JWT token and a refresh token. " +
+                 "By default (browser clients) tokens are only delivered via HttpOnly cookies and the body is `AccountResponseDto`. " +
+                 $"Native clients that send the `{AuthClientConstants.ClientTypeHeaderName}: {AuthClientConstants.MobileClientTypeValue}` header " +
+                 "additionally receive `sessionToken`/`refreshToken` in the JSON body as `AccountTokenResponseDto`.")
              .Accepts<LoginAccountDto>("application/json")
              .Produces<AccountResponseDto>(StatusCodes.Status200OK)
-             .ProducesProblem(StatusCodes.Status400BadRequest);
+             .Produces<AccountTokenResponseDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/logout", Logout)
              .WithSummary("Logout")
@@ -49,10 +62,17 @@ public class AccountEndpoints() : IEndpoint
              .RequireRateLimiting(RateLimitingExtension.AuthPolicy)
              .WithMetadata(new IgnoreSessionMiddleware())
              .WithSummary("Refresh Token")
-             .WithDescription("Refreshes JWT access token using a valid refresh token.")
+             .WithDescription(
+                 "Refreshes the JWT access token using a valid refresh token. Browser clients (no client-type header) " +
+                 "must send the refresh token via the `refreshToken` HttpOnly cookie; the body value is ignored for that path. " +
+                 $"Native clients that send the `{AuthClientConstants.ClientTypeHeaderName}: {AuthClientConstants.MobileClientTypeValue}` header " +
+                 "instead send the refresh token in the JSON body and receive the rotated `sessionToken`/`refreshToken` pair " +
+                 "back in the body as `AccountTokenResponseDto`.")
              .Accepts<RefreshTokenDto>("application/json")
              .Produces<AccountResponseDto>(StatusCodes.Status200OK)
-             .ProducesProblem(StatusCodes.Status400BadRequest);
+             .Produces<AccountTokenResponseDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/{id:guid}/password", UpdatePassword)
              .WithSummary("Update Password")
@@ -69,14 +89,44 @@ public class AccountEndpoints() : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        group.MapGet("/me", GetMyProfile)
+             .WithSummary("Get My Profile")
+             .WithDescription("Returns the authenticated person's profile, resolved from the session identity.")
+             .Produces<MyProfileDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        group.MapPut("/me", UpdateMyProfile)
+             .WithSummary("Update My Profile")
+             .WithDescription("Updates the authenticated person's editable profile fields (name, gender, birthday, picture).")
+             .Accepts<UpdatePersonProfileDto>("application/json")
+             .Produces<MyProfileDto>(StatusCodes.Status200OK)
+             .ProducesProblem(StatusCodes.Status400BadRequest)
+             .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
 
-    private static async Task<IResult> Create(CreateAccountDto createAccount, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
+    internal static async Task<IResult> Create(CreateAccountDto createAccount, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
     {
         var accountDto = await accountService.CreateAccountAsync(createAccount, cancellationToken);
 
         AuthCookieHelper.AppendRefreshToken(httpContext.Response, accountDto.RefreshToken);
         AuthCookieHelper.AppendSessionToken(httpContext.Response, accountDto.SessionToken);
+
+        if (AuthCookieHelper.IsNativeClient(httpContext.Request))
+        {
+            var tokenResult = new AccountTokenResponseDto(
+                accountDto.Id,
+                accountDto.Email,
+                accountDto.Name,
+                accountDto.Gender,
+                accountDto.Birthday,
+                accountDto.SessionToken,
+                accountDto.RefreshToken
+            );
+
+            return Results.Created($"/accounts/{accountDto.Id}", tokenResult);
+        }
 
         var result = new AccountResponseDto(
             accountDto.Id,
@@ -86,15 +136,30 @@ public class AccountEndpoints() : IEndpoint
             accountDto.Birthday
         );
 
-        return Results.Created($"/accounts/{result.Id}", result);
+        return Results.Created($"/accounts/{accountDto.Id}", result);
     }
 
-    private static async Task<IResult> Login(LoginAccountDto loginAccount, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
+    internal static async Task<IResult> Login(LoginAccountDto loginAccount, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
     {
         var accountDto = await accountService.LoginAccountAsync(loginAccount, cancellationToken);
 
         AuthCookieHelper.AppendRefreshToken(httpContext.Response, accountDto.RefreshToken);
         AuthCookieHelper.AppendSessionToken(httpContext.Response, accountDto.SessionToken);
+
+        if (AuthCookieHelper.IsNativeClient(httpContext.Request))
+        {
+            var tokenResult = new AccountTokenResponseDto(
+                accountDto.Id,
+                accountDto.Email,
+                accountDto.Name,
+                accountDto.Gender,
+                accountDto.Birthday,
+                accountDto.SessionToken,
+                accountDto.RefreshToken
+            );
+
+            return Results.Ok(tokenResult);
+        }
 
         var result = new AccountResponseDto(
             accountDto.Id,
@@ -102,7 +167,7 @@ public class AccountEndpoints() : IEndpoint
             accountDto.Name,
             accountDto.Gender,
             accountDto.Birthday
-         );
+        );
 
         return Results.Ok(result);
     }
@@ -117,18 +182,36 @@ public class AccountEndpoints() : IEndpoint
         return Results.NoContent();
     }
 
-    private static async Task<IResult> Refresh(RefreshTokenDto refreshRequest, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
+    internal static async Task<IResult> Refresh(RefreshTokenDto refreshRequest, IAccountService accountService, HttpContext httpContext, CancellationToken cancellationToken)
     {
+        var isNativeClient = AuthCookieHelper.IsNativeClient(httpContext.Request);
         var cookieToken = httpContext.Request.Cookies["refreshToken"];
 
-        if (string.IsNullOrWhiteSpace(cookieToken))
-            return Results.Unauthorized();
+        var effectiveToken = isNativeClient ? refreshRequest.RefreshToken : cookieToken;
 
-        var safeRequest = refreshRequest with { RefreshToken = cookieToken };
+        if (string.IsNullOrWhiteSpace(effectiveToken))
+            throw new UnauthorizedAccessException("Invalid or missing refresh token.");
+
+        var safeRequest = refreshRequest with { RefreshToken = effectiveToken };
         var accountDto = await accountService.RefreshTokenAsync(safeRequest, cancellationToken);
 
         AuthCookieHelper.AppendRefreshToken(httpContext.Response, accountDto.RefreshToken);
         AuthCookieHelper.AppendSessionToken(httpContext.Response, accountDto.SessionToken);
+
+        if (isNativeClient)
+        {
+            var tokenResult = new AccountTokenResponseDto(
+                accountDto.Id,
+                accountDto.Email,
+                accountDto.Name,
+                accountDto.Gender,
+                accountDto.Birthday,
+                accountDto.SessionToken,
+                accountDto.RefreshToken
+            );
+
+            return Results.Ok(tokenResult);
+        }
 
         var result = new AccountResponseDto(
             accountDto.Id,
@@ -136,7 +219,7 @@ public class AccountEndpoints() : IEndpoint
             accountDto.Name,
             accountDto.Gender,
             accountDto.Birthday
-         );
+        );
 
         return Results.Ok(result);
     }
@@ -151,5 +234,17 @@ public class AccountEndpoints() : IEndpoint
     {
         await accountService.DeleteAccountAsync(id, cancellationToken);
         return Results.NoContent();
+    }
+
+    private static async Task<IResult> GetMyProfile(IUserSessionContext session, IPersonService personService, CancellationToken cancellationToken)
+    {
+        var profile = await personService.GetMyProfileAsync(session.PersonId, cancellationToken);
+        return Results.Ok(profile);
+    }
+
+    private static async Task<IResult> UpdateMyProfile(UpdatePersonProfileDto updateProfile, IUserSessionContext session, IPersonService personService, CancellationToken cancellationToken)
+    {
+        var profile = await personService.UpdateMyProfileAsync(session.PersonId, updateProfile, cancellationToken);
+        return Results.Ok(profile);
     }
 }

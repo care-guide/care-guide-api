@@ -41,5 +41,18 @@ namespace CareGuide.Infra.Repositories
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<int> CountByPersonAsync(DateTime? from, DateTime? to, CancellationToken cancellationToken)
+        {
+            var query = Scoped;
+
+            if (from.HasValue)
+                query = query.Where(e => e.StartDate >= from.Value);
+
+            if (to.HasValue)
+                query = query.Where(e => e.StartDate <= to.Value);
+
+            return await query.CountAsync(cancellationToken);
+        }
     }
 }
