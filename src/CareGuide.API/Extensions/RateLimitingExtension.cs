@@ -12,7 +12,6 @@ namespace CareGuide.API.Extensions
         {
             services.AddRateLimiter(options =>
             {
-                // General: sliding window, 60 req/min per authenticated user (falls back to IP if anonymous)
                 options.AddPolicy(GeneralPolicy, httpContext =>
                     RateLimitPartition.GetSlidingWindowLimiter(
                         partitionKey: ResolveIdentityPartitionKey(httpContext),
@@ -56,13 +55,6 @@ namespace CareGuide.API.Extensions
             return services;
         }
 
-        /// <summary>
-        /// Partition key for the <see cref="GeneralPolicy"/>. Authenticated requests partition by the
-        /// validated JWT "sub" (userId) claim so users sharing a public IP (e.g. mobile carrier CGNAT)
-        /// don't throttle each other. The claim comes from the validated token/principal only — never
-        /// from a client-supplied header, which would be trivially spoofable. Genuinely anonymous
-        /// requests fall back to IP-based partitioning.
-        /// </summary>
         internal static string ResolveIdentityPartitionKey(HttpContext context)
         {
             var user = context.User;
