@@ -35,4 +35,10 @@
     <ProjectReference Include="..\CareGuide.Security\CareGuide.Security.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Allows CareGuide.Tests to unit test internal endpoint handlers (e.g. AccountEndpoints)
+         directly, without standing up a WebApplicationFactory. -->
+    <InternalsVisibleTo Include="CareGuide.Tests" />
+  </ItemGroup>
+
 </Project>
