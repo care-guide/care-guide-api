@@ -43,9 +43,8 @@ namespace CareGuide.Core.Services
                 var createUserDto = _mapper.Map<CreateUserDto>(createAccount);
 
                 PersonDto person = await _personService.CreateAsync(createPersonDto, cancellationToken);
-                var createUserDtoWithPerson = createUserDto with { PersonId = person.Id };
 
-                UserDto user = await _userService.CreateAsync(person, createUserDtoWithPerson, cancellationToken);
+                UserDto user = await _userService.CreateAsync(person, createUserDto, cancellationToken);
 
                 var accessToken = _jwtService.GenerateToken(user.Id, person.Id, isAdmin: false);
                 var refreshToken = await _refreshTokenService.CreateAsync(user.Id, cancellationToken);

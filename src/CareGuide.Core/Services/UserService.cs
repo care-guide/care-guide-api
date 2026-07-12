@@ -55,6 +55,7 @@ namespace CareGuide.Core.Services
 
             var user = _mapper.Map<User>(createUser);
 
+            user.PersonId = person.Id;
             user.Password = PasswordManagerHelper.HashPassword(user.Password);
 
             await _userRepository.AddAsync(user, cancellationToken);

@@ -65,7 +65,7 @@ public class UserServiceTests
     public async Task CreateAsync_DuplicateEmail_ThrowsInvalidOperationException()
     {
         var personDto = new PersonDto(Guid.NewGuid(), "Test User", null, Models.Enums.Gender.F, DateOnly.FromDateTime(DateTime.Now.AddYears(-20)), DateTime.UtcNow, DateTime.UtcNow);
-        var createUserDto = new CreateUserDto(Guid.NewGuid(), personDto.Id, "existing@test.com", "Str0ng@Pass!");
+        var createUserDto = new CreateUserDto("existing@test.com", "Str0ng@Pass!");
         var existingUser = new User { PersonId = personDto.Id, Email = "existing@test.com", Password = "hash" };
 
         _repository.GetByEmailAsync(createUserDto.Email, Arg.Any<CancellationToken>()).Returns(existingUser);
@@ -80,7 +80,7 @@ public class UserServiceTests
     public async Task CreateAsync_WeakPassword_ThrowsInvalidOperationException()
     {
         var personDto = new PersonDto(Guid.NewGuid(), "Test User", null, Models.Enums.Gender.F, DateOnly.FromDateTime(DateTime.Now.AddYears(-20)), DateTime.UtcNow, DateTime.UtcNow);
-        var createUserDto = new CreateUserDto(Guid.NewGuid(), personDto.Id, "new@test.com", "weakpassword");
+        var createUserDto = new CreateUserDto("new@test.com", "weakpassword");
 
         _repository.GetByEmailAsync(createUserDto.Email, Arg.Any<CancellationToken>()).Returns((User?)null);
 
@@ -93,8 +93,8 @@ public class UserServiceTests
     public async Task CreateAsync_ValidData_HashesPasswordAndPersists()
     {
         var personDto = new PersonDto(Guid.NewGuid(), "Test User", null, Models.Enums.Gender.F, DateOnly.FromDateTime(DateTime.Now.AddYears(-20)), DateTime.UtcNow, DateTime.UtcNow);
-        var createUserDto = new CreateUserDto(Guid.NewGuid(), personDto.Id, "new@test.com", "Str0ng@Pass!");
-        var userEntity = new User { PersonId = personDto.Id, Email = "new@test.com", Password = "Str0ng@Pass!" };
+        var createUserDto = new CreateUserDto("new@test.com", "Str0ng@Pass!");
+        var userEntity = new User { PersonId = null, Email = "new@test.com", Password = "Str0ng@Pass!" };
         var expected = new UserDto(userEntity.Id, personDto.Id, "new@test.com", DateTime.UtcNow, DateTime.UtcNow);
 
         _repository.GetByEmailAsync(createUserDto.Email, Arg.Any<CancellationToken>()).Returns((User?)null);
@@ -105,6 +105,7 @@ public class UserServiceTests
         var result = await _sut.CreateAsync(personDto, createUserDto);
 
         userEntity.Password.Should().NotBe("Str0ng@Pass!", because: "password must be hashed before persisting");
+        userEntity.PersonId.Should().Be(personDto.Id, because: "the User must be linked to the server-generated Person id, not a client-supplied one");
         result.Should().Be(expected);
         await _repository.Received(1).AddAsync(userEntity, Arg.Any<CancellationToken>());
     }
