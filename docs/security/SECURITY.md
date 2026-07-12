@@ -3,7 +3,7 @@
 Overview of the Care Guide API security mechanisms. All referenced code lives in `CareGuide.Security`
 and `CareGuide.API` (middlewares, filters and helpers).
 
-See also: [LGPD.md](LGPD.md) · [CONFIGURATION.md](CONFIGURATION.md) · [API.md](API.md)
+See also: [LGPD.md](LGPD.md) · [CONFIGURATION.md](../getting-started/CONFIGURATION.md) · [API.md](../architecture/API.md)
 
 ---
 
@@ -106,13 +106,13 @@ In production (`Program.cs`): `UseHsts()` + `UseHttpsRedirection()`.
 
 Entities tied to the logged-in user implement `IPersonOwnedEntity` and are accessed through
 `IBasePersonOwnedRepository`, which restricts queries to the session's `PersonId`. This prevents a
-user from reading/editing another user's data. See [AGENTS.md](../AGENTS.md) → Repositories.
+user from reading/editing another user's data. See [AGENTS.md](../../AGENTS.md) → Repositories.
 
 ---
 
 ## 6. CORS
 
-Allowed origins configured in `CorsOrigins` (`appsettings`). See [CONFIGURATION.md](CONFIGURATION.md).
+Allowed origins configured in `CorsOrigins` (`appsettings`). See [CONFIGURATION.md](../getting-started/CONFIGURATION.md).
 
 The `CorsPolicy` (`Program.cs`) calls `AllowCredentials()` so the browser will send/receive the
 `HttpOnly` auth cookie on cross-origin requests from a web frontend (e.g. a future SPA). Per the
@@ -131,11 +131,11 @@ CORS pipeline entirely.
 
 The JWT `SecretKey` and the connection string **must not be versioned** with real values.
 In the repository these fields are empty; provide the values locally/in production via User Secrets,
-environment variables or a secrets vault. See [CONFIGURATION.md](CONFIGURATION.md) §Secrets.
+environment variables or a secrets vault. See [CONFIGURATION.md](../getting-started/CONFIGURATION.md) §Secrets.
 
 This is enforced, not just documented: a pre-commit hook and a CI step both scan tracked
 `appsettings*.json` files and fail (non-zero exit) if a secret field is populated. See
-[CONFIGURATION.md](CONFIGURATION.md) §"Enforced guard against committed secrets".
+[CONFIGURATION.md](../getting-started/CONFIGURATION.md) §"Enforced guard against committed secrets".
 
 ### Private R2 attachments
 
@@ -149,15 +149,15 @@ This is enforced, not just documented: a pre-commit hook and a CI step both scan
 - URLs, credentials, object keys and patient filenames must not appear in application logs or error bodies.
 - Cleanup and definitive deletion preserve referenced objects and expose partial failures for retry.
 
-Operational controls and credential rotation are documented in [R2_RUNBOOK.md](R2_RUNBOOK.md).
+Operational controls and credential rotation are documented in [R2_RUNBOOK.md](../operations/R2_RUNBOOK.md).
 
 ---
 
 ## 8. Reporting vulnerabilities
 
 Do not open a public issue for security flaws. Contact a maintainer directly
-(see [../README.md](../README.md) → Project Members).
+(see [../../README.md](../../README.md) → Project Members).
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)

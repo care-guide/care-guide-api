@@ -3,7 +3,7 @@
 This document explains how to create and apply migrations in the project using Entity Framework Core with PostgreSQL.
 
 > The commands below assume execution from the repository root. The connection string must be
-> configured — see [CONFIGURATION.md](CONFIGURATION.md).
+> configured — see [CONFIGURATION.md](../getting-started/CONFIGURATION.md).
 
 ## Prerequisite
 
@@ -43,7 +43,7 @@ dotnet run --project database/seeds/CareGuide.Seeds.csproj -- --env-file .env
 ```
 
 The seed is idempotent and intended only for local development. Account credentials and behavior are
-documented in [database/seeds/README.md](../database/seeds/README.md).
+documented in [database/seeds/README.md](../../database/seeds/README.md).
 
 ## Official Documentation
 
@@ -54,4 +54,4 @@ For more commands and options, see the official Entity Framework Core documentat
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)

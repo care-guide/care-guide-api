@@ -2,7 +2,7 @@
 
 Application settings, ports and secret management.
 
-See also: [EXECUTION.md](EXECUTION.md) · [SECURITY.md](SECURITY.md)
+See also: [EXECUTION.md](EXECUTION.md) · [SECURITY.md](../security/SECURITY.md)
 
 ---
 
@@ -17,7 +17,7 @@ See also: [EXECUTION.md](EXECUTION.md) · [SECURITY.md](SECURITY.md)
 
 The development seed runner also reads the root `.env`. Because it runs on the host rather than inside
 the Docker network, it connects to `localhost` using `DB_EXTERNAL_PORT`, plus `DB_NAME`, `DB_USER` and
-`DB_PASSWORD`. See [database/seeds/README.md](../database/seeds/README.md).
+`DB_PASSWORD`. See [database/seeds/README.md](../../database/seeds/README.md).
 
 ## Configuration keys
 
@@ -76,7 +76,7 @@ server-to-server calls) are not subject to CORS and are unaffected by this setti
 
 Docker Compose reads the `STORAGE_R2_*` placeholders from the gitignored root `.env` and maps them to
 .NET's `Storage__R2__*` environment variables. Direct `dotnet run` does not load `.env`; use User Secrets.
-Production must inject the same keys from its secret manager. See [FILE_STORAGE.md](FILE_STORAGE.md).
+Production must inject the same keys from its secret manager. See [FILE_STORAGE.md](../architecture/FILE_STORAGE.md).
 
 ## Ports
 
@@ -154,4 +154,4 @@ dotnet user-secrets set "SecuritySettings:SecretKey" "<value>" --project src/Car
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)

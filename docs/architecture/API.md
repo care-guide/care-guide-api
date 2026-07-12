@@ -1,7 +1,7 @@
 # API Conventions
 
-HTTP contract standards of the Care Guide API. For authentication and security, see [SECURITY.md](SECURITY.md);
-to create endpoints, see [AGENTS.md](../AGENTS.md) → Endpoints.
+HTTP contract standards of the Care Guide API. For authentication and security, see [SECURITY.md](../security/SECURITY.md);
+to create endpoints, see [AGENTS.md](../../AGENTS.md) → Endpoints.
 
 ---
 
@@ -27,7 +27,7 @@ and account deletion require authentication.
   `Authorization: Bearer <token>` header. When both are present, the header takes precedence.
 - The `/api/v1` group requires authentication (`RequireAuthorization`).
 - Anonymous endpoints are marked with `AllowAnonymous` (e.g. create account, login, refresh).
-- Token and cookie details in [SECURITY.md](SECURITY.md).
+- Token and cookie details in [SECURITY.md](../security/SECURITY.md).
 
 By default, successful create/login/refresh return account profile fields (`id`, `email`, `name`,
 `gender`, `birthday`) as `AccountResponseDto` in the JSON body. Access and refresh tokens are written to
@@ -39,7 +39,7 @@ and `POST /accounts/refresh`. When present, the body is `AccountTokenResponseDto
 fields plus `sessionToken` and `refreshToken`. Cookies are still set regardless of the header. Without
 the header, behavior for browsers is completely unchanged. `POST /accounts/refresh` reads the refresh
 token from the `refreshToken` cookie for browsers, or from the request body for native clients (no
-cookie required in that case). See [SECURITY.md](SECURITY.md) → Authentication for the full mechanism.
+cookie required in that case). See [SECURITY.md](../security/SECURITY.md) → Authentication for the full mechanism.
 
 ## Error format — RFC 9457 (ProblemDetails)
 
@@ -79,7 +79,7 @@ Exception → status mapping (`ErrorHandlerMiddleware`):
 
 ## Rate limiting
 
-429 (`Too many requests`) with a `Retry-After` header. Limits in [SECURITY.md](SECURITY.md) §3.
+429 (`Too many requests`) with a `Retry-After` header. Limits in [SECURITY.md](../security/SECURITY.md) §3.
 
 ## Pagination
 
@@ -123,7 +123,7 @@ Every collection endpoint returns the same envelope, `PagedResult<T>`
 ## Validation
 
 Automatic via `ValidationFilterFactory` — do not call the validator manually in the endpoint.
-Every input DTO has a matching validator. See [AGENTS.md](../AGENTS.md) → Validators.
+Every input DTO has a matching validator. See [AGENTS.md](../../AGENTS.md) → Validators.
 
 ## Direct-upload integrity
 
@@ -163,4 +163,4 @@ modify their query parameters, or reuse a PUT URL for GET (and vice versa).
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)

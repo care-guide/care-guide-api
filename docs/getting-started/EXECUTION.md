@@ -48,7 +48,7 @@
    ```
 
    If the design-time factory does not receive your local connection string, pass it explicitly with
-   `--connection`. See [MIGRATIONS.md](MIGRATIONS.md) and [CONFIGURATION.md](CONFIGURATION.md).
+   `--connection`. See [MIGRATIONS.md](../development/MIGRATIONS.md) and [CONFIGURATION.md](CONFIGURATION.md).
 
 6. **Populate development data (optional):**
 
@@ -57,7 +57,7 @@
    ```
 
    This creates complete, isolated datasets for a normal user and an administrator. See the
-   [development seed guide](../database/seeds/README.md) for credentials and rerun behavior.
+   [development seed guide](../../database/seeds/README.md) for credentials and rerun behavior.
 
 ### Important Information
 
@@ -98,4 +98,4 @@
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)

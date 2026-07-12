@@ -4,8 +4,8 @@ Care Guide stores health-related attachments in a **private** Cloudflare R2 buck
 each operation and returns short-lived S3-compatible pre-signed URLs; credentials, bucket names and
 storage keys are never returned to clients.
 
-See also: [CONFIGURATION.md](CONFIGURATION.md) · [API.md](API.md) · [SECURITY.md](SECURITY.md) ·
-[R2_RUNBOOK.md](R2_RUNBOOK.md)
+See also: [CONFIGURATION.md](../getting-started/CONFIGURATION.md) · [API.md](API.md) · [SECURITY.md](../security/SECURITY.md) ·
+[R2_RUNBOOK.md](../operations/R2_RUNBOOK.md)
 
 ## Development setup
 
@@ -115,7 +115,7 @@ Errors use the standard `application/problem+json` format documented in [API.md]
 - Confirm contractual, residency, retention and deletion requirements with legal/privacy stakeholders.
 - Test backup and incident-response procedures without copying production health data into development.
 
-Using R2 does **not** make the system automatically compliant with LGPD. See [LGPD.md](LGPD.md).
+Using R2 does **not** make the system automatically compliant with LGPD. See [LGPD.md](../security/LGPD.md).
 
 ## Cloudflare references
 

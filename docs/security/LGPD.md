@@ -9,7 +9,7 @@
 > Items marked as _pending_ represent measures not yet implemented and must be addressed before any
 > production use with real data.
 
-See also: [AGENTS.md](../AGENTS.md) · [SECURITY.md](SECURITY.md) · [STRUCTURE.md](STRUCTURE.md)
+See also: [AGENTS.md](../../AGENTS.md) · [SECURITY.md](SECURITY.md) · [STRUCTURE.md](../architecture/STRUCTURE.md)
 
 ---
 
@@ -161,4 +161,4 @@ Inventory and document every external service that processes personal data (art.
 
 ---
 
-[Documentation index](README.md) · [Project README](../README.md)
+[Documentation index](../README.md) · [Project README](../../README.md)
