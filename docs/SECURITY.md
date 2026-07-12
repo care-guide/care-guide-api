@@ -122,6 +122,10 @@ The JWT `SecretKey` and the connection string **must not be versioned** with rea
 In the repository these fields are empty; provide the values locally/in production via User Secrets,
 environment variables or a secrets vault. See [CONFIGURATION.md](CONFIGURATION.md) §Secrets.
 
+This is enforced, not just documented: a pre-commit hook and a CI step both scan tracked
+`appsettings*.json` files and fail (non-zero exit) if a secret field is populated. See
+[CONFIGURATION.md](CONFIGURATION.md) §"Enforced guard against committed secrets".
+
 ### Private R2 attachments
 
 - The R2 bucket remains private; no public bucket URL or public custom domain is part of the design.
