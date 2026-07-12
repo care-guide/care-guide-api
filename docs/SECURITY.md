@@ -72,7 +72,7 @@ Implemented in `PasswordManagerHelper`.
 
 | Policy | Target | Limit |
 | ------ | ------ | ----- |
-| `general` | Versioned API endpoints under `/api/v1` | 60 req/min per IP (sliding window) |
+| `general` | Versioned API endpoints under `/api/v1` | 60 req/min per authenticated user (sliding window); falls back to per-IP for anonymous requests |
 | `auth` | `/api/v1/accounts` create, login and refresh | 5 req/min per IP (fixed window) — anti brute-force |
 
 Account endpoints are registered under `/api/v1/accounts`. Create, login and refresh are anonymous
@@ -80,8 +80,13 @@ and explicitly use the stricter `auth` policy; protected account endpoints remai
 API group and require authentication. The endpoint-specific `auth` policy is the intended limiter for
 those three authentication routes.
 
+The `general` policy partitions authenticated traffic by the validated JWT `sub` (userId) claim rather
+than IP, so users sharing a public IP (e.g. mobile carrier CGNAT) do not throttle each other. The
+partition key is never taken from a client-supplied header. Genuinely anonymous requests to `general`
+endpoints, and all `auth`-policy requests, still partition by IP, resolved considering
+`X-Forwarded-For` (behind a proxy) — preserving brute-force protection on the authentication routes.
+
 Response when exceeded: **HTTP 429** with `Retry-After` and an `application/problem+json` body.
-The IP is resolved considering `X-Forwarded-For` (behind a proxy).
 
 ---
 
