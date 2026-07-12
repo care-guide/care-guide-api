@@ -88,7 +88,7 @@ public class CreateAccountDtoValidatorTests
     [Fact(DisplayName = "Future birthday fails validation")]
     public void FutureBirthday_FailsValidation()
     {
-        var dto = Valid() with { Birthday = DateOnly.FromDateTime(DateTime.Now.AddDays(1)) };
+        var dto = Valid() with { Birthday = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)) };
 
         var result = _validator.Validate(dto);
 
@@ -99,7 +99,7 @@ public class CreateAccountDtoValidatorTests
     [Fact(DisplayName = "Today birthday passes validation")]
     public void TodayBirthday_PassesValidation()
     {
-        var dto = Valid() with { Birthday = DateOnly.FromDateTime(DateTime.Now) };
+        var dto = Valid() with { Birthday = DateOnly.FromDateTime(DateTime.UtcNow) };
 
         var result = _validator.Validate(dto);
 

@@ -48,7 +48,7 @@ public class PersonDiseaseDtoValidatorTests
     [Fact(DisplayName = "Create: future diagnosis date fails validation")]
     public void Create_FutureDiagnosisDate_Fails()
     {
-        var dto = new CreatePersonDiseaseDto("Diabetes", DateOnly.FromDateTime(DateTime.Now.AddDays(1)), DiseaseType.Chronic);
+        var dto = new CreatePersonDiseaseDto("Diabetes", DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)), DiseaseType.Chronic);
         var result = _createValidator.Validate(dto);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "DiagnosisDate");
@@ -84,7 +84,7 @@ public class PersonDiseaseDtoValidatorTests
     [Fact(DisplayName = "Update: future diagnosis date fails validation")]
     public void Update_FutureDiagnosisDate_Fails()
     {
-        var dto = new UpdatePersonDiseaseDto(Guid.NewGuid(), "Diabetes", DateOnly.FromDateTime(DateTime.Now.AddDays(1)), DiseaseType.Chronic);
+        var dto = new UpdatePersonDiseaseDto(Guid.NewGuid(), "Diabetes", DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)), DiseaseType.Chronic);
         var result = _updateValidator.Validate(dto);
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(e => e.PropertyName == "DiagnosisDate");
