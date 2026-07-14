@@ -1,4 +1,20 @@
 services:
+  frontend:
+    build:
+      context: ../care-guide-app
+      dockerfile: Dockerfile
+      args:
+        API_URL: ${FRONTEND_API_URL:-http://localhost:8080/api/v1}
+        API_TIMEOUT_MS: ${FRONTEND_API_TIMEOUT_MS:-15000}
+    container_name: careguide_frontend
+    restart: unless-stopped
+    ports:
+      - '${FRONTEND_PORT:-3000}:80'
+    depends_on:
+      - api
+    networks:
+      - care-guide-api-network
+
   api:
     build:
       context: .
@@ -10,6 +26,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
+      CorsOrigins__0: ${FRONTEND_ORIGIN:-http://localhost:3000}
       ConnectionStrings__DatabaseConnection: Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
       Storage__R2__Endpoint: ${STORAGE_R2_ENDPOINT}
       Storage__R2__AccountId: ${STORAGE_R2_ACCOUNT_ID}

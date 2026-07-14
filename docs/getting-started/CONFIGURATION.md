@@ -83,6 +83,7 @@ Production must inject the same keys from its secret manager. See [FILE_STORAGE.
 | Service | Port | Context |
 | ------- | ---- | ------- |
 | API (Docker) | `8080` | `docker-compose` |
+| Flutter Web (Docker) | `3000` | `docker-compose` |
 | PostgreSQL (Docker) | `5434` | `docker-compose` |
 | PostgreSQL test database (Docker) | `5435` | `docker-compose` |
 | API (IIS Express) | `5000` | local via Visual Studio (see `launchSettings.json`) |
