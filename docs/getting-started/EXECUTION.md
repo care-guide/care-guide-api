@@ -16,7 +16,9 @@
    ```
 
 2. **Check the configuration files:**  
-   Make sure the `Dockerfile` and `docker-compose.yml` files are present at the project root.
+   Make sure the `Dockerfile` and `docker-compose.yml` files are present at the project root. To
+   run the Flutter Web frontend too, clone `care-guide-app` beside this repository; the Compose
+   build context expects `../care-guide-app`.
 
 3. **Create the `.env` file:**  
    `docker-compose` reads database credentials and ports from a `.env` file at the
@@ -62,8 +64,9 @@
 ### Important Information
 
 - The API will be available at: [http://localhost:8080](http://localhost:8080)
+- The Flutter Web app will be available at: [http://localhost:3000](http://localhost:3000)
 - The PostgreSQL database uses port `5434`.
-- Make sure ports `8080` and `5434` are free before starting the project.
+- Make sure ports `3000`, `8080`, and `5434` are free before starting the project.
 
 ### Useful Commands
 
